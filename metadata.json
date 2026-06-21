@@ -1,0 +1,6 @@
+{
+  "name": "CarePulse",
+  "description": "A highly polished, secure e-health medical appointment scheduling and coordination application with persistent credentials and automated email notifications.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

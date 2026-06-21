@@ -1,0 +1,3 @@
+# Ignore patient upload documents in codebase tracking
+*
+!.gitignore
