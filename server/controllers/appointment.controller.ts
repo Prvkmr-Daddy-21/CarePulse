@@ -1,6 +1,7 @@
 import { Response, NextFunction } from "express";
 import { AppointmentService } from "../services/appointment.service";
 import { AuthenticatedRequest } from "../middleware/auth.middleware";
+import { db } from "../db/db";
 
 export class AppointmentController {
   static async bookAppointment(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
@@ -12,14 +13,44 @@ export class AppointmentController {
     }
   }
 
+  static async getAvailableSlots(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { doctor, date } = req.query;
+      if (!doctor || !date) {
+        res.status(400).json({ error: "doctor and date parameters are required" });
+        return;
+      }
+
+      const slots = await AppointmentService.getAvailableSlots(doctor as string, date as string);
+      res.status(200).json({ success: true, availableSlots: slots });
+    } catch (err) {
+      next(err);
+    }
+  }
+
   static async getAppointments(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
       const { search, status, doctor } = req.query;
 
+      let doctorIdFilter: string | undefined = undefined;
+      let doctorNameFilter: string | undefined = doctor as string;
+
+      if (req.user?.role === "doctor") {
+        const doctorProfile = await db.doctors.findOne({ email: req.user.email });
+        if (doctorProfile) {
+          doctorIdFilter = doctorProfile._id.toString();
+          doctorNameFilter = doctorProfile.name; // Fallback for old records
+        } else {
+          res.status(403).json({ error: "Doctor profile not found" });
+          return;
+        }
+      }
+
       const list = await AppointmentService.getAppointments({
         search: search as string,
         status: status as string,
-        doctor: doctor as string,
+        doctor: doctorNameFilter,
+        doctorId: doctorIdFilter,
       });
 
       res.status(200).json({ success: true, appointments: list });
@@ -47,12 +78,12 @@ export class AppointmentController {
       const { action } = req.query; // "schedule" or "cancel"
       const { note, cancellationReason } = req.body;
 
-      if (action !== "schedule" && action !== "cancel") {
-        res.status(400).json({ error: "Invalid action type. Must be 'schedule' or 'cancel'" });
+      if (action !== "schedule" && action !== "cancel" && action !== "complete") {
+        res.status(400).json({ error: "Invalid action type. Must be 'schedule', 'cancel', or 'complete'" });
         return;
       }
 
-      const updated = await AppointmentService.updateAppointmentStatus(id, action, {
+      const updated = await AppointmentService.updateAppointmentStatus(id, action as "schedule" | "cancel" | "complete", {
         note,
         cancellationReason,
       });

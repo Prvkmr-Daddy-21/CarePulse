@@ -58,9 +58,10 @@ const AppointmentSchema = new Schema<IAppointment>({
   patientName: { type: String, required: true, index: true },
   patientPhone: { type: String, required: true },
   primaryPhysician: { type: Schema.Types.Mixed, required: true, index: true }, // allow name or ObjectId
+  doctorId: { type: String, index: true },
   schedule: { type: Date, required: true, index: true },
   reason: { type: String, required: true },
-  status: { type: String, enum: ["pending", "scheduled", "cancelled"], default: "pending", index: true },
+  status: { type: String, enum: ["pending", "scheduled", "cancelled", "completed"], default: "pending", index: true },
   note: { type: String },
   cancellationReason: { type: String },
 }, { timestamps: true });

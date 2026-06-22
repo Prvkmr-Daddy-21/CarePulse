@@ -4,6 +4,13 @@ import { authMiddleware, authorizeRoles } from "../middleware/auth.middleware";
 
 const router = Router();
 
+// Retrieve available slots (Patients need access to this)
+router.get(
+  "/available-slots",
+  authMiddleware,
+  AppointmentController.getAvailableSlots
+);
+
 // Retrieve appointments list (Admin/Doctor authorized)
 router.get(
   "/",

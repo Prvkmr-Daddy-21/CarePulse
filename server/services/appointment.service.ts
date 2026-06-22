@@ -7,9 +7,54 @@ export interface IAppointmentFilters {
   search?: string;
   status?: string;
   doctor?: string;
+  doctorId?: string;
 }
 
+export const APPOINTMENT_SLOT_DURATION = 60;
+
 export class AppointmentService {
+  static async getAvailableSlots(doctor: string, date: string): Promise<string[]> {
+    const targetDate = new Date(date);
+    targetDate.setHours(0, 0, 0, 0);
+
+    const doctorProfile = await db.doctors.findOne({ name: doctor });
+    const doctorId = doctorProfile ? doctorProfile._id : undefined;
+
+    const allAppointments = await db.appointments.find();
+    const bookedSlots = allAppointments
+      .filter((a) => {
+        const aDate = new Date(a.schedule);
+        return (
+          (a.status === "pending" || a.status === "scheduled" || a.status === "completed") &&
+          aDate.getFullYear() === targetDate.getFullYear() &&
+          aDate.getMonth() === targetDate.getMonth() &&
+          aDate.getDate() === targetDate.getDate() &&
+          (a.primaryPhysician === doctor || (doctorId && a.doctorId === doctorId))
+        );
+      })
+      .map((a) => new Date(a.schedule).getHours());
+
+    const availableSlots: string[] = [];
+    const now = new Date();
+    
+    for (let i = 9; i < 21; i++) {
+      // Don't show slots in the past for today
+      if (
+        targetDate.getFullYear() === now.getFullYear() &&
+        targetDate.getMonth() === now.getMonth() &&
+        targetDate.getDate() === now.getDate() &&
+        i <= now.getHours()
+      ) {
+        continue;
+      }
+      
+      if (!bookedSlots.includes(i)) {
+        availableSlots.push(`${i.toString().padStart(2, "0")}:00`);
+      }
+    }
+    return availableSlots;
+  }
+
   static async bookAppointment(inputData: any): Promise<IAppointment> {
     const validatedData = appointmentSchema.parse(inputData);
 
@@ -33,6 +78,28 @@ export class AppointmentService {
       };
     }
 
+    const hour = appointmentDate.getHours();
+    if (hour < 9 || hour >= 21) {
+      throw {
+        status: 400,
+        message: "Appointments can only be booked between 9:00 AM and 9:00 PM.",
+      };
+    }
+
+    const doctorProfile = await db.doctors.findOne({ name: validatedData.primaryPhysician });
+    const doctorId = doctorProfile ? doctorProfile._id : undefined;
+
+    const existingAppointments = await db.appointments.find();
+    const isBooked = existingAppointments.some(a => 
+      (a.status === "pending" || a.status === "scheduled" || a.status === "completed") &&
+      new Date(a.schedule).getTime() === appointmentDate.getTime() &&
+      (a.primaryPhysician === validatedData.primaryPhysician || (doctorId && a.doctorId === doctorId))
+    );
+
+    if (isBooked) {
+      throw { status: 400, message: "This appointment slot is already booked." };
+    }
+
     const patient = await db.patients.findById(validatedData.patientId);
     if (!patient) {
       throw { status: 404, message: "Patient profile not found for booking" };
@@ -43,6 +110,7 @@ export class AppointmentService {
       patientName: patient.name,
       patientPhone: patient.phone,
       primaryPhysician: validatedData.primaryPhysician,
+      doctorId: doctorId,
       schedule: validatedData.schedule,
       reason: validatedData.reason,
       status: validatedData.status || "pending",
@@ -74,7 +142,9 @@ export class AppointmentService {
       list = list.filter(a => a.status === filters.status);
     }
 
-    if (filters.doctor && filters.doctor !== "all") {
+    if (filters.doctorId) {
+      list = list.filter(a => a.doctorId === filters.doctorId || a.primaryPhysician === filters.doctor);
+    } else if (filters.doctor && filters.doctor !== "all") {
       list = list.filter(a => a.primaryPhysician.toLowerCase().includes(filters.doctor!.toLowerCase()));
     }
 
@@ -93,7 +163,7 @@ export class AppointmentService {
 
   static async updateAppointmentStatus(
     id: string,
-    action: "schedule" | "cancel",
+    action: "schedule" | "cancel" | "complete",
     data: { note?: string; cancellationReason?: string }
   ): Promise<IAppointment> {
     const appointment = await db.appointments.findById(id);
@@ -102,13 +172,17 @@ export class AppointmentService {
     }
 
     const updatePayload: Partial<IAppointment> = {};
-    let notificationType: "confirmed" | "cancelled";
+    let notificationType: "confirmed" | "cancelled" | "completed";
 
     if (action === "schedule") {
       updatePayload.status = "scheduled";
       updatePayload.note = data.note || "";
       updatePayload.cancellationReason = "";
       notificationType = "confirmed";
+    } else if (action === "complete") {
+      updatePayload.status = "completed";
+      updatePayload.note = data.note || "";
+      notificationType = "completed";
     } else {
       updatePayload.status = "cancelled";
       updatePayload.cancellationReason = data.cancellationReason || "No rationale provided by hospital management.";
@@ -169,9 +243,29 @@ export class AppointmentService {
       };
     }
 
+    const hour = appointmentDate.getHours();
+    if (hour < 9 || hour >= 21) {
+      throw {
+        status: 400,
+        message: "Appointments can only be booked between 9:00 AM and 9:00 PM.",
+      };
+    }
+
     const appointment = await db.appointments.findById(id);
     if (!appointment) {
       throw { status: 404, message: "Appointment record not found" };
+    }
+
+    const existingAppointments = await db.appointments.find();
+    const isBooked = existingAppointments.some(a => 
+      a._id !== id &&
+      (a.status === "pending" || a.status === "scheduled" || a.status === "completed") &&
+      new Date(a.schedule).getTime() === appointmentDate.getTime() &&
+      (a.primaryPhysician === appointment.primaryPhysician || (a.doctorId && a.doctorId === appointment.doctorId))
+    );
+
+    if (isBooked) {
+      throw { status: 400, message: "This appointment slot is already booked." };
     }
 
     const updatePayload: Partial<IAppointment> = {

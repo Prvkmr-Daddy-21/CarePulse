@@ -98,7 +98,7 @@ export class AuthService {
       },
       JWT_SECRET,
       {
-        expiresIn: process.env.JWT_EXPIRES_IN || "1h",
+        expiresIn: (process.env.JWT_EXPIRES_IN || "1h") as any,
       }
     );
   }

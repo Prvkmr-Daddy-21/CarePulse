@@ -7,9 +7,10 @@ import { DashboardView } from "./components/DashboardView";
 import { PatientProfileView } from "./components/PatientProfileView";
 import { ForgotPasswordView } from "./components/ForgotPasswordView";
 import { ResetPasswordView } from "./components/ResetPasswordView";
+import { DoctorDashboardView } from "./components/DoctorDashboardView";
 import { api, IUser, IPatient } from "./services/api";
 
-type ViewState = "landing" | "login" | "register" | "book" | "profile" | "admin" | "forgot-password" | "reset-password";
+type ViewState = "landing" | "login" | "register" | "book" | "profile" | "admin" | "doctor" | "forgot-password" | "reset-password";
 
 export default function App() {
   const [currentView, setCurrentView] = useState<ViewState>("landing");
@@ -50,8 +51,10 @@ export default function App() {
             } catch {
               setCurrentView("register");
             }
-          } else if (userObj.role === "admin" || userObj.role === "doctor") {
+          } else if (userObj.role === "admin") {
             setCurrentView("admin");
+          } else if (userObj.role === "doctor") {
+            setCurrentView("doctor");
           }
         }
       } catch (err) {
@@ -97,6 +100,8 @@ export default function App() {
       } catch {
         setCurrentView("register");
       }
+    } else if (user.role === "doctor") {
+      setCurrentView("doctor");
     } else {
       setCurrentView("admin");
     }
@@ -172,6 +177,14 @@ export default function App() {
 
       {currentView === "admin" && (
         <DashboardView
+          onNavigate={handleNavigate}
+          currentUser={currentUser}
+          onLogout={handleLogout}
+        />
+      )}
+
+      {currentView === "doctor" && (
+        <DoctorDashboardView
           onNavigate={handleNavigate}
           currentUser={currentUser}
           onLogout={handleLogout}

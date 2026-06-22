@@ -17,13 +17,13 @@ import {
 } from "lucide-react";
 import { api, IAppointment } from "../services/api";
 
-interface DashboardViewProps {
-  onNavigate: (view: "landing" | "login" | "register" | "book" | "profile" | "admin") => void;
+interface DoctorDashboardViewProps {
+  onNavigate: (view: "landing" | "login" | "register" | "book" | "profile" | "admin" | "doctor") => void;
   currentUser: any;
   onLogout: () => void;
 }
 
-export const DashboardView: React.FC<DashboardViewProps> = ({
+export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
   onNavigate,
   currentUser,
   onLogout
@@ -39,7 +39,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
   // Scheduling Modal State
   const [actionTarget, setActionTarget] = useState<IAppointment | null>(null);
-  const [actionType, setActionType] = useState<"schedule" | "cancel" | null>(null);
+  const [actionType, setActionType] = useState<"schedule" | "cancel" | "complete" | null>(null);
   const [note, setNote] = useState("");
   const [cancellationReason, setCancellationReason] = useState("");
   const [isActionSubmitting, setIsActionSubmitting] = useState(false);
@@ -99,7 +99,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     loadData();
   };
 
-  const handleActionClick = (apt: IAppointment, action: "schedule" | "cancel") => {
+  const handleActionClick = (apt: IAppointment, action: "schedule" | "cancel" | "complete") => {
     setActionTarget(apt);
     setActionType(action);
     setNote(apt.note || "");
@@ -161,7 +161,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
   // Compile system statistics
   const scheduledCount = appointments.filter(a => a.status === "scheduled").length;
-  const pendingCount = appointments.filter(a => a.status === "pending").length;
   const completedCount = appointments.filter(a => a.status === "completed").length;
   const cancelledCount = appointments.filter(a => a.status === "cancelled").length;
 
@@ -206,7 +205,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       <main className="max-w-7xl mx-auto w-full px-6 py-8 space-y-8 relative z-20 flex-grow">
 
         {/* Statistics highlights bar */}
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4" id="stats-banner-cards">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4" id="stats-banner-cards">
           {/* Scheduled */}
           <div className="bg-dark-200 border border-dark-300 rounded-2xl p-5 flex items-center gap-4 shadow-xl">
             <div className="p-3 bg-brand-green/10 text-brand-green rounded-xl border border-brand-green/15">
@@ -218,20 +217,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
           </div>
 
-          {/* Pending */}
-          <div className="bg-dark-200 border border-dark-300 rounded-2xl p-5 flex items-center gap-4 shadow-xl">
-            <div className="p-3 bg-brand-orange/10 text-brand-orange rounded-xl border border-brand-orange/15 animate-pulse">
-              <Clock className="w-6 h-6" />
-            </div>
-            <div>
-              <span className="block text-2xl font-black text-white leading-none">{pendingCount}</span>
-              <span className="text-[10px] text-dark-500 uppercase tracking-widest font-bold">Pending Validation</span>
-            </div>
-          </div>
-
           {/* Completed */}
           <div className="bg-dark-200 border border-dark-300 rounded-2xl p-5 flex items-center gap-4 shadow-xl">
-            <div className="p-3 bg-cyan-500/10 text-cyan-400 rounded-xl border border-cyan-500/15">
+            <div className="p-3 bg-cyan-500/10 text-cyan-400 rounded-xl border border-cyan-500/15 animate-pulse">
               <CheckCircle className="w-6 h-6" />
             </div>
             <div>
@@ -403,8 +391,17 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
                       {/* Actions */}
                       <td className="py-3.5 px-5 text-right">
-                        {apt.status === "pending" ? (
+                        {apt.status === "pending" || apt.status === "scheduled" ? (
                           <div className="flex items-center justify-end gap-1.5">
+                            {apt.status === "scheduled" && (
+                              <button
+                                onClick={() => handleActionClick(apt, "complete")}
+                                className="px-2.5 py-1.5 bg-brand-green/10 border border-brand-green/20 text-brand-green hover:bg-brand-green/15 text-[10px] uppercase font-black tracking-wider rounded-lg cursor-pointer transition-all"
+                              >
+                                Complete
+                              </button>
+                            )}
+
                             <button
                               onClick={() => {
                                 handleActionClick(apt, "schedule");
@@ -449,11 +446,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           >
             <div className="border-b border-dark-300 pb-4">
               <h3 className="text-lg font-black text-neutral-100 flex items-center gap-2">
-                {actionType === "schedule" ? <CheckCircle className="text-brand-green w-5 h-5" /> : <XOctagon className="text-brand-red w-5 h-5" />}
+                {actionType === "schedule" || actionType === "complete" ? <CheckCircle className="text-brand-green w-5 h-5" /> : <XOctagon className="text-brand-red w-5 h-5" />}
                 <span>
                   {actionType === "schedule"
                     ? "Reschedule Appointment"
-                    : "Submit Cancellation Notice"}
+                    : actionType === "complete" ? "Complete Appointment" : "Submit Cancellation Notice"}
                 </span>
               </h3>
               <p className="text-xs text-slate-100 mt-1">
@@ -511,6 +508,19 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   id="modal-note-textarea"
                 />
               </div>
+            ) : actionType === "complete" ? (
+              <div className="space-y-2">
+                <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Specialist Completion Notes</label>
+                <textarea
+                  required
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  placeholder="e.g. Patient successfully examined. Prescribed XYZ for 5 days."
+                  rows={4}
+                  className="w-full bg-dark-100 border border-dark-300 rounded-xl py-3 px-4 text-xs text-white focus:outline-none focus:border-brand-green transition-all resize-none"
+                  id="modal-complete-note-textarea"
+                />
+              </div>
             ) : (
               <div className="space-y-2">
                 <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Cancellation Reasoning Statement</label>
@@ -558,8 +568,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   </>
                 ) : (
                   <>
-                    {actionType === "schedule" ? <FileCheck className="w-4 h-4" /> : <FileText className="w-4 h-4" />}
-                    <span>{actionType === "schedule" ? "Confirm & Schedule" : "Submit Cancellation"}</span>
+                    {actionType === "schedule" || actionType === "complete" ? <FileCheck className="w-4 h-4" /> : <FileText className="w-4 h-4" />}
+                    <span>{actionType === "schedule" ? "Confirm & Schedule" : actionType === "complete" ? "Complete Appointment" : "Submit Cancellation"}</span>
                   </>
                 )}
               </button>
@@ -570,4 +580,4 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     </div>
   );
 };
-export default DashboardView;
+export default DoctorDashboardView;

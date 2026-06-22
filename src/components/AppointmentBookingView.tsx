@@ -29,7 +29,10 @@ export const AppointmentBookingView: React.FC<AppointmentBookingViewProps> = ({
 
   // Form parameters
   const [primaryPhysician, setPrimaryPhysician] = useState("");
-  const [schedule, setSchedule] = useState("");
+  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedSlot, setSelectedSlot] = useState("");
+  const [availableSlots, setAvailableSlots] = useState<string[]>([]);
+  const [isLoadingSlots, setIsLoadingSlots] = useState(false);
   const [reason, setReason] = useState("");
   const [note, setNote] = useState("");
 
@@ -67,6 +70,28 @@ export const AppointmentBookingView: React.FC<AppointmentBookingViewProps> = ({
     loadResources();
   }, []);
 
+  useEffect(() => {
+    async function fetchSlots() {
+      if (!primaryPhysician || !selectedDate) {
+        setAvailableSlots([]);
+        return;
+      }
+      try {
+        setIsLoadingSlots(true);
+        const res = await api.appointments.getAvailableSlots(primaryPhysician, selectedDate);
+        if (res.success) {
+          setAvailableSlots(res.availableSlots);
+        }
+      } catch {
+        setAvailableSlots([]);
+      } finally {
+        setIsLoadingSlots(false);
+      }
+    }
+    fetchSlots();
+    setSelectedSlot(""); // reset selected slot on date/doctor change
+  }, [primaryPhysician, selectedDate]);
+
   const handleBooking = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -75,7 +100,7 @@ export const AppointmentBookingView: React.FC<AppointmentBookingViewProps> = ({
     // Validate inputs
     const errors: Record<string, string> = {};
     if (!primaryPhysician) errors.primaryPhysician = "Consultant is required";
-    if (!schedule) errors.schedule = "Date and time slot is required";
+    if (!selectedDate || !selectedSlot) errors.schedule = "Date and time slot is required";
     if (!reason || reason.trim().length < 5) errors.reason = "Appointment reason must be at least 5 characters";
 
     if (Object.keys(errors).length > 0) {
@@ -93,7 +118,7 @@ export const AppointmentBookingView: React.FC<AppointmentBookingViewProps> = ({
       const payload = {
         patientId: currentProfileId(),
         primaryPhysician,
-        schedule: new Date(schedule),
+        schedule: new Date(`${selectedDate}T${selectedSlot}:00`),
         reason,
         note,
         status: "pending"
@@ -138,7 +163,7 @@ export const AppointmentBookingView: React.FC<AppointmentBookingViewProps> = ({
             </div>
             <div>
               <span className="block text-[10px] text-dark-500 uppercase font-bold tracking-wide">SLOT REQUEST</span>
-              <span className="font-extrabold text-white">{new Date(schedule).toLocaleString("en-IN", {
+              <span className="font-extrabold text-white">{new Date(`${selectedDate}T${selectedSlot}:00`).toLocaleString("en-IN", {
                 day: "2-digit",
                 month: "short",
                 year: "numeric",
@@ -159,7 +184,8 @@ export const AppointmentBookingView: React.FC<AppointmentBookingViewProps> = ({
             <button
               onClick={() => {
                 setSuccess(false);
-                setSchedule("");
+                setSelectedDate("");
+                setSelectedSlot("");
                 setReason("");
                 setNote("");
               }}
@@ -248,16 +274,16 @@ export const AppointmentBookingView: React.FC<AppointmentBookingViewProps> = ({
             <div>
               <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest mb-1.5">Preferred Slot (Date & Time)</label>
               <input
-                type="datetime-local"
+                type="date"
                 required
-                value={schedule}
-                onChange={(e) => setSchedule(e.target.value)}
+                value={selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value)}
                 min={(() => {
                   const now = new Date();
                   const offset = now.getTimezoneOffset();
                   return new Date(now.getTime() - offset * 60000)
                     .toISOString()
-                    .slice(0, 16);
+                    .split('T')[0];
                 })()}
 
                 max={(() => {
@@ -267,17 +293,38 @@ export const AppointmentBookingView: React.FC<AppointmentBookingViewProps> = ({
                   const offset = d.getTimezoneOffset();
                   return new Date(d.getTime() - offset * 60000)
                     .toISOString()
-                    .slice(0, 16);
+                    .split('T')[0];
                 })()}
-                className="w-full bg-dark-100 border border-dark-300 rounded-xl py-3 px-4 text-xs text-white focus:outline-none focus:border-brand-green transition-all"
-                id="book-input-time"
+                className="w-full bg-dark-100 border border-dark-300 rounded-xl py-3 px-4 text-xs text-white focus:outline-none focus:border-brand-green transition-all mb-4"
+                id="book-input-date"
               />
-              <p className="text-xs text-gray-400 mt-1">
+              
+              {selectedDate && primaryPhysician && (
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Available Time Slots</label>
+                  {isLoadingSlots ? (
+                    <div className="h-10 w-full bg-dark-100 animate-pulse rounded-xl" />
+                  ) : availableSlots.length === 0 ? (
+                    <p className="text-brand-red text-xs font-semibold">No available slots for this date.</p>
+                  ) : (
+                    <div className="grid grid-cols-4 gap-2">
+                      {availableSlots.map(slot => (
+                        <button
+                          type="button"
+                          key={slot}
+                          onClick={() => setSelectedSlot(slot)}
+                          className={`py-2 rounded-lg text-xs font-bold transition-all ${selectedSlot === slot ? 'bg-brand-green text-dark-100 shadow-md shadow-brand-green/20' : 'bg-dark-100 border border-dark-300 text-gray-150 hover:border-brand-green/50'}`}
+                        >
+                          {slot}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+              
+              <p className="text-xs text-gray-400 mt-2">
                 Appointments can only be booked within the next 6 months.
-              </p>
-
-              <p className="text-xs text-gray-500">
-                Date format: DD/MM/YYYY (IST)
               </p>
               {validationErrors.schedule && <p className="text-brand-red text-xs mt-1 font-semibold">{validationErrors.schedule}</p>}
             </div>

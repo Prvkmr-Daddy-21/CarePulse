@@ -5,7 +5,7 @@ interface IEmailParams {
   patientName: string;
   doctorName: string;
   schedule: Date;
-  type: "booked" | "confirmed" | "cancelled" | "rescheduled";
+  type: "booked" | "confirmed" | "cancelled" | "rescheduled" | "completed";
   note?: string;
   cancellationReason?: string;
 }
@@ -121,6 +121,26 @@ export class NotificationService {
               ${params.note ? `<tr><td style="padding: 8px; font-weight: bold;">Note:</td><td style="padding: 8px; font-style: italic;">"${params.note}"</td></tr>` : ""}
             </table>
             <p>Please update your calendar. If this time does not work for you, please contact us or request a change.</p>
+            <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;" />
+            <p style="font-size: 12px; color: #6b7280;">This is an automated notification. Please do not reply directly to this email.</p>
+          </div>
+        `;
+        break;
+
+      case "completed":
+        subject = `✅ Appointment Completed | Healthcare Portal`;
+        bodyText = `Hello ${params.patientName},\n\nYour appointment with ${params.doctorName} on ${formattedDate} has been marked as completed. Thank you for visiting.\n\nWarm regards,\nHealthcare Team`;
+        htmlContent = `
+          <div style="font-family: sans-serif; padding: 20px; color: #333;">
+            <h2 style="color: #10b981; border-bottom: 2px solid #ecfdf5; padding-bottom: 10px;">✅ Appointment Completed</h2>
+            <p>Dear <strong>${params.patientName}</strong>,</p>
+            <p>Your appointment with <strong>${params.doctorName}</strong> on <strong>${formattedDate}</strong> has been marked as successfully completed.</p>
+            <p>Thank you for choosing CarePulse for your healthcare needs.</p>
+            ${params.note ? `
+            <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; padding: 12px; border-radius: 6px; margin: 15px 0;">
+              <strong style="color: #166534;">Specialist Notes:</strong><br/>
+              <span style="color: #15803d;">${params.note}</span>
+            </div>` : ""}
             <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;" />
             <p style="font-size: 12px; color: #6b7280;">This is an automated notification. Please do not reply directly to this email.</p>
           </div>

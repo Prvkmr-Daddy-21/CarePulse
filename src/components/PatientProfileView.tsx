@@ -54,6 +54,10 @@ export const PatientProfileView: React.FC<PatientProfileViewProps> = ({
   const cancelledAppointments = appointments.filter(
     (apt) => apt.status === "cancelled"
   ).length;
+
+  const completedAppointments = appointments.filter(
+    (apt) => apt.status === "completed"
+  ).length;
   useEffect(() => {
     async function loadData() {
       if (!currentUser) return;
@@ -287,7 +291,7 @@ export const PatientProfileView: React.FC<PatientProfileViewProps> = ({
           </div>
 
           {/* Statistics Dashboard */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
 
             <div className="bg-dark-200 border border-dark-300 rounded-2xl p-5">
               <p className="text-dark-500 text-[10px] uppercase font-black tracking-wider">
@@ -322,6 +326,15 @@ export const PatientProfileView: React.FC<PatientProfileViewProps> = ({
               </p>
               <h2 className="text-3xl font-black text-brand-red mt-2">
                 {cancelledAppointments}
+              </h2>
+            </div>
+
+            <div className="bg-dark-200 border border-cyan-500/20 rounded-2xl p-5">
+              <p className="text-cyan-400 text-[10px] uppercase font-black tracking-wider">
+                Completed
+              </p>
+              <h2 className="text-3xl font-black text-cyan-400 mt-2">
+                {completedAppointments}
               </h2>
             </div>
 
@@ -393,9 +406,11 @@ export const PatientProfileView: React.FC<PatientProfileViewProps> = ({
                         ? "bg-brand-green/10 text-brand-green border border-brand-green/20"
                         : apt.status === "pending"
                           ? "bg-brand-orange/10 text-brand-orange border border-brand-orange/20"
+                          : apt.status === "completed"
+                          ? "bg-cyan-500/10 text-cyan-400 border border-cyan-500/20"
                           : "bg-brand-red/10 text-brand-red border border-brand-red/20"
                         }`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${apt.status === "scheduled" ? "bg-brand-green" : apt.status === "pending" ? "bg-brand-orange" : "bg-brand-red"
+                        <span className={`w-1.5 h-1.5 rounded-full ${apt.status === "scheduled" ? "bg-brand-green" : apt.status === "pending" ? "bg-brand-orange" : apt.status === "completed" ? "bg-cyan-400" : "bg-brand-red"
                           }`} />
                         <span>{apt.status}</span>
                       </span>

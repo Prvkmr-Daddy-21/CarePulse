@@ -41,9 +41,10 @@ export interface IAppointment {
   patientName: string;
   patientPhone: string;
   primaryPhysician: string;
+  doctorId?: string;
   schedule: string;
   reason: string;
-  status: "pending" | "scheduled" | "cancelled";
+  status: "pending" | "scheduled" | "cancelled" | "completed";
   note?: string;
   cancellationReason?: string;
   createdAt?: string;
@@ -188,6 +189,12 @@ export const api = {
       
       const query = params.toString() ? `?${params.toString()}` : "";
       return request<{ success: boolean; appointments: IAppointment[] }>(`${API_BASE}/appointments${query}`, {
+        headers: getHeaders(),
+      });
+    },
+    getAvailableSlots: async (doctor: string, date: string) => {
+      const params = new URLSearchParams({ doctor, date });
+      return request<{ success: boolean; availableSlots: string[] }>(`${API_BASE}/appointments/available-slots?${params.toString()}`, {
         headers: getHeaders(),
       });
     },

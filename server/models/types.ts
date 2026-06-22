@@ -44,9 +44,10 @@ export interface IAppointment {
   patientName: string; // Cache patient details for fast listing
   patientPhone: string;
   primaryPhysician: string; // Doctor name
+  doctorId?: string; // Reference to Doctor for security
   schedule: Date;
   reason: string;
-  status: "pending" | "scheduled" | "cancelled";
+  status: "pending" | "scheduled" | "cancelled" | "completed";
   note?: string;
   cancellationReason?: string;
   createdAt?: Date;

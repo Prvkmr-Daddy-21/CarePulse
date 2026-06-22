@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { 
-  User, 
-  Mail, 
-  Phone, 
-  Calendar, 
-  UserCheck, 
-  MapPin, 
-  Briefcase, 
-  ShieldCheck, 
-  Heart, 
-  Activity, 
-  ArrowLeft, 
+import {
+  User,
+  Mail,
+  Phone,
+  Calendar,
+  UserCheck,
+  MapPin,
+  Briefcase,
+  ShieldCheck,
+  Heart,
+  Activity,
+  ArrowLeft,
   ArrowRight,
   Upload,
   FileText,
@@ -25,7 +25,7 @@ interface PatientRegistrationViewProps {
   onRegistrationSuccess: (user: any) => void;
 }
 
-export const PatientRegistrationView: React.FC<PatientRegistrationViewProps> = ({ 
+export const PatientRegistrationView: React.FC<PatientRegistrationViewProps> = ({
   onNavigate,
   onRegistrationSuccess
 }) => {
@@ -52,7 +52,7 @@ export const PatientRegistrationView: React.FC<PatientRegistrationViewProps> = (
   const [emergencyContactNumber, setEmergencyContactNumber] = useState("");
   const [insuranceProvider, setInsuranceProvider] = useState("");
   const [insurancePolicyNumber, setInsurancePolicyNumber] = useState("");
-  
+
   // Step 4: Medical Info & Consent
   const [primaryPhysician, setPrimaryPhysician] = useState("");
   const [allergies, setAllergies] = useState("");
@@ -241,7 +241,7 @@ export const PatientRegistrationView: React.FC<PatientRegistrationViewProps> = (
 
       const formData = new FormData();
       formData.append("data", JSON.stringify(patientPayload));
-      
+
       if (selectedFile) {
         formData.append("document", selectedFile);
       }
@@ -270,7 +270,7 @@ export const PatientRegistrationView: React.FC<PatientRegistrationViewProps> = (
       <div className="absolute bottom-[-5%] right-[-10%] w-[45%] h-[40%] rounded-full bg-brand-blue/5 blur-[100px] pointer-events-none" />
 
       <div className="max-w-3xl mx-auto w-full relative z-10 flex flex-col gap-8">
-        
+
         {/* Brand Banner */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => onNavigate("landing")}>
@@ -284,7 +284,7 @@ export const PatientRegistrationView: React.FC<PatientRegistrationViewProps> = (
               <span className="block text-[8px] font-mono tracking-widest text-brand-green uppercase">Ecosystem Registry</span>
             </div>
           </div>
-          <button 
+          <button
             onClick={() => onNavigate("landing")}
             className="text-xs text-gray-100 hover:text-white flex items-center gap-1 bg-dark-200 border border-dark-300 px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
           >
@@ -314,17 +314,16 @@ export const PatientRegistrationView: React.FC<PatientRegistrationViewProps> = (
             const isActive = step >= s.stepNum;
             const isCurrent = step === s.stepNum;
             return (
-              <div 
-                key={idx} 
+              <div
+                key={idx}
                 className={`flex flex-col items-center text-center gap-2 relative ${isCurrent ? "opacity-100" : "opacity-60"}`}
               >
-                <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold font-mono transition-all border ${
-                  isCurrent 
-                    ? "bg-brand-green text-dark-100 border-brand-green scale-110 shadow-lg shadow-brand-green/20" 
-                    : isActive 
-                    ? "bg-dark-300 text-brand-green border-brand-green" 
+                <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold font-mono transition-all border ${isCurrent
+                  ? "bg-brand-green text-dark-100 border-brand-green scale-110 shadow-lg shadow-brand-green/20"
+                  : isActive
+                    ? "bg-dark-300 text-brand-green border-brand-green"
                     : "bg-dark-100 text-gray-100 border-dark-300"
-                }`}>
+                  }`}>
                   {isActive && step > s.stepNum ? <CheckCircle className="w-4.5 h-4.5 stroke-[2.5]" /> : s.stepNum}
                 </div>
                 <span className={`text-[10px] sm:text-xs font-bold uppercase tracking-wider ${isActive ? "text-brand-green" : "text-gray-100"}`}>
@@ -337,7 +336,7 @@ export const PatientRegistrationView: React.FC<PatientRegistrationViewProps> = (
 
         {/* Form Form Card Wrap */}
         <form onSubmit={handleSubmit} className="bg-dark-200 border border-dark-300 rounded-2xl p-6 sm:p-8 space-y-6 shadow-2xl relative">
-          
+
           {error && (
             <div className="p-4 bg-brand-red/10 border border-brand-red/20 text-brand-red text-sm font-semibold rounded-xl" id="register-error-msg">
               ⚠️ {error}
@@ -357,7 +356,7 @@ export const PatientRegistrationView: React.FC<PatientRegistrationViewProps> = (
               >
                 <div className="border-b border-dark-300 pb-3">
                   <h3 className="text-lg font-bold text-neutral-100 flex items-center gap-2">
-                    <Mail className="w-5 h-5 text-brand-green" /> 
+                    <Mail className="w-5 h-5 text-brand-green" />
                     <span>Account Login Coordinates</span>
                   </h3>
                   <p className="text-xs text-gray-300 mt-1">Specify an active email and secure password for future patient dashboard access or doctor scheduling.</p>
@@ -484,11 +483,10 @@ export const PatientRegistrationView: React.FC<PatientRegistrationViewProps> = (
                           key={g}
                           type="button"
                           onClick={() => setGender(g as any)}
-                          className={`py-3 rounded-xl border text-xs font-bold capitalize transition-all cursor-pointer ${
-                            gender === g 
-                              ? "bg-brand-green/20 text-brand-green border-brand-green shadow-sm" 
-                              : "bg-dark-100 text-gray-300 border-dark-300 hover:border-dark-400"
-                          }`}
+                          className={`py-3 rounded-xl border text-xs font-bold capitalize transition-all cursor-pointer ${gender === g
+                            ? "bg-brand-green/20 text-brand-green border-brand-green shadow-sm"
+                            : "bg-dark-100 text-gray-300 border-dark-300 hover:border-dark-400"
+                            }`}
                         >
                           {g}
                         </button>
@@ -556,7 +554,7 @@ export const PatientRegistrationView: React.FC<PatientRegistrationViewProps> = (
                 <div className="space-y-4">
                   <div className="bg-dark-100 p-4 rounded-xl border border-dark-300 grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <h4 className="sm:col-span-2 text-xs font-extrabold tracking-widest text-brand-green uppercase">Emergency Contact Info</h4>
-                    
+
                     {/* Emergency Contact name */}
                     <div>
                       <label className="block text-xs font-semibold text-gray-300 mb-1">Contact Guardian Person</label>
@@ -590,7 +588,7 @@ export const PatientRegistrationView: React.FC<PatientRegistrationViewProps> = (
 
                   <div className="bg-dark-100 p-4 rounded-xl border border-dark-300 grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <h4 className="sm:col-span-2 text-xs font-extrabold tracking-widest text-brand-blue uppercase">Insurance Policy Data</h4>
-                    
+
                     {/* Provider name */}
                     <div>
                       <label className="block text-xs font-semibold text-gray-300 mb-1">Insurance Provider Company</label>
@@ -695,28 +693,27 @@ export const PatientRegistrationView: React.FC<PatientRegistrationViewProps> = (
                   {/* Advanced Drag and Drop File Upload for Medical Documents */}
                   <div>
                     <label className="block text-xs font-bold text-gray-300 uppercase tracking-widest mb-1.5">Scanned Clinical/Insurance Documents </label>
-                    <div 
+                    <div
                       onDragEnter={handleDrag}
                       onDragOver={handleDrag}
                       onDragLeave={handleDrag}
                       onDrop={handleDrop}
-                      className={`border-2 border-dashed rounded-xl p-6 text-center transition-all relative ${
-                        dragActive 
-                          ? "border-brand-green bg-brand-green/5" 
-                          : selectedFile 
-                          ? "border-brand-blue bg-brand-blue/5" 
+                      className={`border-2 border-dashed rounded-xl p-6 text-center transition-all relative ${dragActive
+                        ? "border-brand-green bg-brand-green/5"
+                        : selectedFile
+                          ? "border-brand-blue bg-brand-blue/5"
                           : "border-dark-300 hover:border-dark-400 bg-dark-100"
-                      }`}
+                        }`}
                       id="document-drag-upload-zone"
                     >
-                      <input 
-                        type="file" 
+                      <input
+                        type="file"
                         onChange={handleFileChange}
                         accept=".pdf,.png,.jpg,.jpeg,.doc,.docx"
-                        className="hidden" 
-                        id="medical-file-picker" 
+                        className="hidden"
+                        id="medical-file-picker"
                       />
-                      
+
                       {selectedFile ? (
                         <div className="flex flex-col items-center gap-2">
                           <div className="p-3 bg-brand-blue/15 text-brand-blue rounded-xl">
@@ -757,7 +754,7 @@ export const PatientRegistrationView: React.FC<PatientRegistrationViewProps> = (
                       <ShieldCheck className="w-4 h-4 text-brand-green" />
                       <span>Ecosystem Legal Notice Consent</span>
                     </h4>
-                    
+
                     <label className="flex items-start gap-2.5 cursor-pointer select-none">
                       <input
                         type="checkbox"
