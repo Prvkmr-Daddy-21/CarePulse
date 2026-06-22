@@ -13,6 +13,8 @@ export interface IDoctor {
   phone: string;
   avatarUrl?: string;
   status: "active" | "inactive";
+  qualification?: string;
+  experience?: number;
 }
 
 export interface IPatient {
@@ -146,6 +148,18 @@ export const api = {
   doctors: {
     list: async () => {
       return request<{ success: boolean; doctors: IDoctor[] }>(`${API_BASE}/doctors`, {
+        headers: getHeaders(),
+      });
+    },
+    addDoctor: async (payload: any) => {
+      return request<{ success: boolean; doctor: IDoctor }>(`${API_BASE}/doctors`, {
+        method: "POST",
+        headers: getHeaders(),
+        body: JSON.stringify(payload),
+      });
+    },
+    getStats: async () => {
+      return request<{ success: boolean; doctors: any[] }>(`${API_BASE}/doctors/stats`, {
         headers: getHeaders(),
       });
     }

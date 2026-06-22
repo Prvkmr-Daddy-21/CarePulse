@@ -16,6 +16,7 @@ import {
   FileMinus
 } from "lucide-react";
 import { api, IAppointment } from "../services/api";
+import { DoctorManagementSection } from "./DoctorManagementSection";
 
 interface DashboardViewProps {
   onNavigate: (view: "landing" | "login" | "register" | "book" | "profile" | "admin") => void;
@@ -31,6 +32,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const [appointments, setAppointments] = useState<IAppointment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Tabs state
+  const [activeTab, setActiveTab] = useState<"appointments" | "doctors">("appointments");
 
   // Filters State
   const [statusFilter, setStatusFilter] = useState("all");
@@ -226,8 +230,29 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
       {/* Content wrapper */}
       <main className="max-w-7xl mx-auto w-full px-6 py-8 space-y-8 relative z-20 flex-grow">
+        {/* Navigation Tabs */}
+        <div className="flex items-center gap-4 border-b border-dark-300 pb-4">
+          <button
+            onClick={() => setActiveTab("appointments")}
+            className={`px-6 py-2.5 font-bold text-xs uppercase tracking-widest rounded-xl transition-all cursor-pointer ${
+              activeTab === "appointments" ? "bg-brand-green text-dark-100 shadow-lg shadow-brand-green/20" : "bg-dark-200 border border-dark-300 text-gray-150 hover:text-white hover:bg-dark-300"
+            }`}
+          >
+            Appointments
+          </button>
+          <button
+            onClick={() => setActiveTab("doctors")}
+            className={`px-6 py-2.5 font-bold text-xs uppercase tracking-widest rounded-xl transition-all cursor-pointer ${
+              activeTab === "doctors" ? "bg-brand-green text-dark-100 shadow-lg shadow-brand-green/20" : "bg-dark-200 border border-dark-300 text-gray-150 hover:text-white hover:bg-dark-300"
+            }`}
+          >
+            Doctor Management
+          </button>
+        </div>
 
-        {/* Statistics highlights bar */}
+        {activeTab === "appointments" ? (
+          <>
+            {/* Statistics highlights bar */}
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-4" id="stats-banner-cards">
           {/* Scheduled */}
           <div 
@@ -502,6 +527,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
           )}
         </section>
+        </>
+        ) : (
+          <DoctorManagementSection />
+        )}
       </main>
 
       {/* Action scheduling overlay modal */}

@@ -22,6 +22,8 @@ const DoctorSchema = new Schema<IDoctor>({
   phone: { type: String, required: true },
   avatarUrl: { type: String },
   status: { type: String, enum: ["active", "inactive"], default: "active", index: true },
+  qualification: { type: String },
+  experience: { type: Number },
 });
 
 DoctorSchema.index({ specialty: 1, status: 1 });

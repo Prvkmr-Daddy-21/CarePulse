@@ -16,6 +16,8 @@ export interface IDoctor {
   phone: string;
   avatarUrl?: string;
   status: "active" | "inactive";
+  qualification?: string;
+  experience?: number;
 }
 
 export interface IPatient {
