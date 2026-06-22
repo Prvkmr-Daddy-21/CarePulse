@@ -11,8 +11,17 @@ export interface IDoctor {
   email: string;
   specialty: string;
   phone: string;
+  qualification?: string;
+  experience?: string | number;
   avatarUrl?: string;
   status: "active" | "inactive";
+  stats?: {
+    total: number;
+    pending: number;
+    scheduled: number;
+    completed: number;
+    cancelled: number;
+  };
 }
 
 export interface IPatient {
@@ -144,9 +153,26 @@ export const api = {
 
   // Doctors Endpoint controllers
   doctors: {
-    list: async () => {
-      return request<{ success: boolean; doctors: IDoctor[] }>(`${API_BASE}/doctors`, {
+    list: async (filters: { status?: string } = {}) => {
+      const params = new URLSearchParams();
+      if (filters.status) params.append("status", filters.status);
+      const query = params.toString() ? `?${params.toString()}` : "";
+      return request<{ success: boolean; doctors: IDoctor[] }>(`${API_BASE}/doctors${query}`, {
         headers: getHeaders(),
+      });
+    },
+    create: async (payload: any) => {
+      return request<{ success: boolean; doctor: IDoctor }>(`${API_BASE}/doctors`, {
+        method: "POST",
+        headers: getHeaders(),
+        body: JSON.stringify(payload),
+      });
+    },
+    updateStatus: async (id: string, status: "active" | "inactive") => {
+      return request<{ success: boolean; doctor: IDoctor }>(`${API_BASE}/doctors/${id}/status`, {
+        method: "PATCH",
+        headers: getHeaders(),
+        body: JSON.stringify({ status }),
       });
     }
   },
@@ -188,14 +214,16 @@ export const api = {
         body: JSON.stringify(payload),
       });
     },
-    list: async (filters: { search?: string; status?: string; doctor?: string } = {}) => {
+    list: async (filters: { search?: string; status?: string; doctor?: string; page?: number; limit?: number } = {}) => {
       const params = new URLSearchParams();
       if (filters.search) params.append("search", filters.search);
-      if (filters.status) params.append("status", filters.status);
-      if (filters.doctor) params.append("doctor", filters.doctor);
+      if (filters.status && filters.status !== "all") params.append("status", filters.status);
+      if (filters.doctor && filters.doctor !== "all") params.append("doctor", filters.doctor);
+      if (filters.page) params.append("page", filters.page.toString());
+      if (filters.limit) params.append("limit", filters.limit.toString());
       
       const query = params.toString() ? `?${params.toString()}` : "";
-      return request<{ success: boolean; appointments: IAppointment[] }>(`${API_BASE}/appointments${query}`, {
+      return request<{ success: boolean; appointments: IAppointment[]; total: number; page: number; totalPages: number; stats: { total: number, pending: number, scheduled: number, completed: number, cancelled: number } }>(`${API_BASE}/appointments${query}`, {
         headers: getHeaders(),
       });
     },

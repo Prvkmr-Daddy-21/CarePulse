@@ -8,6 +8,8 @@ export interface IAppointmentFilters {
   status?: string;
   doctor?: string;
   doctorId?: string;
+  page?: number;
+  limit?: number;
 }
 
 export const APPOINTMENT_SLOT_DURATION = 60;
@@ -19,6 +21,9 @@ export class AppointmentService {
     targetDate.setHours(0, 0, 0, 0);
 
     const doctorProfile = await db.doctors.findOne({ name: doctor });
+    if (doctorProfile && doctorProfile.status !== "active") {
+      return [];
+    }
     const doctorId = doctorProfile ? doctorProfile._id : undefined;
 
     const allAppointments = await db.appointments.find();
@@ -92,6 +97,12 @@ export class AppointmentService {
     }
 
     const doctorProfile = await db.doctors.findOne({ name: validatedData.primaryPhysician });
+    if (doctorProfile && doctorProfile.status !== "active") {
+      throw {
+        status: 400,
+        message: "This doctor is not currently receiving new appointments.",
+      };
+    }
     const doctorId = doctorProfile ? doctorProfile._id : undefined;
 
     const existingAppointments = await db.appointments.find();
@@ -151,18 +162,28 @@ export class AppointmentService {
     return appointment;
   }
 
-  static async getAppointments(filters: IAppointmentFilters = {}): Promise<IAppointment[]> {
+  static async getAppointments(filters: IAppointmentFilters = {}): Promise<{ appointments: IAppointment[], total: number, page: number, totalPages: number, stats: any }> {
     let list = await db.appointments.find();
 
-    // Filtering logic (fully type-safe and case-insensitive)
-    if (filters.status && filters.status !== "all") {
-      list = list.filter(a => a.status === filters.status);
-    }
-
+    // Context filter (Doctor or Admin)
     if (filters.doctorId) {
       list = list.filter(a => a.doctorId === filters.doctorId || a.primaryPhysician === filters.doctor);
     } else if (filters.doctor && filters.doctor !== "all") {
       list = list.filter(a => a.primaryPhysician.toLowerCase().includes(filters.doctor!.toLowerCase()));
+    }
+
+    // Calculate global stats for this context
+    const stats = {
+      total: list.length,
+      pending: list.filter(a => a.status === "pending").length,
+      scheduled: list.filter(a => a.status === "scheduled").length,
+      completed: list.filter(a => a.status === "completed").length,
+      cancelled: list.filter(a => a.status === "cancelled").length
+    };
+
+    // Apply status and search filters
+    if (filters.status && filters.status !== "all") {
+      list = list.filter(a => a.status === filters.status);
     }
 
     if (filters.search) {
@@ -175,7 +196,24 @@ export class AppointmentService {
       );
     }
 
-    return list;
+    // Server-side sorting: newest first
+    list.sort((a, b) => new Date(b.schedule).getTime() - new Date(a.schedule).getTime());
+
+    const total = list.length;
+    const page = filters.page || 1;
+    const limit = filters.limit || 10;
+    const totalPages = Math.ceil(total / limit);
+    const startIndex = (page - 1) * limit;
+    
+    const paginatedList = list.slice(startIndex, startIndex + limit);
+
+    return {
+      appointments: paginatedList,
+      total,
+      page,
+      totalPages,
+      stats
+    };
   }
 
   static async updateAppointmentStatus(

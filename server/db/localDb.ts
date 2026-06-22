@@ -119,6 +119,14 @@ export const localDb = {
       db.doctors.push(newDoc);
       writeDb(db);
       return newDoc;
+    },
+    findByIdAndUpdate: async (id: string, update: Partial<IDoctor>) => {
+      const db = readDb();
+      const index = db.doctors.findIndex(d => d._id === id);
+      if (index === -1) return null;
+      db.doctors[index] = { ...db.doctors[index], ...update };
+      writeDb(db);
+      return db.doctors[index];
     }
   },
 

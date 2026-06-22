@@ -193,6 +193,22 @@ export const db = {
       }
       assertMongoDBConnection();
       return localDb.doctors.create(data);
+    },
+    findByIdAndUpdate: async (id: string, update: Partial<IDoctor>): Promise<IDoctor | null> => {
+      if (isMongoConnected) {
+        try {
+          const doc = await DoctorModel.findByIdAndUpdate(
+            id as any,
+            { $set: update } as any,
+            { returnDocument: "after" } as any
+          );
+          return doc ? toJSON<IDoctor>(doc) : null;
+        } catch {
+          return null;
+        }
+      }
+      assertMongoDBConnection();
+      return localDb.doctors.findByIdAndUpdate(id, update as any); // localDb.doctors might not have it either? Let's check localDb
     }
   },
 

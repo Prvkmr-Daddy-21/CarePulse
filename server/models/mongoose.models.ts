@@ -20,6 +20,8 @@ const DoctorSchema = new Schema<IDoctor>({
   email: { type: String, required: true, unique: true, index: true },
   specialty: { type: String, required: true, index: true },
   phone: { type: String, required: true },
+  qualification: { type: String },
+  experience: { type: Schema.Types.Mixed }, // String or Number
   avatarUrl: { type: String },
   status: { type: String, enum: ["active", "inactive"], default: "active", index: true },
 });

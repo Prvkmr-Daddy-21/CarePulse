@@ -30,7 +30,7 @@ export class AppointmentController {
 
   static async getAppointments(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { search, status, doctor } = req.query;
+      const { search, status, doctor, page, limit } = req.query;
 
       let doctorIdFilter: string | undefined = undefined;
       let doctorNameFilter: string | undefined = doctor as string;
@@ -46,14 +46,23 @@ export class AppointmentController {
         }
       }
 
-      const list = await AppointmentService.getAppointments({
+      const result = await AppointmentService.getAppointments({
         search: search as string,
         status: status as string,
         doctor: doctorNameFilter,
         doctorId: doctorIdFilter,
+        page: page ? parseInt(page as string, 10) : 1,
+        limit: limit ? parseInt(limit as string, 10) : 10,
       });
 
-      res.status(200).json({ success: true, appointments: list });
+      res.status(200).json({ 
+        success: true, 
+        appointments: result.appointments,
+        total: result.total,
+        page: result.page,
+        totalPages: result.totalPages,
+        stats: result.stats
+      });
     } catch (err) {
       next(err);
     }
