@@ -33,7 +33,7 @@ export default function App() {
 
         const storedToken = localStorage.getItem("carepulse_token");
         const storedUserJson = localStorage.getItem("carepulse_user");
-        
+
         if (storedToken && storedUserJson) {
           const userObj = JSON.parse(storedUserJson) as IUser;
           setCurrentUser(userObj);
@@ -133,7 +133,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#0d0f10] select-none text-white">
       {currentView === "landing" && (
-        <LandingView 
+        <LandingView
           onNavigate={handleNavigate}
           currentUser={currentUser}
           currentPatient={currentPatient}
@@ -142,28 +142,28 @@ export default function App() {
       )}
 
       {currentView === "register" && (
-        <PatientRegistrationView 
+        <PatientRegistrationView
           onNavigate={handleNavigate}
           onRegistrationSuccess={handleRegistrationSuccess}
         />
       )}
 
       {currentView === "login" && (
-        <AdminLoginView 
+        <AdminLoginView
           onNavigate={handleNavigate}
           onLoginSuccess={handleLoginSuccess}
         />
       )}
 
       {currentView === "book" && (
-        <AppointmentBookingView 
+        <AppointmentBookingView
           onNavigate={handleNavigate}
           currentPatient={currentPatient}
         />
       )}
 
       {currentView === "profile" && (
-        <PatientProfileView 
+        <PatientProfileView
           onNavigate={handleNavigate}
           currentUser={currentUser}
           onLogout={handleLogout}
@@ -171,7 +171,7 @@ export default function App() {
       )}
 
       {currentView === "admin" && (
-        <DashboardView 
+        <DashboardView
           onNavigate={handleNavigate}
           currentUser={currentUser}
           onLogout={handleLogout}
@@ -179,13 +179,13 @@ export default function App() {
       )}
 
       {currentView === "forgot-password" && (
-        <ForgotPasswordView 
+        <ForgotPasswordView
           onNavigate={handleNavigate}
         />
       )}
 
       {currentView === "reset-password" && (
-        <ResetPasswordView 
+        <ResetPasswordView
           token={resetToken || ""}
           onNavigate={handleNavigate}
         />

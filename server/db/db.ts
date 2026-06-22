@@ -142,7 +142,11 @@ export const db = {
     findByIdAndUpdate: async (id: string, update: Partial<IUser>): Promise<IUser | null> => {
       if (isMongoConnected) {
         try {
-          const user = await UserModel.findByIdAndUpdate(id as any, { $set: update } as any, { new: true } as any);
+          const user = await UserModel.findByIdAndUpdate(
+            id as any,
+            { $set: update } as any,
+            { returnDocument: "after" } as any
+          );
           return user ? toJSON<IUser>(user) : null;
         } catch {
           return null;
