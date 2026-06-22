@@ -47,5 +47,27 @@ export class AuthController {
       next(err);
     }
   }
+
+  static async forgotPassword(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { email } = req.body;
+      const host = req.get("host") || "localhost:3000";
+      const protocol = req.secure || req.headers["x-forwarded-proto"] === "https" ? "https" : "http";
+      await AuthService.sendForgotPasswordLink(email, protocol, host);
+      res.status(200).json({ success: true, message: "If an account exists, a reset link has been sent." });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async resetPassword(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { token } = req.params;
+      await AuthService.resetPassword(token, req.body);
+      res.status(200).json({ success: true, message: "Password reset successful." });
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 export default AuthController;

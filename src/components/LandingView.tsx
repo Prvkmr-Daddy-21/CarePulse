@@ -11,7 +11,9 @@ import {
   Heart,
   Award,
   Mail,
-  UserCheck
+  UserCheck,
+  Eye,
+  EyeOff
 } from "lucide-react";
 import { api } from "../services/api";
 
@@ -32,6 +34,7 @@ export const LandingView: React.FC<LandingViewProps> = ({
   const [patientLoginPass, setPatientLoginPass] = useState("");
   const [isLoggy, setIsLoggy] = useState(false);
   const [loginErr, setLoginErr] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handlePatientLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -227,13 +230,20 @@ export const LandingView: React.FC<LandingViewProps> = ({
                 <div className="relative">
                   <UserCheck className="absolute left-3.5 top-3.5 w-4 h-4 text-gray-100" />
                   <input
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     required
                     value={patientLoginPass}
                     onChange={(e) => setPatientLoginPass(e.target.value)}
                     placeholder="Input security password"
-                    className="w-full bg-dark-100 border border-dark-300 rounded-xl py-3 pl-10 pr-4 text-xs text-white placeholder-dark-500 focus:outline-none focus:border-brand-green transition-all"
+                    className="w-full bg-dark-100 border border-dark-300 rounded-xl py-3 pl-10 pr-10 text-xs text-white placeholder-dark-500 focus:outline-none focus:border-brand-green transition-all"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-3.5 text-gray-400 hover:text-white transition-colors"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
                 </div>
               </div>
 
@@ -256,7 +266,7 @@ export const LandingView: React.FC<LandingViewProps> = ({
               </button>
             </form>
 
-            <div className="text-center pt-2">
+            <div className="text-center pt-2 flex flex-col gap-2">
               <span className="text-xs text-gray-100">
                 New physician patient?{" "}
                 <button 
@@ -266,6 +276,12 @@ export const LandingView: React.FC<LandingViewProps> = ({
                   Create Patient File
                 </button>
               </span>
+              <button 
+                onClick={() => onNavigate("forgot-password")}
+                className="text-xs text-brand-green hover:text-brand-green/80 underline cursor-pointer self-center"
+              >
+                Forgot Password?
+              </button>
             </div>
           </div>
         </div>

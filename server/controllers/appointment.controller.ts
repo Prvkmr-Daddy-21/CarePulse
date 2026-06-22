@@ -62,4 +62,22 @@ export class AppointmentController {
       next(err);
     }
   }
+
+  static async reschedule(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { id } = req.params;
+      const { schedule, note } = req.body;
+      if (!schedule) {
+        res.status(400).json({ error: "Schedule date/time is required" });
+        return;
+      }
+      const updated = await AppointmentService.rescheduleAppointment(id, {
+        schedule: new Date(schedule),
+        note,
+      });
+      res.status(200).json({ success: true, appointment: updated });
+    } catch (err) {
+      next(err);
+    }
+  }
 }

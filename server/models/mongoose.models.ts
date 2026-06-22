@@ -6,6 +6,8 @@ const UserSchema = new Schema<IUser>({
   email: { type: String, required: true, unique: true, index: true },
   password: { type: String, required: true },
   role: { type: String, enum: ["admin", "patient", "doctor"], default: "patient", index: true },
+  resetPasswordToken: { type: String, default: null, index: true },
+  resetPasswordExpire: { type: Date, default: null },
 }, { timestamps: true });
 
 UserSchema.index({ email: 1, role: 1 });

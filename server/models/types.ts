@@ -3,6 +3,8 @@ export interface IUser {
   email: string;
   password?: string;
   role: "admin" | "patient" | "doctor";
+  resetPasswordToken?: string | null;
+  resetPasswordExpire?: Date | null;
   createdAt?: Date;
 }
 

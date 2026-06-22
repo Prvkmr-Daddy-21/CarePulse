@@ -34,4 +34,12 @@ router.patch(
   AppointmentController.updateStatus
 );
 
+// Trigger administrative update (reschedule appointment)
+router.patch(
+  "/:id/reschedule",
+  authMiddleware,
+  authorizeRoles(["admin", "doctor"]),
+  AppointmentController.reschedule
+);
+
 export default router;

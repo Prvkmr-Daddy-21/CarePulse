@@ -5,7 +5,7 @@ interface IEmailParams {
   patientName: string;
   doctorName: string;
   schedule: Date;
-  type: "booked" | "confirmed" | "cancelled";
+  type: "booked" | "confirmed" | "cancelled" | "rescheduled";
   note?: string;
   cancellationReason?: string;
 }
@@ -105,6 +105,27 @@ export class NotificationService {
           </div>
         `;
         break;
+
+      case "rescheduled":
+        subject = `🕒 Appointment Rescheduled | Healthcare Portal`;
+        bodyText = `Hello ${params.patientName},\n\nYour appointment with ${params.doctorName} has been rescheduled to ${formattedDate}.\n\nWarm regards,\nHealthcare Team`;
+        htmlContent = `
+          <div style="font-family: sans-serif; padding: 20px; color: #333;">
+            <h2 style="color: #2563eb; border-bottom: 2px solid #eff6ff; padding-bottom: 10px;">🕒 Appointment Rescheduled</h2>
+            <p>Dear <strong>${params.patientName}</strong>,</p>
+            <p>Your appointment with <strong>${params.doctorName}</strong> has been rescheduled. Here are the new details:</p>
+            <table style="width: 100%; max-width: 500px; border-collapse: collapse; margin: 15px 0;">
+              <tr><td style="padding: 8px; font-weight: bold; width: 150px;">Practitioner:</td><td style="padding: 8px;">${params.doctorName}</td></tr>
+              <tr><td style="padding: 8px; font-weight: bold;">New Date & Time:</td><td style="padding: 8px;">${formattedDate}</td></tr>
+              <tr><td style="padding: 8px; font-weight: bold;">Status:</td><td style="padding: 8px; color: #2563eb; font-weight: bold;">Rescheduled</td></tr>
+              ${params.note ? `<tr><td style="padding: 8px; font-weight: bold;">Note:</td><td style="padding: 8px; font-style: italic;">"${params.note}"</td></tr>` : ""}
+            </table>
+            <p>Please update your calendar. If this time does not work for you, please contact us or request a change.</p>
+            <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;" />
+            <p style="font-size: 12px; color: #6b7280;">This is an automated notification. Please do not reply directly to this email.</p>
+          </div>
+        `;
+        break;
     }
 
     const transporter = this.getTransporter();
@@ -126,6 +147,48 @@ export class NotificationService {
       console.log(`To: ${params.email}`);
       console.log(`Subject: ${subject}`);
       console.log(`Content:\n${bodyText}`);
+      console.log("----------------------------------------------------------------");
+    }
+  }
+
+  static async sendPasswordResetEmail(email: string, resetUrl: string): Promise<void> {
+    const subject = `🔑 Password Reset Request | CarePulse`;
+    const bodyText = `Hello,\n\nYou requested a password reset for your CarePulse account. Please click the following link to reset your password:\n\n${resetUrl}\n\nThis link is valid for 15 minutes.\n\nWarm regards,\nCarePulse Team`;
+    const htmlContent = `
+      <div style="font-family: sans-serif; padding: 20px; color: #333;">
+        <h2 style="color: #2563eb; border-bottom: 2px solid #eff6ff; padding-bottom: 10px;">🔑 Password Reset Request</h2>
+        <p>Hello,</p>
+        <p>You requested a password reset for your CarePulse account. Please click the button below to reset your password:</p>
+        <div style="margin: 20px 0;">
+          <a href="${resetUrl}" style="background-color: #2563eb; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">Reset Password</a>
+        </div>
+        <p>If the button doesn't work, copy and paste the link below into your browser:</p>
+        <p><a href="${resetUrl}">${resetUrl}</a></p>
+        <p>This link is valid for 15 minutes. If you did not request this reset, please ignore this email.</p>
+        <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;" />
+        <p style="font-size: 12px; color: #6b7280;">This is an automated notification. Please do not reply directly to this email.</p>
+      </div>
+    `;
+
+    const transporter = this.getTransporter();
+    if (transporter) {
+      try {
+        await transporter.sendMail({
+          from: `"CarePulse Healthcare" <${process.env.SMTP_USER}>`,
+          to: email,
+          subject,
+          text: bodyText,
+          html: htmlContent,
+        });
+        console.log(`✉️ Password reset email sent successfully to: ${email}`);
+      } catch (mailingError) {
+        console.error("❌ NodeMailer failed to transmit reset email:", mailingError);
+      }
+    } else {
+      console.log("------------------ CarePulse Reset Password Notification Log ------------------");
+      console.log(`To: ${email}`);
+      console.log(`Subject: ${subject}`);
+      console.log(`Link: ${resetUrl}`);
       console.log("----------------------------------------------------------------");
     }
   }

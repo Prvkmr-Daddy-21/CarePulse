@@ -124,5 +124,46 @@ export class AppointmentService {
   static async getPatientAppointments(patientId: string): Promise<IAppointment[]> {
     return await db.appointments.find({ patientId });
   }
+
+  static async rescheduleAppointment(
+    id: string,
+    data: { schedule: Date; note?: string }
+  ): Promise<IAppointment> {
+    const appointment = await db.appointments.findById(id);
+    if (!appointment) {
+      throw { status: 404, message: "Appointment record not found" };
+    }
+
+    const updatePayload: Partial<IAppointment> = {
+      schedule: data.schedule,
+    };
+    if (data.note !== undefined) {
+      updatePayload.note = data.note;
+    }
+
+    const updated = await db.appointments.findByIdAndUpdate(id, updatePayload);
+    if (!updated) {
+      throw { status: 404, message: "Appointment reschedule error" };
+    }
+
+    // Trigger email alert asynchronously
+    const patientProfile = await db.patients.findById(updated.patientId);
+    if (patientProfile) {
+      try {
+        await NotificationService.sendAppointmentEmail({
+          email: patientProfile.email,
+          patientName: patientProfile.name,
+          doctorName: updated.primaryPhysician,
+          schedule: data.schedule,
+          type: "rescheduled",
+          note: data.note,
+        });
+      } catch (err) {
+        console.error("Failed to trigger reschedule email notification", err);
+      }
+    }
+
+    return updated;
+  }
 }
 export default AppointmentService;

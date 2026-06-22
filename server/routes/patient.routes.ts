@@ -16,6 +16,9 @@ router.post(
 // Get currently logged-in user's patient profile
 router.get("/me", authMiddleware, PatientController.getMyProfile);
 
+// Update currently logged-in user's patient profile
+router.put("/me", authMiddleware, PatientController.updateMyProfile);
+
 // Get any patient's profile (authorized for administrative personnel / doctors)
 router.get(
   "/:id",

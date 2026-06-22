@@ -57,5 +57,18 @@ export class PatientController {
       next(err);
     }
   }
+
+  static async updateMyProfile(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      if (!req.user) {
+        res.status(401).json({ error: "Unauthorized" });
+        return;
+      }
+      const updated = await PatientService.updatePatientProfile(req.user.userId, req.body);
+      res.status(200).json({ success: true, profile: updated });
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 export default PatientController;

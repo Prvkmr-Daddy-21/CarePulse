@@ -84,6 +84,14 @@ export const localDb = {
       db.users.push(newUser);
       writeDb(db);
       return newUser;
+    },
+    findByIdAndUpdate: async (id: string, update: Partial<IUser>) => {
+      const db = readDb();
+      const index = db.users.findIndex(u => u._id === id);
+      if (index === -1) return null;
+      db.users[index] = { ...db.users[index], ...update };
+      writeDb(db);
+      return db.users[index];
     }
   },
 

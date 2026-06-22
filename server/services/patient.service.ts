@@ -1,5 +1,5 @@
 import { db } from "../db/db";
-import { patientSchema } from "../schemas/patient.schema";
+import { patientSchema, updatePatientSchema } from "../schemas/patient.schema";
 import { IPatient } from "../models/types";
 
 export class PatientService {
@@ -40,6 +40,28 @@ export class PatientService {
   static async getPatientById(id: string): Promise<IPatient | null> {
     const profile = await db.patients.findOne({ _id: id });
     return profile || await db.patients.findOne({ userId: id });
+  }
+
+  static async updatePatientProfile(userId: string, inputData: any): Promise<IPatient> {
+    const validatedData = updatePatientSchema.parse(inputData);
+    const patient = await db.patients.findOne({ userId });
+    if (!patient) {
+      throw { status: 404, message: "Patient profile not found to update" };
+    }
+
+    const updated = await db.patients.findByIdAndUpdate(patient._id, {
+      phone: validatedData.phone,
+      address: validatedData.address,
+      occupation: validatedData.occupation,
+      emergencyContactName: validatedData.emergencyContactName,
+      emergencyContactNumber: validatedData.emergencyContactNumber,
+    });
+
+    if (!updated) {
+      throw { status: 404, message: "Patient profile update failed" };
+    }
+
+    return updated;
   }
 }
 export default PatientService;

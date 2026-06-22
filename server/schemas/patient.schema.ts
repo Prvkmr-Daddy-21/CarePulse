@@ -30,3 +30,11 @@ export const patientSchema = z.object({
   ),
 });
 
+export const updatePatientSchema = z.object({
+  phone: z.string().min(8, "Phone number must be at least 8 digits"),
+  address: z.string().min(5, "Address must be at least 5 characters"),
+  occupation: z.string().min(2, "Occupation must be at least 2 characters"),
+  emergencyContactName: z.string().min(2, "Emergency contact name must be at least 2 characters"),
+  emergencyContactNumber: z.string().min(8, "Emergency contact number must be at least 8 digits"),
+});
+

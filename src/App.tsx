@@ -5,20 +5,32 @@ import { AdminLoginView } from "./components/AdminLoginView";
 import { AppointmentBookingView } from "./components/AppointmentBookingView";
 import { DashboardView } from "./components/DashboardView";
 import { PatientProfileView } from "./components/PatientProfileView";
+import { ForgotPasswordView } from "./components/ForgotPasswordView";
+import { ResetPasswordView } from "./components/ResetPasswordView";
 import { api, IUser, IPatient } from "./services/api";
 
-type ViewState = "landing" | "login" | "register" | "book" | "profile" | "admin";
+type ViewState = "landing" | "login" | "register" | "book" | "profile" | "admin" | "forgot-password" | "reset-password";
 
 export default function App() {
   const [currentView, setCurrentView] = useState<ViewState>("landing");
   const [currentUser, setCurrentUser] = useState<IUser | null>(null);
   const [currentPatient, setCurrentPatient] = useState<IPatient | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
+  const [resetToken, setResetToken] = useState<string | null>(null);
 
   // Parse session logs on system boot
   useEffect(() => {
     async function loadSession() {
       try {
+        const path = window.location.pathname;
+        const resetMatch = path.match(/^\/reset-password\/([a-f0-9]+)$/i);
+        if (resetMatch) {
+          setResetToken(resetMatch[1]);
+          setCurrentView("reset-password");
+          setIsInitializing(false);
+          return;
+        }
+
         const storedToken = localStorage.getItem("carepulse_token");
         const storedUserJson = localStorage.getItem("carepulse_user");
         
@@ -55,7 +67,7 @@ export default function App() {
     const handleLogoutTrigger = () => {
       setCurrentUser(null);
       setCurrentPatient(null);
-      setCurrentView("landing");
+      handleNavigate("landing");
     };
 
     window.addEventListener("carepulse_logout", handleLogoutTrigger);
@@ -63,6 +75,13 @@ export default function App() {
       window.removeEventListener("carepulse_logout", handleLogoutTrigger);
     };
   }, []);
+
+  const handleNavigate = (view: ViewState) => {
+    if (view === "landing" || view === "login" || view === "register" || view === "forgot-password") {
+      window.history.pushState({}, "", "/");
+    }
+    setCurrentView(view);
+  };
 
   const handleLoginSuccess = async (user: IUser) => {
     setCurrentUser(user);
@@ -115,7 +134,7 @@ export default function App() {
     <div className="min-h-screen bg-[#0d0f10] select-none text-white">
       {currentView === "landing" && (
         <LandingView 
-          onNavigate={setCurrentView}
+          onNavigate={handleNavigate}
           currentUser={currentUser}
           currentPatient={currentPatient}
           onLoginSuccess={handleLoginSuccess}
@@ -124,28 +143,28 @@ export default function App() {
 
       {currentView === "register" && (
         <PatientRegistrationView 
-          onNavigate={setCurrentView}
+          onNavigate={handleNavigate}
           onRegistrationSuccess={handleRegistrationSuccess}
         />
       )}
 
       {currentView === "login" && (
         <AdminLoginView 
-          onNavigate={setCurrentView}
+          onNavigate={handleNavigate}
           onLoginSuccess={handleLoginSuccess}
         />
       )}
 
       {currentView === "book" && (
         <AppointmentBookingView 
-          onNavigate={setCurrentView}
+          onNavigate={handleNavigate}
           currentPatient={currentPatient}
         />
       )}
 
       {currentView === "profile" && (
         <PatientProfileView 
-          onNavigate={setCurrentView}
+          onNavigate={handleNavigate}
           currentUser={currentUser}
           onLogout={handleLogout}
         />
@@ -153,9 +172,22 @@ export default function App() {
 
       {currentView === "admin" && (
         <DashboardView 
-          onNavigate={setCurrentView}
+          onNavigate={handleNavigate}
           currentUser={currentUser}
           onLogout={handleLogout}
+        />
+      )}
+
+      {currentView === "forgot-password" && (
+        <ForgotPasswordView 
+          onNavigate={handleNavigate}
+        />
+      )}
+
+      {currentView === "reset-password" && (
+        <ResetPasswordView 
+          token={resetToken || ""}
+          onNavigate={handleNavigate}
         />
       )}
     </div>

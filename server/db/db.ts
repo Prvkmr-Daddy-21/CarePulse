@@ -138,6 +138,18 @@ export const db = {
       }
       assertMongoDBConnection();
       return localDb.users.create(data);
+    },
+    findByIdAndUpdate: async (id: string, update: Partial<IUser>): Promise<IUser | null> => {
+      if (isMongoConnected) {
+        try {
+          const user = await UserModel.findByIdAndUpdate(id as any, { $set: update } as any, { new: true } as any);
+          return user ? toJSON<IUser>(user) : null;
+        } catch {
+          return null;
+        }
+      }
+      assertMongoDBConnection();
+      return localDb.users.findByIdAndUpdate(id, update);
     }
   },
 

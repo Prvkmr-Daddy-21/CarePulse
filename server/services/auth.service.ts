@@ -1,9 +1,11 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
 import { db } from "../db/db";
-import { loginSchema, registerSchema } from "../schemas/auth.schema";
+import { loginSchema, registerSchema, forgotPasswordSchema, resetPasswordSchema } from "../schemas/auth.schema";
 import { JWT_SECRET, JWT_REFRESH_SECRET } from "../middleware/auth.middleware";
 import { IUser } from "../models/types";
+import { NotificationService } from "./notification.service";
 
 export class AuthService {
   static async register(inputData: any): Promise<{ user: Omit<IUser, "password">; token: string; refreshToken: string }> {
@@ -126,6 +128,53 @@ export class AuthService {
     } catch (err) {
       throw { status: 401, message: "Invalid or expired refresh token." };
     }
+  }
+
+  static async sendForgotPasswordLink(emailInput: string, protocol: string, host: string): Promise<void> {
+    const validatedData = forgotPasswordSchema.parse({ email: emailInput });
+    const user = await db.users.findOne({ email: validatedData.email });
+    if (!user) {
+      // Security: never reveal whether an email exists. Always log or return silently.
+      console.log(`🔍 [ForgotPassword] Email not registered: ${validatedData.email} (Silent ignore to prevent enumeration)`);
+      return;
+    }
+
+    const rawToken = crypto.randomBytes(32).toString("hex");
+    const hashedToken = crypto.createHash("sha256").update(rawToken).digest("hex");
+    const resetPasswordExpire = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+
+    await db.users.findByIdAndUpdate(user._id, {
+      resetPasswordToken: hashedToken,
+      resetPasswordExpire
+    });
+
+    const resetUrl = `${protocol}://${host}/reset-password/${rawToken}`;
+    await NotificationService.sendPasswordResetEmail(validatedData.email, resetUrl);
+  }
+
+  static async resetPassword(rawToken: string, inputData: any): Promise<void> {
+    const validatedData = resetPasswordSchema.parse(inputData);
+    const hashedToken = crypto.createHash("sha256").update(rawToken).digest("hex");
+
+    const user = await db.users.findOne({
+      resetPasswordToken: hashedToken,
+    });
+
+    if (!user) {
+      throw { status: 400, message: "Invalid or expired reset token" };
+    }
+
+    if (user.resetPasswordExpire && new Date(user.resetPasswordExpire).getTime() < Date.now()) {
+      throw { status: 400, message: "Reset token has expired" };
+    }
+
+    const hashedPassword = await bcrypt.hash(validatedData.password, 10);
+
+    await db.users.findByIdAndUpdate(user._id, {
+      password: hashedPassword,
+      resetPasswordToken: null,
+      resetPasswordExpire: null
+    });
   }
 }
 export default AuthService;

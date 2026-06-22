@@ -113,6 +113,20 @@ export const api = {
         headers: getHeaders(),
       });
     },
+    forgotPassword: async (payload: { email: string }) => {
+      return request<{ success: boolean; message: string }>(`${API_BASE}/auth/forgot-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+    },
+    resetPassword: async (token: string, payload: any) => {
+      return request<{ success: boolean; message: string }>(`${API_BASE}/auth/reset-password/${token}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+    },
     logout: () => {
       localStorage.removeItem("carepulse_token");
       localStorage.removeItem("carepulse_user");
@@ -147,6 +161,13 @@ export const api = {
       return request<{ profile: IPatient }>(`${API_BASE}/patients/${id}`, {
         headers: getHeaders(),
       });
+    },
+    updateProfile: async (payload: any) => {
+      return request<{ success: boolean; profile: IPatient }>(`${API_BASE}/patients/me`, {
+        method: "PUT",
+        headers: getHeaders(),
+        body: JSON.stringify(payload),
+      });
     }
   },
 
@@ -177,6 +198,13 @@ export const api = {
     },
     updateStatus: async (id: string, action: "schedule" | "cancel", payload: { note?: string; cancellationReason?: string }) => {
       return request<{ success: boolean; appointment: IAppointment }>(`${API_BASE}/appointments/${id}/status?action=${action}`, {
+        method: "PATCH",
+        headers: getHeaders(),
+        body: JSON.stringify(payload),
+      });
+    },
+    reschedule: async (id: string, payload: { schedule: string; note?: string }) => {
+      return request<{ success: boolean; appointment: IAppointment }>(`${API_BASE}/appointments/${id}/reschedule`, {
         method: "PATCH",
         headers: getHeaders(),
         body: JSON.stringify(payload),
