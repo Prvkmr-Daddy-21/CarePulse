@@ -236,7 +236,11 @@ export const db = {
     findByIdAndUpdate: async (id: string, update: Partial<IPatient>): Promise<IPatient | null> => {
       if (isMongoConnected) {
         try {
-          const patient = await PatientModel.findByIdAndUpdate(id as any, { $set: update } as any, { new: true } as any);
+          const patient = await PatientModel.findByIdAndUpdate(
+            id as any,
+            { $set: update } as any,
+            { returnDocument: "after" } as any
+          );
           return patient ? toJSON<IPatient>(patient) : null;
         } catch {
           return null;
@@ -289,7 +293,11 @@ export const db = {
     findByIdAndUpdate: async (id: string, update: Partial<IAppointment>): Promise<IAppointment | null> => {
       if (isMongoConnected) {
         try {
-          const appointment = await AppointmentModel.findByIdAndUpdate(id as any, { $set: update } as any, { new: true } as any);
+          const appointment = await AppointmentModel.findByIdAndUpdate(
+            id as any,
+            { $set: update } as any,
+            { returnDocument: "after" } as any
+          );
           return appointment ? toJSON<IAppointment>(appointment) : null;
         } catch {
           return null;
