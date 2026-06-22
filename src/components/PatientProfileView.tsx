@@ -41,6 +41,19 @@ export const PatientProfileView: React.FC<PatientProfileViewProps> = ({
     emergencyContactName: profile?.emergencyContactName || "",
     emergencyContactNumber: profile?.emergencyContactNumber || "",
   });
+  const totalAppointments = appointments.length;
+
+  const scheduledAppointments = appointments.filter(
+    (apt) => apt.status === "scheduled"
+  ).length;
+
+  const pendingAppointments = appointments.filter(
+    (apt) => apt.status === "pending"
+  ).length;
+
+  const cancelledAppointments = appointments.filter(
+    (apt) => apt.status === "cancelled"
+  ).length;
   useEffect(() => {
     async function loadData() {
       if (!currentUser) return;
@@ -263,6 +276,46 @@ export const PatientProfileView: React.FC<PatientProfileViewProps> = ({
             </button>
           </div>
 
+          {/* Statistics Dashboard */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+
+            <div className="bg-dark-200 border border-dark-300 rounded-2xl p-5">
+              <p className="text-dark-500 text-[10px] uppercase font-black tracking-wider">
+                Total Appointments
+              </p>
+              <h2 className="text-3xl font-black text-white mt-2">
+                {totalAppointments}
+              </h2>
+            </div>
+
+            <div className="bg-dark-200 border border-brand-green/20 rounded-2xl p-5">
+              <p className="text-brand-green text-[10px] uppercase font-black tracking-wider">
+                Scheduled
+              </p>
+              <h2 className="text-3xl font-black text-brand-green mt-2">
+                {scheduledAppointments}
+              </h2>
+            </div>
+
+            <div className="bg-dark-200 border border-brand-orange/20 rounded-2xl p-5">
+              <p className="text-brand-orange text-[10px] uppercase font-black tracking-wider">
+                Pending
+              </p>
+              <h2 className="text-3xl font-black text-brand-orange mt-2">
+                {pendingAppointments}
+              </h2>
+            </div>
+
+            <div className="bg-dark-200 border border-brand-red/20 rounded-2xl p-5">
+              <p className="text-brand-red text-[10px] uppercase font-black tracking-wider">
+                Cancelled
+              </p>
+              <h2 className="text-3xl font-black text-brand-red mt-2">
+                {cancelledAppointments}
+              </h2>
+            </div>
+
+          </div>
           {/* History listings */}
           <div className="bg-dark-200 border border-dark-300 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-4">
             <h3 className="text-sm font-black text-neutral-100 uppercase tracking-wider flex items-center gap-1.5 pb-2 border-b border-dark-300">

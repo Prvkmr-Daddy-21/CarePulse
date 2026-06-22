@@ -91,20 +91,31 @@ export class AuthService {
 
   static generateAccessToken(user: IUser): string {
     return jwt.sign(
-      { userId: user._id, role: user.role, email: user.email },
+      {
+        userId: user._id,
+        role: user.role,
+        email: user.email,
+      },
       JWT_SECRET,
-      { expiresIn: "1h" } // Increase in AI Studio to avoid token issues during dev play
+      {
+        expiresIn: process.env.JWT_EXPIRES_IN || "1h",
+      }
     );
   }
 
   static generateRefreshToken(user: IUser): string {
     return jwt.sign(
-      { userId: user._id, role: user.role, email: user.email },
+      {
+        userId: user._id,
+        role: user.role,
+        email: user.email,
+      },
       JWT_REFRESH_SECRET,
-      { expiresIn: "7d" }
+      {
+        expiresIn: "7d",
+      }
     );
   }
-
   static async refresh(token: string): Promise<{ token: string; refreshToken: string }> {
     try {
       const decoded = jwt.verify(token, JWT_REFRESH_SECRET) as {
