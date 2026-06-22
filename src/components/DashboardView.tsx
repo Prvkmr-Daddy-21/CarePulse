@@ -58,7 +58,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const [doctorsError, setDoctorsError] = useState<string | null>(null);
   const [doctorSearchTerm, setDoctorSearchTerm] = useState("");
   const [doctorCurrentPage, setDoctorCurrentPage] = useState(1);
-  
+
   const [isAddingDoctor, setIsAddingDoctor] = useState(false);
   const [isSubmittingDoctor, setIsSubmittingDoctor] = useState(false);
   const [newDoctor, setNewDoctor] = useState({
@@ -276,12 +276,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   };
 
   // DOCTORS PAGINATION LOGIC
-  const filteredDoctors = doctorsList.filter(d => 
-    d.name.toLowerCase().includes(doctorSearchTerm.toLowerCase()) || 
+  const filteredDoctors = doctorsList.filter(d =>
+    d.name.toLowerCase().includes(doctorSearchTerm.toLowerCase()) ||
     d.specialty.toLowerCase().includes(doctorSearchTerm.toLowerCase()) ||
     d.email.toLowerCase().includes(doctorSearchTerm.toLowerCase())
   );
-  
+
   const totalDoctorsFiltered = filteredDoctors.length;
   const docTotalPages = Math.ceil(totalDoctorsFiltered / ITEMS_PER_PAGE) || 1;
   const docStartIndex = (doctorCurrentPage - 1) * ITEMS_PER_PAGE;
@@ -320,16 +320,16 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 <span className="block text-[8px] font-mono tracking-widest text-brand-green uppercase">Admin Terminal</span>
               </div>
             </div>
-            
+
             <div className="hidden sm:flex items-center gap-2 bg-dark-100 p-1 rounded-xl border border-dark-300">
-              <button 
+              <button
                 onClick={() => setActiveTab("appointments")}
                 className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${activeTab === "appointments" ? "bg-dark-300 text-white shadow-md" : "text-gray-150 hover:text-white"}`}
               >
                 <Calendar className="w-3.5 h-3.5" />
                 Appointments
               </button>
-              <button 
+              <button
                 onClick={() => setActiveTab("doctors")}
                 className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${activeTab === "doctors" ? "bg-dark-300 text-white shadow-md" : "text-gray-150 hover:text-white"}`}
               >
@@ -357,14 +357,14 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
       {/* Main Content Wrapper */}
       <main className="max-w-7xl mx-auto w-full px-6 py-8 space-y-6 relative z-20 flex-grow flex flex-col h-0">
-        
+
         {/* ======================= APPOINTMENTS TAB ======================= */}
         {activeTab === "appointments" && (
           <>
             {/* Statistics highlights bar */}
             <div className="grid grid-cols-1 sm:grid-cols-6 gap-4 flex-shrink-0" id="stats-banner-cards">
               {/* Total */}
-              <div 
+              <div
                 className={`bg-dark-200 border rounded-2xl p-5 flex items-center gap-4 transition-all cursor-pointer ${statusFilter === "all" ? "border-purple-500 shadow-xl shadow-purple-500/10" : "border-dark-300 hover:border-purple-500/50"}`}
                 onClick={() => handleFilterClick("all")}
               >
@@ -378,7 +378,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               </div>
 
               {/* Scheduled */}
-              <div 
+              <div
                 className={`bg-dark-200 border rounded-2xl p-5 flex items-center gap-4 transition-all cursor-pointer ${statusFilter === "scheduled" ? "border-brand-green shadow-xl shadow-brand-green/10" : "border-dark-300 hover:border-brand-green/50"}`}
                 onClick={() => handleFilterClick("scheduled")}
               >
@@ -392,7 +392,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               </div>
 
               {/* Pending */}
-              <div 
+              <div
                 className={`bg-dark-200 border rounded-2xl p-5 flex items-center gap-4 transition-all cursor-pointer ${statusFilter === "pending" ? "border-brand-orange shadow-xl shadow-brand-orange/10" : "border-dark-300 hover:border-brand-orange/50"}`}
                 onClick={() => handleFilterClick("pending")}
               >
@@ -406,7 +406,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               </div>
 
               {/* Completed */}
-              <div 
+              <div
                 className={`bg-dark-200 border rounded-2xl p-5 flex items-center gap-4 transition-all cursor-pointer ${statusFilter === "completed" ? "border-cyan-500 shadow-xl shadow-cyan-500/10" : "border-dark-300 hover:border-cyan-500/50"}`}
                 onClick={() => handleFilterClick("completed")}
               >
@@ -420,7 +420,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               </div>
 
               {/* Cancelled */}
-              <div 
+              <div
                 className={`bg-dark-200 border rounded-2xl p-5 flex items-center gap-4 transition-all cursor-pointer ${statusFilter === "cancelled" ? "border-brand-red shadow-xl shadow-brand-red/10" : "border-dark-300 hover:border-brand-red/50"}`}
                 onClick={() => handleFilterClick("cancelled")}
               >
@@ -515,93 +515,93 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   </div>
                   <div className="overflow-x-auto flex-grow overflow-y-auto">
                     <table className="w-full border-collapse text-left relative">
-                    <thead className="sticky top-0 z-10">
-                      <tr className="bg-dark-200 border-b border-dark-300 text-[10px] uppercase font-mono tracking-widest text-dark-500 font-black">
-                        <th className="py-4 px-5">Patient Name</th>
-                        <th className="py-4 px-5">Scheduled Date</th>
-                        <th className="py-4 px-5">Specialist</th>
-                        <th className="py-4 px-5">Diagnosis Requirements</th>
-                        <th className="py-4 px-5">Validation Status</th>
-                        <th className="py-4 px-5 text-right">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-dark-300 text-xs text-gray-150">
-                      {appointments.map((apt) => (
-                        <tr key={apt._id} className="hover:bg-dark-100/25 transition-colors">
-                          <td className="py-3.5 px-5">
-                            <div className="flex flex-col">
-                              <span className="font-black text-white text-sm">{apt.patientName}</span>
-                              <span className="text-[10px] text-dark-500 font-mono">{apt.patientPhone}</span>
-                            </div>
-                          </td>
-                          <td className="py-3.5 px-5 font-bold">
-                            <div className="flex items-center gap-1.5">
-                              <Clock className="w-3.5 h-3.5 text-brand-green" />
-                              <span>
-                                {new Date(apt.schedule).toLocaleString("en-IN", {
-                                  day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: true,
-                                })}
-                              </span>
-                            </div>
-                          </td>
-                          <td className="py-3.5 px-5 font-semibold text-neutral-100">
-                            {apt.primaryPhysician}
-                          </td>
-                          <td className="py-3.5 px-5 max-w-xs xl:max-w-sm truncate" title={apt.reason}>
-                            <div className="flex flex-col gap-0.5">
-                              <span>{apt.reason}</span>
-                              {apt.note && (
-                                <span className="text-[10px] text-brand-green font-semibold leading-none flex items-center gap-0.5">
-                                  <CornerDownRight className="w-3 h-3" /> Note: "{apt.note}"
-                                </span>
-                              )}
-                              {apt.cancellationReason && (
-                                <span className="text-[10px] text-brand-red font-semibold leading-none flex items-center gap-0.5">
-                                  <CornerDownRight className="w-3 h-3" /> Cancelled: "{apt.cancellationReason}"
-                                </span>
-                              )}
-                            </div>
-                          </td>
-                          <td className="py-3.5 px-5">
-                            <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wider ${apt.status === "scheduled"
-                              ? "bg-brand-green/10 text-brand-green border border-brand-green/20"
-                              : apt.status === "pending"
-                                ? "bg-brand-orange/10 text-brand-orange border border-brand-orange/20"
-                                : apt.status === "completed"
-                                ? "bg-cyan-500/10 text-cyan-400 border border-cyan-500/20"
-                                : "bg-brand-red/10 text-brand-red border border-brand-red/20"
-                              }`}>
-                              <span className={`w-1.5 h-1.5 rounded-full ${apt.status === "scheduled" ? "bg-brand-green" : apt.status === "pending" ? "bg-brand-orange" : apt.status === "completed" ? "bg-cyan-400" : "bg-brand-red"}`} />
-                              <span>{apt.status}</span>
-                            </span>
-                          </td>
-                          <td className="py-3.5 px-5 text-right">
-                            {apt.status === "pending" ? (
-                              <div className="flex items-center justify-end gap-1.5">
-                                <button
-                                  onClick={() => {
-                                    handleActionClick(apt, "schedule");
-                                    setSelectedDate(new Date(apt.schedule).toISOString().split('T')[0]);
-                                  }}
-                                  className="px-2.5 py-1.5 bg-brand-blue/10 border border-brand-blue/20 text-brand-blue hover:bg-brand-blue/15 text-[10px] uppercase font-black tracking-wider rounded-lg cursor-pointer transition-all"
-                                >
-                                  Reschedule
-                                </button>
-                                <button
-                                  onClick={() => handleActionClick(apt, "cancel")}
-                                  className="px-2.5 py-1.5 bg-brand-red/10 border border-brand-red/20 text-brand-red hover:bg-brand-red/15 text-[10px] uppercase font-black tracking-wider rounded-lg cursor-pointer transition-all"
-                                >
-                                  Cancel
-                                </button>
-                              </div>
-                            ) : (
-                              <span className="text-[10px] text-dark-500 font-mono">Processed</span>
-                            )}
-                          </td>
+                      <thead className="sticky top-0 z-10">
+                        <tr className="bg-dark-200 border-b border-dark-300 text-[10px] uppercase font-mono tracking-widest text-dark-500 font-black">
+                          <th className="py-4 px-5">Patient Name</th>
+                          <th className="py-4 px-5">Scheduled Date</th>
+                          <th className="py-4 px-5">Specialist</th>
+                          <th className="py-4 px-5">Diagnosis Requirements</th>
+                          <th className="py-4 px-5">Validation Status</th>
+                          <th className="py-4 px-5 text-right">Actions</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody className="divide-y divide-dark-300 text-xs text-gray-150">
+                        {appointments.map((apt) => (
+                          <tr key={apt._id} className="hover:bg-dark-100/25 transition-colors">
+                            <td className="py-3.5 px-5">
+                              <div className="flex flex-col">
+                                <span className="font-black text-white text-sm">{apt.patientName}</span>
+                                <span className="text-[10px] text-dark-500 font-mono">{apt.patientPhone}</span>
+                              </div>
+                            </td>
+                            <td className="py-3.5 px-5 font-bold">
+                              <div className="flex items-center gap-1.5">
+                                <Clock className="w-3.5 h-3.5 text-brand-green" />
+                                <span>
+                                  {new Date(apt.schedule).toLocaleString("en-IN", {
+                                    day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: true,
+                                  })}
+                                </span>
+                              </div>
+                            </td>
+                            <td className="py-3.5 px-5 font-semibold text-neutral-100">
+                              {apt.primaryPhysician}
+                            </td>
+                            <td className="py-3.5 px-5 max-w-xs xl:max-w-sm truncate" title={apt.reason}>
+                              <div className="flex flex-col gap-0.5">
+                                <span>{apt.reason}</span>
+                                {apt.note && (
+                                  <span className="text-[10px] text-brand-green font-semibold leading-none flex items-center gap-0.5">
+                                    <CornerDownRight className="w-3 h-3" /> Note: "{apt.note}"
+                                  </span>
+                                )}
+                                {apt.cancellationReason && (
+                                  <span className="text-[10px] text-brand-red font-semibold leading-none flex items-center gap-0.5">
+                                    <CornerDownRight className="w-3 h-3" /> Cancelled: "{apt.cancellationReason}"
+                                  </span>
+                                )}
+                              </div>
+                            </td>
+                            <td className="py-3.5 px-5">
+                              <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wider ${apt.status === "scheduled"
+                                ? "bg-brand-green/10 text-brand-green border border-brand-green/20"
+                                : apt.status === "pending"
+                                  ? "bg-brand-orange/10 text-brand-orange border border-brand-orange/20"
+                                  : apt.status === "completed"
+                                    ? "bg-cyan-500/10 text-cyan-400 border border-cyan-500/20"
+                                    : "bg-brand-red/10 text-brand-red border border-brand-red/20"
+                                }`}>
+                                <span className={`w-1.5 h-1.5 rounded-full ${apt.status === "scheduled" ? "bg-brand-green" : apt.status === "pending" ? "bg-brand-orange" : apt.status === "completed" ? "bg-cyan-400" : "bg-brand-red"}`} />
+                                <span>{apt.status}</span>
+                              </span>
+                            </td>
+                            <td className="py-3.5 px-5 text-right">
+                              {apt.status === "pending" ? (
+                                <div className="flex items-center justify-end gap-1.5">
+                                  <button
+                                    onClick={() => {
+                                      handleActionClick(apt, "schedule");
+                                      setSelectedDate(new Date(apt.schedule).toISOString().split('T')[0]);
+                                    }}
+                                    className="px-2.5 py-1.5 bg-brand-blue/10 border border-brand-blue/20 text-brand-blue hover:bg-brand-blue/15 text-[10px] uppercase font-black tracking-wider rounded-lg cursor-pointer transition-all"
+                                  >
+                                    Reschedule
+                                  </button>
+                                  <button
+                                    onClick={() => handleActionClick(apt, "cancel")}
+                                    className="px-2.5 py-1.5 bg-brand-red/10 border border-brand-red/20 text-brand-red hover:bg-brand-red/15 text-[10px] uppercase font-black tracking-wider rounded-lg cursor-pointer transition-all"
+                                  >
+                                    Cancel
+                                  </button>
+                                </div>
+                              ) : (
+                                <span className="text-[10px] text-dark-500 font-mono">Processed</span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                   {totalPages > 1 && (
                     <div className="flex items-center justify-between p-5 border-t border-dark-300 bg-dark-100/30 flex-shrink-0">
@@ -643,7 +643,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   <span className="text-[10px] text-dark-500 uppercase tracking-widest font-bold">Total Doctors</span>
                 </div>
               </div>
-              
+
               <div className="bg-dark-200 border border-dark-300 rounded-2xl p-5 flex items-center gap-4">
                 <div className="p-3 rounded-xl border bg-purple-500/10 text-purple-400 border-purple-500/15">
                   <Calendar className="w-6 h-6" />
@@ -676,7 +676,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 <button onClick={loadDoctors} className="p-3 border border-dark-300 hover:border-dark-400 bg-dark-100 text-gray-150 hover:text-white rounded-xl cursor-pointer">
                   <Activity className="w-4 h-4" />
                 </button>
-                <button 
+                <button
                   onClick={() => setIsAddingDoctor(true)}
                   className="px-4 py-3 bg-brand-green hover:bg-brand-green/90 text-dark-100 font-bold text-xs rounded-xl flex items-center gap-2 shadow-md shadow-brand-green/10 transition-all cursor-pointer"
                 >
@@ -710,65 +710,65 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   </div>
                   <div className="overflow-x-auto flex-grow overflow-y-auto">
                     <table className="w-full border-collapse text-left relative">
-                    <thead className="sticky top-0 z-10">
-                      <tr className="bg-dark-200 border-b border-dark-300 text-[10px] uppercase font-mono tracking-widest text-dark-500 font-black">
-                        <th className="py-4 px-5">Doctor Profile</th>
-                        <th className="py-4 px-5">Specialty</th>
-                        <th className="py-4 px-5">Experience</th>
-                        <th className="py-4 px-5">System Status</th>
-                        <th className="py-4 px-5 text-right">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-dark-300 text-xs text-gray-150">
-                      {paginatedDoctors.map((doc) => (
-                        <tr key={doc._id} className="hover:bg-dark-100/25 transition-colors">
-                          <td className="py-4 px-5">
-                            <div className="flex flex-col">
-                              <span className="font-black text-white text-sm">{doc.name}</span>
-                              <span className="text-[10px] text-dark-500 font-mono flex items-center gap-1 mt-0.5">
-                                <Mail className="w-2.5 h-2.5" /> {doc.email}
-                              </span>
-                              <span className="text-[10px] text-dark-500 font-mono flex items-center gap-1 mt-0.5">
-                                <Phone className="w-2.5 h-2.5" /> {doc.phone}
-                              </span>
-                            </div>
-                          </td>
-                          <td className="py-4 px-5">
-                            <div className="flex flex-col gap-1">
-                              <span className="font-bold text-brand-green flex items-center gap-1">
-                                <Briefcase className="w-3.5 h-3.5" /> {doc.specialty}
-                              </span>
-                              {doc.qualification && (
-                                <span className="text-[10px] text-gray-300 flex items-center gap-1">
-                                  <GraduationCap className="w-3 h-3 text-dark-500" /> {doc.qualification}
-                                </span>
-                              )}
-                            </div>
-                          </td>
-                          <td className="py-4 px-5">
-                            <span className="font-semibold text-white">{doc.experience || "N/A"}</span>
-                          </td>
-                          <td className="py-4 px-5">
-                            <button
-                              onClick={() => handleStatusToggle(doc)}
-                              className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer ${doc.status === "active" ? "bg-brand-green/10 text-brand-green border border-brand-green/20 hover:bg-brand-green/20" : "bg-dark-300 text-dark-500 hover:bg-dark-400 border border-dark-400 hover:text-white"}`}
-                            >
-                              <span className={`w-1.5 h-1.5 rounded-full ${doc.status === "active" ? "bg-brand-green" : "bg-dark-500"}`} />
-                              <span>{doc.status}</span>
-                            </button>
-                          </td>
-                          <td className="py-4 px-5 text-right">
-                            <button
-                              onClick={() => setSelectedDoctorView(doc)}
-                              className="px-3 py-1.5 bg-brand-blue/10 border border-brand-blue/20 text-brand-blue hover:bg-brand-blue/15 text-[10px] uppercase font-black tracking-wider rounded-lg cursor-pointer transition-all"
-                            >
-                              View Dashboard
-                            </button>
-                          </td>
+                      <thead className="sticky top-0 z-10">
+                        <tr className="bg-dark-200 border-b border-dark-300 text-[10px] uppercase font-mono tracking-widest text-dark-500 font-black">
+                          <th className="py-4 px-5">Doctor Profile</th>
+                          <th className="py-4 px-5">Specialty</th>
+                          <th className="py-4 px-5">Experience</th>
+                          <th className="py-4 px-5">System Status</th>
+                          <th className="py-4 px-5 text-right">Actions</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody className="divide-y divide-dark-300 text-xs text-gray-150">
+                        {paginatedDoctors.map((doc) => (
+                          <tr key={doc._id} className="hover:bg-dark-100/25 transition-colors">
+                            <td className="py-4 px-5">
+                              <div className="flex flex-col">
+                                <span className="font-black text-white text-sm">{doc.name}</span>
+                                <span className="text-[10px] text-dark-500 font-mono flex items-center gap-1 mt-0.5">
+                                  <Mail className="w-2.5 h-2.5" /> {doc.email}
+                                </span>
+                                <span className="text-[10px] text-dark-500 font-mono flex items-center gap-1 mt-0.5">
+                                  <Phone className="w-2.5 h-2.5" /> {doc.phone}
+                                </span>
+                              </div>
+                            </td>
+                            <td className="py-4 px-5">
+                              <div className="flex flex-col gap-1">
+                                <span className="font-bold text-brand-green flex items-center gap-1">
+                                  <Briefcase className="w-3.5 h-3.5" /> {doc.specialty}
+                                </span>
+                                {doc.qualification && (
+                                  <span className="text-[10px] text-gray-300 flex items-center gap-1">
+                                    <GraduationCap className="w-3 h-3 text-dark-500" /> {doc.qualification}
+                                  </span>
+                                )}
+                              </div>
+                            </td>
+                            <td className="py-4 px-5">
+                              <span className="font-semibold text-white">{doc.experience || "N/A"}</span>
+                            </td>
+                            <td className="py-4 px-5">
+                              <button
+                                onClick={() => handleStatusToggle(doc)}
+                                className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-[10px] font-black uppercase tracking-wider transition-all cursor-pointer ${doc.status === "active" ? "bg-brand-green/10 text-brand-green border border-brand-green/20 hover:bg-brand-green/20" : "bg-dark-300 text-dark-500 hover:bg-dark-400 border border-dark-400 hover:text-white"}`}
+                              >
+                                <span className={`w-1.5 h-1.5 rounded-full ${doc.status === "active" ? "bg-brand-green" : "bg-dark-500"}`} />
+                                <span>{doc.status}</span>
+                              </button>
+                            </td>
+                            <td className="py-4 px-5 text-right">
+                              <button
+                                onClick={() => setSelectedDoctorView(doc)}
+                                className="px-3 py-1.5 bg-brand-blue/10 border border-brand-blue/20 text-brand-blue hover:bg-brand-blue/15 text-[10px] uppercase font-black tracking-wider rounded-lg cursor-pointer transition-all"
+                              >
+                                View Dashboard
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                   {docTotalPages > 1 && (
                     <div className="flex items-center justify-between p-5 border-t border-dark-300 bg-dark-100/30 flex-shrink-0">
@@ -818,11 +818,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1">
                 <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Full Name</label>
-                <input required type="text" value={newDoctor.name} onChange={e => setNewDoctor({...newDoctor, name: e.target.value})} placeholder="Dr. John Doe" className="w-full bg-dark-100 border border-dark-300 rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:border-brand-green transition-all" />
+                <input required type="text" value={newDoctor.name} onChange={e => setNewDoctor({ ...newDoctor, name: e.target.value })} placeholder="Dr. John Doe" className="w-full bg-dark-100 border border-dark-300 rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:border-brand-green transition-all" />
               </div>
               <div className="space-y-1">
                 <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Specialty</label>
-                <select value={newDoctor.specialty} onChange={e => setNewDoctor({...newDoctor, specialty: e.target.value})} className="w-full bg-dark-100 border border-dark-300 rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:border-brand-green transition-all appearance-none cursor-pointer">
+                <select value={newDoctor.specialty} onChange={e => setNewDoctor({ ...newDoctor, specialty: e.target.value })} className="w-full bg-dark-100 border border-dark-300 rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:border-brand-green transition-all appearance-none cursor-pointer">
                   <option>General Medicine</option>
                   <option>Cardiologist</option>
                   <option>Pediatrician</option>
@@ -834,23 +834,23 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               </div>
               <div className="space-y-1">
                 <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Email Address</label>
-                <input required type="email" value={newDoctor.email} onChange={e => setNewDoctor({...newDoctor, email: e.target.value})} placeholder="doctor@carepulse.com" className="w-full bg-dark-100 border border-dark-300 rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:border-brand-green transition-all" />
+                <input required type="email" value={newDoctor.email} onChange={e => setNewDoctor({ ...newDoctor, email: e.target.value })} placeholder="doctor@carepulse.com" className="w-full bg-dark-100 border border-dark-300 rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:border-brand-green transition-all" />
               </div>
               <div className="space-y-1">
                 <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">System Password</label>
-                <input required type="password" value={newDoctor.password} onChange={e => setNewDoctor({...newDoctor, password: e.target.value})} placeholder="********" className="w-full bg-dark-100 border border-dark-300 rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:border-brand-green transition-all" />
+                <input required type="password" value={newDoctor.password} onChange={e => setNewDoctor({ ...newDoctor, password: e.target.value })} placeholder="********" className="w-full bg-dark-100 border border-dark-300 rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:border-brand-green transition-all" />
               </div>
               <div className="space-y-1">
                 <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Phone Number</label>
-                <input required type="text" value={newDoctor.phone} onChange={e => setNewDoctor({...newDoctor, phone: e.target.value})} placeholder="+1 (555) 000-0000" className="w-full bg-dark-100 border border-dark-300 rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:border-brand-green transition-all" />
+                <input required type="text" value={newDoctor.phone} onChange={e => setNewDoctor({ ...newDoctor, phone: e.target.value })} placeholder="+1 (555) 000-0000" className="w-full bg-dark-100 border border-dark-300 rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:border-brand-green transition-all" />
               </div>
               <div className="space-y-1">
                 <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Experience (Years)</label>
-                <input type="text" value={newDoctor.experience} onChange={e => setNewDoctor({...newDoctor, experience: e.target.value})} placeholder="e.g. 10 Years" className="w-full bg-dark-100 border border-dark-300 rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:border-brand-green transition-all" />
+                <input type="text" value={newDoctor.experience} onChange={e => setNewDoctor({ ...newDoctor, experience: e.target.value })} placeholder="e.g. 10 Years" className="w-full bg-dark-100 border border-dark-300 rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:border-brand-green transition-all" />
               </div>
               <div className="space-y-1 sm:col-span-2">
                 <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Qualifications</label>
-                <input type="text" value={newDoctor.qualification} onChange={e => setNewDoctor({...newDoctor, qualification: e.target.value})} placeholder="MBBS, MD - Cardiology" className="w-full bg-dark-100 border border-dark-300 rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:border-brand-green transition-all" />
+                <input type="text" value={newDoctor.qualification} onChange={e => setNewDoctor({ ...newDoctor, qualification: e.target.value })} placeholder="MBBS, MD - Cardiology" className="w-full bg-dark-100 border border-dark-300 rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:border-brand-green transition-all" />
               </div>
             </div>
 
@@ -882,14 +882,14 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               </div>
             </div>
             <div className="flex items-center gap-3 w-full">
-              <button 
-                onClick={() => setDoctorToDeactivate(null)} 
+              <button
+                onClick={() => setDoctorToDeactivate(null)}
                 className="flex-1 px-4 py-3 bg-dark-300 hover:bg-dark-400 border border-dark-400 text-xs font-bold text-white rounded-xl transition-all cursor-pointer"
               >
                 Cancel
               </button>
-              <button 
-                onClick={confirmDeactivate} 
+              <button
+                onClick={confirmDeactivate}
                 className="flex-1 px-4 py-3 bg-brand-red hover:bg-brand-red/90 text-dark-100 text-xs font-black uppercase tracking-wider rounded-xl transition-all shadow-lg shadow-brand-red/10 cursor-pointer"
               >
                 Deactivate
