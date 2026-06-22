@@ -136,6 +136,7 @@ export class AppointmentService {
 
     const updatePayload: Partial<IAppointment> = {
       schedule: data.schedule,
+      status: "scheduled",
     };
     if (data.note !== undefined) {
       updatePayload.note = data.note;

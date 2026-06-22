@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { 
-  Activity, 
-  CalendarCheck, 
-  Clock, 
-  XOctagon, 
-  Search, 
-  CornerDownRight, 
-  FileCheck, 
-  FileText, 
-  LogOut, 
+import {
+  Activity,
+  CalendarCheck,
+  Clock,
+  XOctagon,
+  Search,
+  CornerDownRight,
+  FileCheck,
+  FileText,
+  LogOut,
   Calendar,
   Filter,
   CheckCircle,
@@ -23,7 +23,7 @@ interface DashboardViewProps {
   onLogout: () => void;
 }
 
-export const DashboardView: React.FC<DashboardViewProps> = ({ 
+export const DashboardView: React.FC<DashboardViewProps> = ({
   onNavigate,
   currentUser,
   onLogout
@@ -43,6 +43,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const [note, setNote] = useState("");
   const [cancellationReason, setCancellationReason] = useState("");
   const [isActionSubmitting, setIsActionSubmitting] = useState(false);
+  const [selectedDate, setSelectedDate] = useState("");
 
   async function loadData() {
     try {
@@ -86,18 +87,43 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
     try {
       setIsActionSubmitting(true);
-      const payload = {
-        note: actionType === "schedule" ? note : "",
-        cancellationReason: actionType === "cancel" ? cancellationReason : ""
-      };
 
-      const res = await api.appointments.updateStatus(actionTarget._id, actionType, payload);
-      if (res.success) {
-        // Refresh appointment listings
-        await loadData();
-        // Close modal overlay
-        setActionTarget(null);
-        setActionType(null);
+      if (actionType === "schedule" && selectedDate) {
+        const res = await api.appointments.reschedule(
+          actionTarget._id,
+          {
+            schedule: selectedDate,
+            note,
+          }
+        );
+
+        if (res.success) {
+          await loadData();
+          setActionTarget(null);
+          setActionType(null);
+          setSelectedDate("");
+        }
+      } else {
+        const payload = {
+          note: actionType === "schedule" ? note : "",
+          cancellationReason:
+            actionType === "cancel"
+              ? cancellationReason
+              : "",
+        };
+
+        const res = await api.appointments.updateStatus(
+          actionTarget._id,
+          actionType,
+          payload
+        );
+
+        if (res.success) {
+          await loadData();
+          setActionTarget(null);
+          setActionType(null);
+          setSelectedDate("");
+        }
       }
     } catch (err: any) {
       alert(err?.message || "Action state transmission failed.");
@@ -137,7 +163,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <span className="block text-xs font-mono text-dark-500 font-bold uppercase">CONNECTED SPECIALIST</span>
               <span className="text-xs font-extrabold text-white">{currentUser?.email}</span>
             </div>
-            <button 
+            <button
               onClick={onLogout}
               className="text-xs text-brand-red flex items-center gap-1 bg-brand-red/10 border border-brand-red/20 px-3.5 py-2 rounded-xl hover:bg-brand-red/15 transition-all cursor-pointer"
             >
@@ -150,7 +176,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
       {/* Content wrapper */}
       <main className="max-w-7xl mx-auto w-full px-6 py-8 space-y-8 relative z-20 flex-grow">
-        
+
         {/* Statistics highlights bar */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4" id="stats-banner-cards">
           {/* Scheduled */}
@@ -193,8 +219,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <form onSubmit={handleSearchSubmit} className="flex items-center gap-2 max-w-md w-full">
             <div className="relative flex-grow">
               <Search className="absolute left-3 top-3.5 w-4 h-4 text-gray-150" />
-              <input 
-                type="text" 
+              <input
+                type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search patient, symptoms, or clinical notes..."
@@ -202,8 +228,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 id="search-input"
               />
             </div>
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className="px-4 py-3 bg-brand-green hover:bg-brand-green/90 text-dark-100 font-bold text-xs rounded-xl flex items-center gap-1 shadow-md shadow-brand-green/10 transition-all cursor-pointer"
             >
               Search
@@ -217,11 +243,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 <button
                   key={s}
                   onClick={() => setStatusFilter(s)}
-                  className={`px-3 py-1.5 rounded-lg text-[10px] font-extrabold uppercase tracking-wider transition-all cursor-pointer ${
-                    statusFilter === s 
-                      ? "bg-brand-green text-dark-100 shadow-lg" 
-                      : "text-gray-150 hover:text-white hover:bg-dark-200"
-                  }`}
+                  className={`px-3 py-1.5 rounded-lg text-[10px] font-extrabold uppercase tracking-wider transition-all cursor-pointer ${statusFilter === s
+                    ? "bg-brand-green text-dark-100 shadow-lg"
+                    : "text-gray-150 hover:text-white hover:bg-dark-200"
+                    }`}
                 >
                   {s}
                 </button>
@@ -229,7 +254,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
 
             {/* Quick Refresh */}
-            <button 
+            <button
               onClick={loadData}
               className="p-2 border border-dark-300 hover:border-dark-400 bg-dark-100 text-gray-150 hover:text-white rounded-xl cursor-pointer"
               title="Sync dataset"
@@ -279,7 +304,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                           <span className="text-[10px] text-dark-500 font-mono">{apt.patientPhone}</span>
                         </div>
                       </td>
-                      
+
                       {/* Schedule */}
                       <td className="py-3.5 px-5 font-bold">
                         <div className="flex items-center gap-1.5">
@@ -321,16 +346,14 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
                       {/* Status */}
                       <td className="py-3.5 px-5">
-                        <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wider ${
-                          apt.status === "scheduled" 
-                            ? "bg-brand-green/10 text-brand-green border border-brand-green/20" 
-                            : apt.status === "pending" 
-                            ? "bg-brand-orange/10 text-brand-orange border border-brand-orange/20" 
+                        <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wider ${apt.status === "scheduled"
+                          ? "bg-brand-green/10 text-brand-green border border-brand-green/20"
+                          : apt.status === "pending"
+                            ? "bg-brand-orange/10 text-brand-orange border border-brand-orange/20"
                             : "bg-brand-red/10 text-brand-red border border-brand-red/20"
-                        }`}>
-                          <span className={`w-1.5 h-1.5 rounded-full ${
-                            apt.status === "scheduled" ? "bg-brand-green" : apt.status === "pending" ? "bg-brand-orange" : "bg-brand-red"
-                          }`} />
+                          }`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${apt.status === "scheduled" ? "bg-brand-green" : apt.status === "pending" ? "bg-brand-orange" : "bg-brand-red"
+                            }`} />
                           <span>{apt.status === "scheduled" ? "scheduled" : apt.status === "pending" ? "pending" : "cancelled"}</span>
                         </span>
                       </td>
@@ -340,11 +363,20 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                         {apt.status === "pending" ? (
                           <div className="flex items-center justify-end gap-1.5">
                             <button
-                              onClick={() => handleActionClick(apt, "schedule")}
-                              className="px-2.5 py-1.5 bg-brand-green/10 border border-brand-green/20 text-brand-green hover:bg-brand-green/15 text-[10px] uppercase font-black tracking-wider rounded-lg cursor-pointer transition-all"
+                              onClick={() => {
+                                handleActionClick(apt, "schedule");
+
+                                setSelectedDate(
+                                  new Date(apt.schedule)
+                                    .toISOString()
+                                    .slice(0, 16)
+                                );
+                              }}
+                              className="px-2.5 py-1.5 bg-brand-blue/10 border border-brand-blue/20 text-brand-blue hover:bg-brand-blue/15 text-[10px] uppercase font-black tracking-wider rounded-lg cursor-pointer transition-all"
                             >
-                              Schedule
+                              Reschedule
                             </button>
+
                             <button
                               onClick={() => handleActionClick(apt, "cancel")}
                               className="px-2.5 py-1.5 bg-brand-red/10 border border-brand-red/20 text-brand-red hover:bg-brand-red/15 text-[10px] uppercase font-black tracking-wider rounded-lg cursor-pointer transition-all"
@@ -368,14 +400,18 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       {/* Action scheduling overlay modal */}
       {actionTarget && actionType && (
         <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-6">
-          <form 
-            onSubmit={handleActionSubmit} 
+          <form
+            onSubmit={handleActionSubmit}
             className="bg-dark-200 border border-dark-300 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl space-y-6 animate-in fade-in zoom-in duration-150"
           >
             <div className="border-b border-dark-300 pb-4">
               <h3 className="text-lg font-black text-neutral-100 flex items-center gap-2">
                 {actionType === "schedule" ? <CheckCircle className="text-brand-green w-5 h-5" /> : <XOctagon className="text-brand-red w-5 h-5" />}
-                <span>{actionType === "schedule" ? "Scheduling Appointment" : "Submit Cancellation Notice"}</span>
+                <span>
+                  {actionType === "schedule"
+                    ? "Reschedule Appointment"
+                    : "Submit Cancellation Notice"}
+                </span>
               </h3>
               <p className="text-xs text-slate-100 mt-1">
                 Updating schedule state for patient profile <strong>{actionTarget.patientName}</strong>.
@@ -385,6 +421,19 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             {actionType === "schedule" ? (
               <div className="space-y-2">
                 <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Specialist Consultation Notes</label>
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">
+                    New Appointment Date & Time
+                  </label>
+
+                  <input
+                    type="datetime-local"
+                    value={selectedDate}
+                    onChange={(e) => setSelectedDate(e.target.value)}
+                    className="w-full bg-dark-100 border border-dark-300 rounded-xl py-3 px-4 text-xs text-white"
+                    required
+                  />
+                </div>
                 <textarea
                   required
                   value={note}
@@ -416,6 +465,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 onClick={() => {
                   setActionTarget(null);
                   setActionType(null);
+                  setSelectedDate("");
+
+
                 }}
                 className="px-4 py-2 bg-dark-300 hover:bg-dark-400 border border-dark-400 text-xs font-bold rounded-xl transition-all cursor-pointer"
               >
@@ -425,11 +477,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <button
                 type="submit"
                 disabled={isActionSubmitting}
-                className={`px-5 py-2.5 text-dark-100 text-xs font-black uppercase tracking-wider rounded-xl flex items-center gap-1 shadow-lg cursor-pointer disabled:cursor-not-allowed transition-all ${
-                  actionType === "schedule" 
-                    ? "bg-brand-green hover:bg-brand-green/90 shadow-brand-green/10" 
-                    : "bg-brand-red hover:bg-brand-red/90 shadow-brand-red/10"
-                }`}
+                className={`px-5 py-2.5 text-dark-100 text-xs font-black uppercase tracking-wider rounded-xl flex items-center gap-1 shadow-lg cursor-pointer disabled:cursor-not-allowed transition-all ${actionType === "schedule"
+                  ? "bg-brand-green hover:bg-brand-green/90 shadow-brand-green/10"
+                  : "bg-brand-red hover:bg-brand-red/90 shadow-brand-red/10"
+                  }`}
                 id="modal-submit-btn"
               >
                 {isActionSubmitting ? (

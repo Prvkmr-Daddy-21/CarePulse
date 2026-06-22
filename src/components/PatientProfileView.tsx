@@ -257,7 +257,10 @@ export const PatientProfileView: React.FC<PatientProfileViewProps> = ({
         {/* Right column - Historic Consultations Allocation list */}
         <section className="lg:col-span-8 flex flex-col gap-6">
 
+
+
           {/* Welcome Banner */}
+
           <div className="bg-dark-200 border border-dark-300 rounded-3xl p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-2xl relative overflow-hidden">
             <div className="space-y-1 z-10 text-center sm:text-left">
               <h2 className="text-2xl font-black text-white tracking-tight">Active Therapist Timeline</h2>

@@ -159,7 +159,9 @@ export class AuthService {
       resetPasswordExpire
     });
 
-    const resetUrl = `${protocol}://${host}/reset-password/${rawToken}`;
+    const appUrl = process.env.APP_URL || `${protocol}://${host}`;
+
+    const resetUrl = `${appUrl}/reset-password/${rawToken}`;
     await NotificationService.sendPasswordResetEmail(validatedData.email, resetUrl);
   }
 
