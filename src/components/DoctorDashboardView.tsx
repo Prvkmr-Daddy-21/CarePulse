@@ -36,6 +36,8 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
   const [statusFilter, setStatusFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [doctorFilter, setDoctorFilter] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 10;
 
   // Scheduling Modal State
   const [actionTarget, setActionTarget] = useState<IAppointment | null>(null);
@@ -54,7 +56,6 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
       setError(null);
       const res = await api.appointments.list({
         search: searchTerm,
-        status: statusFilter,
         doctor: doctorFilter
       });
       if (res.success) {
@@ -69,7 +70,7 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
 
   useEffect(() => {
     loadData();
-  }, [statusFilter, doctorFilter]);
+  }, [doctorFilter]);
 
   useEffect(() => {
     async function fetchSlots() {
@@ -164,6 +165,27 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
   const completedCount = appointments.filter(a => a.status === "completed").length;
   const cancelledCount = appointments.filter(a => a.status === "cancelled").length;
 
+  const filteredAppointments = appointments.filter((apt) => {
+    if (statusFilter === "all") return true;
+    return apt.status === statusFilter;
+  });
+
+  const sortedAppointments = [...filteredAppointments].sort(
+    (a, b) => new Date(b.schedule).getTime() - new Date(a.schedule).getTime()
+  );
+
+  const totalFiltered = sortedAppointments.length;
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, totalFiltered);
+  const paginatedAppointments = sortedAppointments.slice(startIndex, endIndex);
+
+  const totalPages = Math.ceil(totalFiltered / ITEMS_PER_PAGE);
+
+  const handleFilterClick = (status: string) => {
+    setStatusFilter(status);
+    setCurrentPage(1);
+  };
+
   return (
     <div className="min-h-screen bg-dark-100 text-white flex flex-col justify-start relative font-sans" id="specialist-dashboard">
       {/* Absolute Dynamic Gradients */}
@@ -207,8 +229,11 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
         {/* Statistics highlights bar */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4" id="stats-banner-cards">
           {/* Scheduled */}
-          <div className="bg-dark-200 border border-dark-300 rounded-2xl p-5 flex items-center gap-4 shadow-xl">
-            <div className="p-3 bg-brand-green/10 text-brand-green rounded-xl border border-brand-green/15">
+          <div 
+            className={`bg-dark-200 border rounded-2xl p-5 flex items-center gap-4 transition-all cursor-pointer ${statusFilter === "scheduled" ? "border-brand-green shadow-xl shadow-brand-green/10" : "border-dark-300 hover:border-brand-green/50"}`}
+            onClick={() => handleFilterClick("scheduled")}
+          >
+            <div className={`p-3 rounded-xl border ${statusFilter === "scheduled" ? "bg-brand-green text-dark-100 border-brand-green" : "bg-brand-green/10 text-brand-green border-brand-green/15"}`}>
               <CalendarCheck className="w-6 h-6" />
             </div>
             <div>
@@ -218,8 +243,11 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
           </div>
 
           {/* Completed */}
-          <div className="bg-dark-200 border border-dark-300 rounded-2xl p-5 flex items-center gap-4 shadow-xl">
-            <div className="p-3 bg-cyan-500/10 text-cyan-400 rounded-xl border border-cyan-500/15 animate-pulse">
+          <div 
+            className={`bg-dark-200 border rounded-2xl p-5 flex items-center gap-4 transition-all cursor-pointer ${statusFilter === "completed" ? "border-cyan-500 shadow-xl shadow-cyan-500/10" : "border-dark-300 hover:border-cyan-500/50"}`}
+            onClick={() => handleFilterClick("completed")}
+          >
+            <div className={`p-3 rounded-xl border ${statusFilter === "completed" ? "bg-cyan-500 text-dark-100 border-cyan-500" : "bg-cyan-500/10 text-cyan-400 border-cyan-500/15 animate-pulse"}`}>
               <CheckCircle className="w-6 h-6" />
             </div>
             <div>
@@ -229,8 +257,11 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
           </div>
 
           {/* Cancelled */}
-          <div className="bg-dark-200 border border-dark-300 rounded-2xl p-5 flex items-center gap-4 shadow-xl">
-            <div className="p-3 bg-brand-red/10 text-brand-red rounded-xl border border-brand-red/15">
+          <div 
+            className={`bg-dark-200 border rounded-2xl p-5 flex items-center gap-4 transition-all cursor-pointer ${statusFilter === "cancelled" ? "border-brand-red shadow-xl shadow-brand-red/10" : "border-dark-300 hover:border-brand-red/50"}`}
+            onClick={() => handleFilterClick("cancelled")}
+          >
+            <div className={`p-3 rounded-xl border ${statusFilter === "cancelled" ? "bg-brand-red text-dark-100 border-brand-red" : "bg-brand-red/10 text-brand-red border-brand-red/15"}`}>
               <XOctagon className="w-6 h-6" />
             </div>
             <div>
@@ -269,7 +300,7 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
               {["all", "pending", "scheduled", "completed", "cancelled"].map((s) => (
                 <button
                   key={s}
-                  onClick={() => setStatusFilter(s)}
+                  onClick={() => handleFilterClick(s)}
                   className={`px-3 py-1.5 rounded-lg text-[10px] font-extrabold uppercase tracking-wider transition-all cursor-pointer ${statusFilter === s
                     ? "bg-brand-green text-dark-100 shadow-lg"
                     : "text-gray-150 hover:text-white hover:bg-dark-200"
@@ -302,15 +333,23 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
             <div className="p-12 text-center text-brand-red font-semibold">
               ⚠️ {error}
             </div>
-          ) : appointments.length === 0 ? (
+          ) : totalFiltered === 0 ? (
             <div className="p-12 text-center text-dark-500 space-y-2">
               <FileMinus className="w-10 h-10 mx-auto text-dark-400" />
               <p className="font-extrabold text-sm text-neutral-100">No schedules match the active criteria.</p>
               <p className="text-xs text-dark-500">Wait for client requests or adjust parameters.</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse text-left" id="schedules-data-table">
+            <div className="flex flex-col">
+              {totalFiltered > 0 && (
+                <div className="px-5 py-3 border-b border-dark-300 bg-dark-100/30 flex justify-between items-center">
+                  <span className="text-xs font-bold text-dark-500 uppercase tracking-widest">
+                    Showing {startIndex + 1}–{endIndex} of {totalFiltered} appointments
+                  </span>
+                </div>
+              )}
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse text-left" id="schedules-data-table">
                 <thead>
                   <tr className="bg-dark-100/50 border-b border-dark-300 text-[10px] uppercase font-mono tracking-widest text-dark-500 font-black">
                     <th className="py-4 px-5">Patient Name</th>
@@ -322,7 +361,7 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-dark-300 text-xs text-gray-150">
-                  {appointments.map((apt) => (
+                  {paginatedAppointments.map((apt) => (
                     <tr key={apt._id} className="hover:bg-dark-100/25 transition-colors">
                       {/* Name */}
                       <td className="py-3.5 px-5">
@@ -432,6 +471,28 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
                   ))}
                 </tbody>
               </table>
+              </div>
+              {totalPages > 1 && (
+                <div className="flex items-center justify-between p-5 border-t border-dark-300 bg-dark-100/30">
+                  <button
+                    onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                    disabled={currentPage === 1}
+                    className="px-4 py-2 bg-dark-100 hover:bg-dark-200 border border-dark-300 text-xs font-bold text-white rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  >
+                    Previous
+                  </button>
+                  <span className="text-[10px] text-dark-500 font-bold uppercase tracking-widest">
+                    Page {currentPage} of {totalPages}
+                  </span>
+                  <button
+                    onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                    disabled={currentPage === totalPages}
+                    className="px-4 py-2 bg-dark-100 hover:bg-dark-200 border border-dark-300 text-xs font-bold text-white rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </section>

@@ -50,8 +50,17 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
       <div className="absolute top-[-10%] left-[-15%] w-[50%] h-[50%] rounded-full bg-brand-green/5 blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-15%] w-[45%] h-[40%] rounded-full bg-brand-blue/5 blur-[100px] pointer-events-none" />
 
+      {/* Back to Home Button */}
+      <button
+        onClick={() => onNavigate("landing")}
+        className="absolute top-6 left-6 z-50 text-xs text-gray-150 hover:text-white flex items-center gap-1.5 bg-dark-200 border border-dark-300 px-3 py-1.5 rounded-xl cursor-pointer"
+      >
+        <ArrowLeft className="w-3.5 h-3.5" />
+        Back to Home
+      </button>
+
       {/* Brand Header */}
-      <div className="max-w-md mx-auto w-full flex items-center justify-between relative z-10">
+      <div className="max-w-md mx-auto w-full flex items-center justify-center relative z-10 mb-6">
         <div className="flex items-center gap-2 cursor-pointer" onClick={() => onNavigate("landing")}>
           <div className="bg-brand-green/25 p-2 rounded-xl border border-brand-green/30">
             <Activity className="h-5 w-5 text-brand-green" />
@@ -62,13 +71,6 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
             </span>
           </div>
         </div>
-        <button
-          onClick={() => onNavigate("landing")}
-          className="text-xs text-gray-150 hover:text-white flex items-center gap-1.5 bg-dark-200 border border-dark-300 px-3 py-1.5 rounded-xl cursor-pointer"
-        >
-          <ArrowLeft className="w-3.5 h-3.5" />
-          Home Base
-        </button>
       </div>
 
       {/* Content Form Box */}

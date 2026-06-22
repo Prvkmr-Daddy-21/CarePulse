@@ -213,7 +213,7 @@ export const PatientRegistrationView: React.FC<PatientRegistrationViewProps> = (
         authUser = registerRes.user;
       } catch (authErr: any) {
         if (authErr && authErr.message && authErr.message.includes("already registered")) {
-          setError("This email address is already registered. Please go to Login room.");
+          setError("An account already exists with this email.");
           setIsSubmitting(false);
           return;
         }
@@ -262,17 +262,25 @@ export const PatientRegistrationView: React.FC<PatientRegistrationViewProps> = (
       setIsSubmitting(false);
     }
   };
-
   return (
     <div className="min-h-screen bg-dark-100 flex flex-col justify-start relative text-white py-12 px-6" id="patient-registration-container">
       {/* Dynamic Background Blur */}
       <div className="absolute top-[-5%] left-[-10%] w-[45%] h-[40%] rounded-full bg-brand-green/5 blur-[100px] pointer-events-none" />
       <div className="absolute bottom-[-5%] right-[-10%] w-[45%] h-[40%] rounded-full bg-brand-blue/5 blur-[100px] pointer-events-none" />
 
+      {/* Back to Home Button */}
+      <button
+        onClick={() => onNavigate("landing")}
+        className="absolute top-6 left-6 z-50 text-xs text-gray-150 hover:text-white flex items-center gap-1.5 bg-dark-200 border border-dark-300 px-3 py-1.5 rounded-xl transition-colors cursor-pointer"
+      >
+        <ArrowLeft className="w-3.5 h-3.5" />
+        Back to Home
+      </button>
+
       <div className="max-w-3xl mx-auto w-full relative z-10 flex flex-col gap-8">
 
         {/* Brand Banner */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-center">
           <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => onNavigate("landing")}>
             <div className="bg-brand-green/25 p-2 rounded-xl border border-brand-green/30">
               <Activity className="h-5 w-5 text-brand-green" />
@@ -284,13 +292,6 @@ export const PatientRegistrationView: React.FC<PatientRegistrationViewProps> = (
               <span className="block text-[8px] font-mono tracking-widest text-brand-green uppercase">Ecosystem Registry</span>
             </div>
           </div>
-          <button
-            onClick={() => onNavigate("landing")}
-            className="text-xs text-gray-100 hover:text-white flex items-center gap-1 bg-dark-200 border border-dark-300 px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            Back to Home
-          </button>
         </div>
 
         {/* Section Title */}
@@ -338,8 +339,17 @@ export const PatientRegistrationView: React.FC<PatientRegistrationViewProps> = (
         <form onSubmit={handleSubmit} className="bg-dark-200 border border-dark-300 rounded-2xl p-6 sm:p-8 space-y-6 shadow-2xl relative">
 
           {error && (
-            <div className="p-4 bg-brand-red/10 border border-brand-red/20 text-brand-red text-sm font-semibold rounded-xl" id="register-error-msg">
-              ⚠️ {error}
+            <div className="p-4 bg-brand-red/10 border border-brand-red/20 text-brand-red text-sm font-semibold rounded-xl flex flex-col items-start gap-3" id="register-error-msg">
+              <div>⚠️ {error}</div>
+              {error === "An account already exists with this email." && (
+                <button
+                  type="button"
+                  onClick={() => onNavigate("login")}
+                  className="px-4 py-2 bg-brand-red/20 hover:bg-brand-red/30 text-brand-red border border-brand-red/30 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-sm"
+                >
+                  Go To Login
+                </button>
+              )}
             </div>
           )}
 

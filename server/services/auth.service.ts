@@ -8,6 +8,11 @@ import { IUser } from "../models/types";
 import { NotificationService } from "./notification.service";
 
 export class AuthService {
+  static async checkEmail(email: string): Promise<boolean> {
+    const existingUser = await db.users.findOne({ email });
+    return !!existingUser;
+  }
+
   static async register(inputData: any): Promise<{ user: Omit<IUser, "password">; token: string; refreshToken: string }> {
     const validatedData = registerSchema.parse(inputData);
 

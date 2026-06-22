@@ -33,6 +33,9 @@ export const PatientProfileView: React.FC<PatientProfileViewProps> = ({
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 10;
 
   const [formData, setFormData] = useState({
     phone: profile?.phone || "",
@@ -58,6 +61,27 @@ export const PatientProfileView: React.FC<PatientProfileViewProps> = ({
   const completedAppointments = appointments.filter(
     (apt) => apt.status === "completed"
   ).length;
+
+  const filteredAppointments = appointments.filter((apt) => {
+    if (statusFilter === "all") return true;
+    return apt.status === statusFilter;
+  });
+
+  const sortedAppointments = [...filteredAppointments].sort(
+    (a, b) => new Date(b.schedule).getTime() - new Date(a.schedule).getTime()
+  );
+
+  const totalFiltered = sortedAppointments.length;
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, totalFiltered);
+  const paginatedAppointments = sortedAppointments.slice(startIndex, endIndex);
+
+  const totalPages = Math.ceil(totalFiltered / ITEMS_PER_PAGE);
+
+  const handleFilterClick = (status: string) => {
+    setStatusFilter(status);
+    setCurrentPage(1);
+  };
   useEffect(() => {
     async function loadData() {
       if (!currentUser) return;
@@ -293,16 +317,22 @@ export const PatientProfileView: React.FC<PatientProfileViewProps> = ({
           {/* Statistics Dashboard */}
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
 
-            <div className="bg-dark-200 border border-dark-300 rounded-2xl p-5">
-              <p className="text-dark-500 text-[10px] uppercase font-black tracking-wider">
+            <div 
+              className={`bg-dark-200 border rounded-2xl p-5 cursor-pointer transition-all ${statusFilter === "all" ? "border-white shadow-lg" : "border-dark-300 hover:border-dark-400"}`}
+              onClick={() => handleFilterClick("all")}
+            >
+              <p className={`text-[10px] uppercase font-black tracking-wider ${statusFilter === "all" ? "text-white" : "text-dark-500"}`}>
                 Total Appointments
               </p>
-              <h2 className="text-3xl font-black text-white mt-2">
+              <h2 className={`text-3xl font-black mt-2 ${statusFilter === "all" ? "text-white" : "text-white"}`}>
                 {totalAppointments}
               </h2>
             </div>
 
-            <div className="bg-dark-200 border border-brand-green/20 rounded-2xl p-5">
+            <div 
+              className={`bg-dark-200 border rounded-2xl p-5 cursor-pointer transition-all ${statusFilter === "scheduled" ? "border-brand-green shadow-lg" : "border-brand-green/20 hover:border-brand-green/50"}`}
+              onClick={() => handleFilterClick("scheduled")}
+            >
               <p className="text-brand-green text-[10px] uppercase font-black tracking-wider">
                 Scheduled
               </p>
@@ -311,7 +341,10 @@ export const PatientProfileView: React.FC<PatientProfileViewProps> = ({
               </h2>
             </div>
 
-            <div className="bg-dark-200 border border-brand-orange/20 rounded-2xl p-5">
+            <div 
+              className={`bg-dark-200 border rounded-2xl p-5 cursor-pointer transition-all ${statusFilter === "pending" ? "border-brand-orange shadow-lg" : "border-brand-orange/20 hover:border-brand-orange/50"}`}
+              onClick={() => handleFilterClick("pending")}
+            >
               <p className="text-brand-orange text-[10px] uppercase font-black tracking-wider">
                 Pending
               </p>
@@ -320,7 +353,10 @@ export const PatientProfileView: React.FC<PatientProfileViewProps> = ({
               </h2>
             </div>
 
-            <div className="bg-dark-200 border border-brand-red/20 rounded-2xl p-5">
+            <div 
+              className={`bg-dark-200 border rounded-2xl p-5 cursor-pointer transition-all ${statusFilter === "cancelled" ? "border-brand-red shadow-lg" : "border-brand-red/20 hover:border-brand-red/50"}`}
+              onClick={() => handleFilterClick("cancelled")}
+            >
               <p className="text-brand-red text-[10px] uppercase font-black tracking-wider">
                 Cancelled
               </p>
@@ -329,7 +365,10 @@ export const PatientProfileView: React.FC<PatientProfileViewProps> = ({
               </h2>
             </div>
 
-            <div className="bg-dark-200 border border-cyan-500/20 rounded-2xl p-5">
+            <div 
+              className={`bg-dark-200 border rounded-2xl p-5 cursor-pointer transition-all ${statusFilter === "completed" ? "border-cyan-500 shadow-lg" : "border-cyan-500/20 hover:border-cyan-500/50"}`}
+              onClick={() => handleFilterClick("completed")}
+            >
               <p className="text-cyan-400 text-[10px] uppercase font-black tracking-wider">
                 Completed
               </p>
@@ -341,10 +380,17 @@ export const PatientProfileView: React.FC<PatientProfileViewProps> = ({
           </div>
           {/* History listings */}
           <div className="bg-dark-200 border border-dark-300 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-4">
-            <h3 className="text-sm font-black text-neutral-100 uppercase tracking-wider flex items-center gap-1.5 pb-2 border-b border-dark-300">
-              <Clock className="w-4.5 h-4.5 text-brand-green" />
-              <span>Historic Consultant Appointments</span>
-            </h3>
+            <div className="flex items-center justify-between pb-2 border-b border-dark-300">
+              <h3 className="text-sm font-black text-neutral-100 uppercase tracking-wider flex items-center gap-1.5">
+                <Clock className="w-4.5 h-4.5 text-brand-green" />
+                <span>Historic Consultant Appointments</span>
+              </h3>
+              {totalFiltered > 0 && (
+                <span className="text-[10px] font-bold text-dark-500 uppercase">
+                  Showing {startIndex + 1}–{endIndex} of {totalFiltered} appointments
+                </span>
+              )}
+            </div>
 
             {error && (
               <div className="p-4 bg-brand-red/10 border border-brand-red/20 text-brand-red text-xs font-semibold rounded-xl">
@@ -363,10 +409,15 @@ export const PatientProfileView: React.FC<PatientProfileViewProps> = ({
                   Create slot allocation request
                 </button>
               </div>
+            ) : totalFiltered === 0 ? (
+              <div className="py-12 text-center text-dark-500 space-y-2">
+                <p className="font-extrabold text-xs text-slate-150">No schedules match the current filter.</p>
+              </div>
             ) : (
-              <div className="divide-y divide-dark-300">
-                {appointments.map((apt) => (
-                  <div key={apt._id} className="py-4 first:pt-0 last:pb-0 flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <>
+                <div className="divide-y divide-dark-300">
+                  {paginatedAppointments.map((apt) => (
+                    <div key={apt._id} className="py-4 first:pt-0 last:pb-0 flex flex-col md:flex-row md:items-center justify-between gap-4">
 
                     {/* Diagnostic Reason details */}
                     <div className="space-y-1.5">
@@ -375,10 +426,13 @@ export const PatientProfileView: React.FC<PatientProfileViewProps> = ({
                           {apt.primaryPhysician}
                         </span>
                         <span className="text-xs font-mono font-bold text-dark-500">
-                          {new Date(profile.birthDate).toLocaleDateString("en-IN", {
+                          {new Date(apt.schedule).toLocaleString("en-IN", {
                             day: "2-digit",
-                            month: "long",
-                            year: "numeric"
+                            month: "short",
+                            year: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            hour12: true,
                           })}
                         </span>
                       </div>
@@ -418,7 +472,29 @@ export const PatientProfileView: React.FC<PatientProfileViewProps> = ({
 
                   </div>
                 ))}
-              </div>
+                </div>
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-between pt-4 border-t border-dark-300 mt-4">
+                    <button
+                      onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                      disabled={currentPage === 1}
+                      className="px-4 py-2 bg-dark-100 hover:bg-dark-200 border border-dark-300 text-xs font-bold text-white rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                    >
+                      Previous
+                    </button>
+                    <span className="text-[10px] text-dark-500 font-bold uppercase tracking-widest">
+                      Page {currentPage} of {totalPages}
+                    </span>
+                    <button
+                      onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                      disabled={currentPage === totalPages}
+                      className="px-4 py-2 bg-dark-100 hover:bg-dark-200 border border-dark-300 text-xs font-bold text-white rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                    >
+                      Next
+                    </button>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </section>

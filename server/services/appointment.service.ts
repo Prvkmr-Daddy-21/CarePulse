@@ -11,6 +11,7 @@ export interface IAppointmentFilters {
 }
 
 export const APPOINTMENT_SLOT_DURATION = 60;
+export const MAX_PATIENTS_PER_SLOT = 5;
 
 export class AppointmentService {
   static async getAvailableSlots(doctor: string, date: string): Promise<string[]> {
@@ -21,18 +22,21 @@ export class AppointmentService {
     const doctorId = doctorProfile ? doctorProfile._id : undefined;
 
     const allAppointments = await db.appointments.find();
-    const bookedSlots = allAppointments
-      .filter((a) => {
-        const aDate = new Date(a.schedule);
-        return (
-          (a.status === "pending" || a.status === "scheduled" || a.status === "completed") &&
-          aDate.getFullYear() === targetDate.getFullYear() &&
-          aDate.getMonth() === targetDate.getMonth() &&
-          aDate.getDate() === targetDate.getDate() &&
-          (a.primaryPhysician === doctor || (doctorId && a.doctorId === doctorId))
-        );
-      })
-      .map((a) => new Date(a.schedule).getHours());
+    const bookedSlotCounts: Record<number, number> = {};
+
+    allAppointments.forEach((a) => {
+      const aDate = new Date(a.schedule);
+      if (
+        (a.status === "pending" || a.status === "scheduled" || a.status === "completed") &&
+        aDate.getFullYear() === targetDate.getFullYear() &&
+        aDate.getMonth() === targetDate.getMonth() &&
+        aDate.getDate() === targetDate.getDate() &&
+        (a.primaryPhysician === doctor || (doctorId && a.doctorId === doctorId))
+      ) {
+        const hour = aDate.getHours();
+        bookedSlotCounts[hour] = (bookedSlotCounts[hour] || 0) + 1;
+      }
+    });
 
     const availableSlots: string[] = [];
     const now = new Date();
@@ -48,7 +52,8 @@ export class AppointmentService {
         continue;
       }
       
-      if (!bookedSlots.includes(i)) {
+      const count = bookedSlotCounts[i] || 0;
+      if (count < MAX_PATIENTS_PER_SLOT) {
         availableSlots.push(`${i.toString().padStart(2, "0")}:00`);
       }
     }
@@ -90,14 +95,26 @@ export class AppointmentService {
     const doctorId = doctorProfile ? doctorProfile._id : undefined;
 
     const existingAppointments = await db.appointments.find();
-    const isBooked = existingAppointments.some(a => 
+
+    const isPatientAlreadyBooked = existingAppointments.some(a => 
+      a.patientId === validatedData.patientId &&
       (a.status === "pending" || a.status === "scheduled" || a.status === "completed") &&
       new Date(a.schedule).getTime() === appointmentDate.getTime() &&
       (a.primaryPhysician === validatedData.primaryPhysician || (doctorId && a.doctorId === doctorId))
     );
 
-    if (isBooked) {
-      throw { status: 400, message: "This appointment slot is already booked." };
+    if (isPatientAlreadyBooked) {
+      throw { status: 400, message: "You already have an appointment with this doctor at this time." };
+    }
+
+    const bookedCount = existingAppointments.filter(a => 
+      (a.status === "pending" || a.status === "scheduled" || a.status === "completed") &&
+      new Date(a.schedule).getTime() === appointmentDate.getTime() &&
+      (a.primaryPhysician === validatedData.primaryPhysician || (doctorId && a.doctorId === doctorId))
+    ).length;
+
+    if (bookedCount >= MAX_PATIENTS_PER_SLOT) {
+      throw { status: 400, message: "This slot is fully booked. Please choose another available slot." };
     }
 
     const patient = await db.patients.findById(validatedData.patientId);
@@ -257,15 +274,28 @@ export class AppointmentService {
     }
 
     const existingAppointments = await db.appointments.find();
-    const isBooked = existingAppointments.some(a => 
+
+    const isPatientAlreadyBooked = existingAppointments.some(a => 
       a._id !== id &&
+      a.patientId === appointment.patientId &&
       (a.status === "pending" || a.status === "scheduled" || a.status === "completed") &&
       new Date(a.schedule).getTime() === appointmentDate.getTime() &&
       (a.primaryPhysician === appointment.primaryPhysician || (a.doctorId && a.doctorId === appointment.doctorId))
     );
 
-    if (isBooked) {
-      throw { status: 400, message: "This appointment slot is already booked." };
+    if (isPatientAlreadyBooked) {
+      throw { status: 400, message: "You already have an appointment with this doctor at this time." };
+    }
+
+    const bookedCount = existingAppointments.filter(a => 
+      a._id !== id &&
+      (a.status === "pending" || a.status === "scheduled" || a.status === "completed") &&
+      new Date(a.schedule).getTime() === appointmentDate.getTime() &&
+      (a.primaryPhysician === appointment.primaryPhysician || (a.doctorId && a.doctorId === appointment.doctorId))
+    ).length;
+
+    if (bookedCount >= MAX_PATIENTS_PER_SLOT) {
+      throw { status: 400, message: "This slot is fully booked. Please choose another available slot." };
     }
 
     const updatePayload: Partial<IAppointment> = {

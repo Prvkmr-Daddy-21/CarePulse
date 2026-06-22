@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Lock } from "lucide-react";
 import { api } from "../services/api";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, ArrowLeft } from "lucide-react";
 
 interface Props {
     token: string;
@@ -44,7 +44,15 @@ export function ResetPasswordView({
         }
     };
     return (
-        <div className="min-h-screen bg-dark-100 flex items-center justify-center p-6">
+        <div className="min-h-screen bg-dark-100 flex items-center justify-center p-6 relative">
+            {/* Back to Home Button */}
+            <button
+                onClick={() => onNavigate("landing")}
+                className="absolute top-6 left-6 z-50 text-xs text-gray-150 hover:text-white flex items-center gap-1.5 bg-dark-200 border border-dark-300 px-3 py-1.5 rounded-xl transition-colors cursor-pointer"
+            >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                Back to Home
+            </button>
 
             <div className="bg-dark-200 border border-dark-300 rounded-3xl p-8 w-full max-w-md">
 
