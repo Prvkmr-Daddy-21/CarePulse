@@ -23,6 +23,10 @@ export function ResetPasswordView({
             setMessage("❌ Passwords do not match");
             return;
         }
+        if (password.length < 6) {
+            setMessage("❌ Password must be at least 6 characters");
+            return;
+        }
 
         try {
             await api.auth.resetPassword(token, {

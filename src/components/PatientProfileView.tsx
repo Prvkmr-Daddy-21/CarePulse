@@ -195,7 +195,14 @@ export const PatientProfileView: React.FC<PatientProfileViewProps> = ({
                   <div>
                     <span className="block text-[9px] text-dark-500 uppercase font-mono leading-none">DATE OF BIRTH / GENDER</span>
                     <span className="font-bold text-white capitalize">
-                      {profile?.birthDate ? new Date(profile.birthDate).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) : ""} • {profile?.gender}
+                      {profile?.birthDate
+                        ? new Date(profile.birthDate).toLocaleDateString("en-IN", {
+                          day: "2-digit",
+                          month: "long",
+                          year: "numeric"
+                        })
+                        : ""}
+                      • {profile?.gender}
                     </span>
                   </div>
                 </div>
@@ -355,8 +362,10 @@ export const PatientProfileView: React.FC<PatientProfileViewProps> = ({
                           {apt.primaryPhysician}
                         </span>
                         <span className="text-xs font-mono font-bold text-dark-500">
-                          {new Date(apt.schedule).toLocaleDateString("en-US", {
-                            weekday: "short", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit"
+                          {new Date(profile.birthDate).toLocaleDateString("en-IN", {
+                            day: "2-digit",
+                            month: "long",
+                            year: "numeric"
                           })}
                         </span>
                       </div>

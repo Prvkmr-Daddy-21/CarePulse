@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { 
-  LogIn, 
-  Mail, 
-  UserCheck, 
-  Activity, 
-  ArrowLeft, 
-  ShieldAlert 
+import {
+  LogIn,
+  Mail,
+  UserCheck,
+  Activity,
+  ArrowLeft,
+  ShieldAlert
 } from "lucide-react";
 import { api } from "../services/api";
 
@@ -14,7 +14,7 @@ interface AdminLoginViewProps {
   onLoginSuccess: (user: any) => void;
 }
 
-export const AdminLoginView: React.FC<AdminLoginViewProps> = ({ 
+export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
   onNavigate,
   onLoginSuccess
 }) => {
@@ -30,7 +30,7 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
 
     try {
       const res = await api.auth.login({ email, password });
-      
+
       // Specialist panel only accepts admin or doctor roles
       if (res.user.role === "admin" || res.user.role === "doctor") {
         onLoginSuccess(res.user);
@@ -62,7 +62,7 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
             </span>
           </div>
         </div>
-        <button 
+        <button
           onClick={() => onNavigate("landing")}
           className="text-xs text-gray-150 hover:text-white flex items-center gap-1.5 bg-dark-200 border border-dark-300 px-3 py-1.5 rounded-xl cursor-pointer"
         >

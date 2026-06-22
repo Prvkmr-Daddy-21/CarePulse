@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { 
-  Activity, 
-  CalendarCheck, 
-  Heart, 
-  ChevronRight, 
-  ArrowLeft, 
-  ShieldCheck, 
-  CheckCircle2, 
-  PlusCircle, 
-  FileText 
+import {
+  Activity,
+  CalendarCheck,
+  Heart,
+  ChevronRight,
+  ArrowLeft,
+  ShieldCheck,
+  CheckCircle2,
+  PlusCircle,
+  FileText
 } from "lucide-react";
 import { api, IDoctor } from "../services/api";
 
@@ -17,7 +17,7 @@ interface AppointmentBookingViewProps {
   currentPatient: any;
 }
 
-export const AppointmentBookingView: React.FC<AppointmentBookingViewProps> = ({ 
+export const AppointmentBookingView: React.FC<AppointmentBookingViewProps> = ({
   onNavigate,
   currentPatient
 }) => {
@@ -71,13 +71,13 @@ export const AppointmentBookingView: React.FC<AppointmentBookingViewProps> = ({
     e.preventDefault();
     setError(null);
     setValidationErrors({});
-    
+
     // Validate inputs
     const errors: Record<string, string> = {};
     if (!primaryPhysician) errors.primaryPhysician = "Consultant is required";
     if (!schedule) errors.schedule = "Date and time slot is required";
     if (!reason || reason.trim().length < 5) errors.reason = "Appointment reason must be at least 5 characters";
-    
+
     if (Object.keys(errors).length > 0) {
       setValidationErrors(errors);
       return;
@@ -122,7 +122,7 @@ export const AppointmentBookingView: React.FC<AppointmentBookingViewProps> = ({
           <div className="p-4 bg-brand-green/10 text-brand-green rounded-full border border-brand-green/20 animate-bounce">
             <CheckCircle2 className="w-12 h-12" />
           </div>
-          
+
           <div className="space-y-2">
             <h2 className="text-2xl font-black text-white tracking-tight">Booking Requested Successfully!</h2>
             <p className="text-xs text-slate-100 leading-relaxed max-w-sm">
@@ -138,7 +138,14 @@ export const AppointmentBookingView: React.FC<AppointmentBookingViewProps> = ({
             </div>
             <div>
               <span className="block text-[10px] text-dark-500 uppercase font-bold tracking-wide">SLOT REQUEST</span>
-              <span className="font-extrabold text-white">{new Date(schedule).toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}</span>
+              <span className="font-extrabold text-white">{new Date(schedule).toLocaleString("en-IN", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: true,
+              })}</span>
             </div>
           </div>
 
@@ -173,7 +180,7 @@ export const AppointmentBookingView: React.FC<AppointmentBookingViewProps> = ({
       <div className="absolute bottom-[-5%] right-[-10%] w-[45%] h-[40%] rounded-full bg-brand-blue/5 blur-[100px] pointer-events-none" />
 
       <div className="max-w-2xl mx-auto w-full relative z-10 flex flex-col gap-8">
-        
+
         {/* Brand Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => onNavigate("profile")}>
@@ -186,7 +193,7 @@ export const AppointmentBookingView: React.FC<AppointmentBookingViewProps> = ({
               </span>
             </div>
           </div>
-          <button 
+          <button
             onClick={() => onNavigate("profile")}
             className="text-xs text-gray-150 hover:text-white flex items-center gap-1.5 bg-dark-200 border border-dark-300 px-3.5 py-2 rounded-xl cursor-pointer"
           >
@@ -245,9 +252,33 @@ export const AppointmentBookingView: React.FC<AppointmentBookingViewProps> = ({
                 required
                 value={schedule}
                 onChange={(e) => setSchedule(e.target.value)}
+                min={(() => {
+                  const now = new Date();
+                  const offset = now.getTimezoneOffset();
+                  return new Date(now.getTime() - offset * 60000)
+                    .toISOString()
+                    .slice(0, 16);
+                })()}
+
+                max={(() => {
+                  const d = new Date();
+                  d.setMonth(d.getMonth() + 6);
+
+                  const offset = d.getTimezoneOffset();
+                  return new Date(d.getTime() - offset * 60000)
+                    .toISOString()
+                    .slice(0, 16);
+                })()}
                 className="w-full bg-dark-100 border border-dark-300 rounded-xl py-3 px-4 text-xs text-white focus:outline-none focus:border-brand-green transition-all"
                 id="book-input-time"
               />
+              <p className="text-xs text-gray-400 mt-1">
+                Appointments can only be booked within the next 6 months.
+              </p>
+
+              <p className="text-xs text-gray-500">
+                Date format: DD/MM/YYYY (IST)
+              </p>
               {validationErrors.schedule && <p className="text-brand-red text-xs mt-1 font-semibold">{validationErrors.schedule}</p>}
             </div>
 

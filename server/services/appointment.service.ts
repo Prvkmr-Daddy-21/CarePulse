@@ -13,6 +13,26 @@ export class AppointmentService {
   static async bookAppointment(inputData: any): Promise<IAppointment> {
     const validatedData = appointmentSchema.parse(inputData);
 
+    const appointmentDate = new Date(validatedData.schedule);
+    const now = new Date();
+
+    if (appointmentDate < now) {
+      throw {
+        status: 400,
+        message: "Appointment date cannot be in the past",
+      };
+    }
+
+    const maxDate = new Date();
+    maxDate.setMonth(maxDate.getMonth() + 6);
+
+    if (appointmentDate > maxDate) {
+      throw {
+        status: 400,
+        message: "Appointments can only be booked within 6 months",
+      };
+    }
+
     const patient = await db.patients.findById(validatedData.patientId);
     if (!patient) {
       throw { status: 404, message: "Patient profile not found for booking" };
@@ -129,6 +149,26 @@ export class AppointmentService {
     id: string,
     data: { schedule: Date; note?: string }
   ): Promise<IAppointment> {
+
+    const appointmentDate = new Date(data.schedule);
+
+    if (appointmentDate < new Date()) {
+      throw {
+        status: 400,
+        message: "Cannot reschedule appointment to a past date",
+      };
+    }
+
+    const maxDate = new Date();
+    maxDate.setMonth(maxDate.getMonth() + 6);
+
+    if (appointmentDate > maxDate) {
+      throw {
+        status: 400,
+        message: "Appointments can only be rescheduled within 6 months",
+      };
+    }
+
     const appointment = await db.appointments.findById(id);
     if (!appointment) {
       throw { status: 404, message: "Appointment record not found" };

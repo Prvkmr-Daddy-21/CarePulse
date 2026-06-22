@@ -310,11 +310,13 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                         <div className="flex items-center gap-1.5">
                           <Clock className="w-3.5 h-3.5 text-brand-green" />
                           <span>
-                            {new Date(apt.schedule).toLocaleDateString("en-US", {
+                            {new Date(apt.schedule).toLocaleString("en-IN", {
+                              day: "2-digit",
                               month: "short",
-                              day: "numeric",
+                              year: "numeric",
                               hour: "2-digit",
-                              minute: "2-digit"
+                              minute: "2-digit",
+                              hour12: true,
                             })}
                           </span>
                         </div>
