@@ -12,6 +12,16 @@ export class AuthController {
     }
   }
 
+  static async checkEmail(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { email } = req.body;
+      const { exists, role } = await AuthService.checkEmail(email);
+      res.status(200).json({ exists, role });
+    } catch (err) {
+      next(err);
+    }
+  }
+
   static async login(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const result = await AuthService.login(req.body);

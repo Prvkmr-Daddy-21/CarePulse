@@ -89,6 +89,13 @@ async function request<T>(url: string, options: RequestInit = {}): Promise<T> {
 export const api = {
   // Auth Endpoint controllers
   auth: {
+    checkEmail: async (payload: { email: string }) => {
+      return request<{ exists: boolean; role?: string }>(`${API_BASE}/auth/check-email`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+    },
     register: async (payload: any) => {
       const data = await request<{ user: IUser; token: string; refreshToken: string }>(`${API_BASE}/auth/register`, {
         method: "POST",

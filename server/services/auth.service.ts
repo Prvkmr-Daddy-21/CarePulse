@@ -8,9 +8,12 @@ import { IUser } from "../models/types";
 import { NotificationService } from "./notification.service";
 
 export class AuthService {
-  static async checkEmail(email: string): Promise<boolean> {
+  static async checkEmail(email: string): Promise<{ exists: boolean; role?: string }> {
     const existingUser = await db.users.findOne({ email });
-    return !!existingUser;
+    if (existingUser) {
+      return { exists: true, role: existingUser.role };
+    }
+    return { exists: false };
   }
 
   static async register(inputData: any): Promise<{ user: Omit<IUser, "password">; token: string; refreshToken: string }> {

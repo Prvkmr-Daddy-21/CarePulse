@@ -63,6 +63,7 @@ export const PatientRegistrationView: React.FC<PatientRegistrationViewProps> = (
 
   // Validate fields for each step
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const [existingRole, setExistingRole] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadResources() {
@@ -182,8 +183,25 @@ export const PatientRegistrationView: React.FC<PatientRegistrationViewProps> = (
     return Object.keys(errors).length === 0;
   };
 
-  const nextStep = () => {
+  const nextStep = async () => {
     if (validateStep(step)) {
+      if (step === 1) {
+        setIsSubmitting(true);
+        try {
+          const res = await api.auth.checkEmail({ email });
+          if (res.exists) {
+            setError("An account already exists with this email.");
+            setExistingRole(res.role || "patient");
+            setIsSubmitting(false);
+            return;
+          }
+        } catch (err: any) {
+          setError(err?.message || "Failed to verify email");
+          setIsSubmitting(false);
+          return;
+        }
+        setIsSubmitting(false);
+      }
       setStep((prev) => prev + 1);
       setError(null);
     }
@@ -344,7 +362,13 @@ export const PatientRegistrationView: React.FC<PatientRegistrationViewProps> = (
               {error === "An account already exists with this email." && (
                 <button
                   type="button"
-                  onClick={() => onNavigate("login")}
+                  onClick={() => {
+                    if (existingRole === "doctor" || existingRole === "admin") {
+                      onNavigate("login");
+                    } else {
+                      onNavigate("landing");
+                    }
+                  }}
                   className="px-4 py-2 bg-brand-red/20 hover:bg-brand-red/30 text-brand-red border border-brand-red/30 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-sm"
                 >
                   Go To Login
@@ -804,10 +828,11 @@ export const PatientRegistrationView: React.FC<PatientRegistrationViewProps> = (
               <button
                 type="button"
                 onClick={nextStep}
-                className="px-5 py-2.5 bg-brand-green hover:bg-brand-green/90 text-dark-100 text-xs font-extrabold rounded-xl flex items-center gap-1.5 shadow-md shadow-brand-green/10 transition-all cursor-pointer"
+                disabled={isSubmitting}
+                className="px-5 py-2.5 bg-brand-green hover:bg-brand-green/90 text-dark-100 text-xs font-black uppercase tracking-wider rounded-xl flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-brand-green/10"
                 id="wizard-next-btn"
               >
-                <span>Continue</span>
+                {isSubmitting ? "Processing..." : "Next Phase"}
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             ) : (

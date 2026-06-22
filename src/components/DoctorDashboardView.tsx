@@ -161,6 +161,8 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
   };
 
   // Compile system statistics
+  const totalCount = appointments.length;
+  const pendingCount = appointments.filter(a => a.status === "pending").length;
   const scheduledCount = appointments.filter(a => a.status === "scheduled").length;
   const completedCount = appointments.filter(a => a.status === "completed").length;
   const cancelledCount = appointments.filter(a => a.status === "cancelled").length;
@@ -227,7 +229,35 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
       <main className="max-w-7xl mx-auto w-full px-6 py-8 space-y-8 relative z-20 flex-grow">
 
         {/* Statistics highlights bar */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4" id="stats-banner-cards">
+        <div className="grid grid-cols-1 sm:grid-cols-5 gap-4" id="stats-banner-cards">
+          {/* Total */}
+          <div 
+            className={`bg-dark-200 border rounded-2xl p-5 flex items-center gap-4 transition-all cursor-pointer ${statusFilter === "all" ? "border-purple-500 shadow-xl shadow-purple-500/10" : "border-dark-300 hover:border-purple-500/50"}`}
+            onClick={() => handleFilterClick("all")}
+          >
+            <div className={`p-3 rounded-xl border ${statusFilter === "all" ? "bg-purple-500 text-dark-100 border-purple-500" : "bg-purple-500/10 text-purple-400 border-purple-500/15"}`}>
+              <Calendar className="w-6 h-6" />
+            </div>
+            <div>
+              <span className="block text-2xl font-black text-white leading-none">{totalCount}</span>
+              <span className="text-[10px] text-dark-500 uppercase tracking-widest font-bold">Total Appointments</span>
+            </div>
+          </div>
+
+          {/* Pending */}
+          <div 
+            className={`bg-dark-200 border rounded-2xl p-5 flex items-center gap-4 transition-all cursor-pointer ${statusFilter === "pending" ? "border-brand-orange shadow-xl shadow-brand-orange/10" : "border-dark-300 hover:border-brand-orange/50"}`}
+            onClick={() => handleFilterClick("pending")}
+          >
+            <div className={`p-3 rounded-xl border ${statusFilter === "pending" ? "bg-brand-orange text-dark-100 border-brand-orange" : "bg-brand-orange/10 text-brand-orange border-brand-orange/15 animate-pulse"}`}>
+              <Clock className="w-6 h-6" />
+            </div>
+            <div>
+              <span className="block text-2xl font-black text-white leading-none">{pendingCount}</span>
+              <span className="text-[10px] text-dark-500 uppercase tracking-widest font-bold">Pending Validation</span>
+            </div>
+          </div>
+
           {/* Scheduled */}
           <div 
             className={`bg-dark-200 border rounded-2xl p-5 flex items-center gap-4 transition-all cursor-pointer ${statusFilter === "scheduled" ? "border-brand-green shadow-xl shadow-brand-green/10" : "border-dark-300 hover:border-brand-green/50"}`}
