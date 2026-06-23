@@ -57,8 +57,8 @@ async function startServer() {
   }
 
   app.listen(PORT, "0.0.0.0", () => {
-    console.log(`🚀 CarePulse E-Health System successfully running at http://localhost:${PORT}`);
-    console.log(`📁 Verification uploads accessible at http://localhost:${PORT}/uploads/`);
+    console.log(`🚀 CarePulse E-Health System running on port ${PORT}`);
+    console.log(`📁 Uploads endpoint available at /uploads`);
   });
 }
 
