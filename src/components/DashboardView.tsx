@@ -75,7 +75,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
   // Scheduling Modal State
   const [actionTarget, setActionTarget] = useState<IAppointment | null>(null);
-  const [actionType, setActionType] = useState<"schedule" | "cancel" | null>(null);
+  const [actionType, setActionType] = useState<"schedule" | "cancel" | "complete" | null>(null);
   const [note, setNote] = useState("");
   const [cancellationReason, setCancellationReason] = useState("");
   const [isActionSubmitting, setIsActionSubmitting] = useState(false);
@@ -166,7 +166,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     setDoctorCurrentPage(1);
   };
 
-  const handleActionClick = (apt: IAppointment, action: "schedule" | "cancel") => {
+  const handleActionClick = (apt: IAppointment, action: "schedule" | "cancel" | "complete") => {
     setActionTarget(apt);
     setActionType(action);
     setNote(apt.note || "");
@@ -576,8 +576,16 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                               </span>
                             </td>
                             <td className="py-3.5 px-5 text-right">
-                              {apt.status === "pending" ? (
+                              {apt.status === "pending" || apt.status === "scheduled" ? (
                                 <div className="flex items-center justify-end gap-1.5">
+                                  {apt.status === "scheduled" && (
+                                    <button
+                                      onClick={() => handleActionClick(apt, "complete")}
+                                      className="px-2.5 py-1.5 bg-brand-green/10 border border-brand-green/20 text-brand-green hover:bg-brand-green/15 text-[10px] uppercase font-black tracking-wider rounded-lg cursor-pointer transition-all"
+                                    >
+                                      Complete
+                                    </button>
+                                  )}
                                   <button
                                     onClick={() => {
                                       handleActionClick(apt, "schedule");
@@ -908,8 +916,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           >
             <div className="border-b border-dark-300 pb-4">
               <h3 className="text-lg font-black text-neutral-100 flex items-center gap-2">
-                {actionType === "schedule" ? <CheckCircle className="text-brand-green w-5 h-5" /> : <XOctagon className="text-brand-red w-5 h-5" />}
-                <span>{actionType === "schedule" ? "Reschedule Appointment" : "Cancel Appointment"}</span>
+                {actionType === "schedule" || actionType === "complete" ? <CheckCircle className="text-brand-green w-5 h-5" /> : <XOctagon className="text-brand-red w-5 h-5" />}
+                <span>{actionType === "schedule" ? "Reschedule Appointment" : actionType === "complete" ? "Complete Appointment" : "Cancel Appointment"}</span>
               </h3>
               <p className="text-xs text-slate-100 mt-1">Updating state for <strong>{actionTarget.patientName}</strong>.</p>
             </div>
@@ -956,6 +964,17 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   className="w-full bg-dark-100 border border-dark-300 rounded-xl py-3 px-4 text-xs text-white focus:border-brand-green transition-all resize-none"
                 />
               </div>
+            ) : actionType === "complete" ? (
+              <div className="space-y-2">
+                <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Completion Notes</label>
+                <textarea
+                  required
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  rows={3}
+                  className="w-full bg-dark-100 border border-dark-300 rounded-xl py-3 px-4 text-xs text-white focus:border-brand-green transition-all resize-none"
+                />
+              </div>
             ) : (
               <div className="space-y-2">
                 <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Reason for Cancellation</label>
@@ -973,8 +992,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <button type="button" onClick={() => { setActionTarget(null); setActionType(null); }} className="px-4 py-2 bg-dark-300 hover:bg-dark-400 border border-dark-400 text-xs font-bold rounded-xl transition-all cursor-pointer">
                 Close
               </button>
-              <button type="submit" disabled={isActionSubmitting} className={`px-5 py-2 text-dark-100 text-xs font-black uppercase rounded-xl flex items-center gap-1 cursor-pointer transition-all ${actionType === "schedule" ? "bg-brand-green" : "bg-brand-red"}`}>
-                {isActionSubmitting ? "Processing..." : (actionType === "schedule" ? "Confirm" : "Submit")}
+              <button type="submit" disabled={isActionSubmitting} className={`px-5 py-2 text-dark-100 text-xs font-black uppercase rounded-xl flex items-center gap-1 cursor-pointer transition-all ${actionType === "schedule" || actionType === "complete" ? "bg-brand-green" : "bg-brand-red"}`}>
+                {isActionSubmitting ? "Processing..." : (actionType === "schedule" ? "Confirm" : actionType === "complete" ? "Complete" : "Submit")}
               </button>
             </div>
           </form>
