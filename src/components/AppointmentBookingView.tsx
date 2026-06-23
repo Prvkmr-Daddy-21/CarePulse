@@ -307,7 +307,7 @@ export const AppointmentBookingView: React.FC<AppointmentBookingViewProps> = ({
                   ) : availableSlots.length === 0 ? (
                     <p className="text-brand-red text-xs font-semibold">No available slots for this date.</p>
                   ) : (
-                    <div className="grid grid-cols-4 gap-2">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                       {availableSlots.map(slot => (
                         <button
                           type="button"

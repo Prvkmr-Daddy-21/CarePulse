@@ -150,7 +150,7 @@ export const PatientProfileView: React.FC<PatientProfileViewProps> = ({
 
       {/* Main Header */}
       <header className="bg-dark-200 border-b border-dark-300 relative z-30">
-        <div className="max-w-7xl mx-auto w-full px-6 py-5 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto w-full px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2.5">
             <div className="bg-brand-green/25 p-2 rounded-xl border border-brand-green/30">
               <Activity className="h-5 w-5 text-brand-green" />
@@ -163,10 +163,10 @@ export const PatientProfileView: React.FC<PatientProfileViewProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex w-full sm:w-auto items-center justify-between sm:justify-end gap-3">
             <button
               onClick={() => onNavigate("book")}
-              className="text-xs text-dark-100 bg-brand-green hover:bg-brand-green/90 px-4 py-2 rounded-xl font-black uppercase tracking-wider flex items-center gap-1 shadow-lg shadow-brand-green/10 transition-all cursor-pointer"
+              className="flex-1 sm:flex-none justify-center text-xs text-dark-100 bg-brand-green hover:bg-brand-green/90 px-4 py-2 rounded-xl font-black uppercase tracking-wider flex items-center gap-1 shadow-lg shadow-brand-green/10 transition-all cursor-pointer"
               id="header-book-appointment-btn"
             >
               <PlusCircle className="w-4 h-4" />
@@ -174,7 +174,7 @@ export const PatientProfileView: React.FC<PatientProfileViewProps> = ({
             </button>
             <button
               onClick={onLogout}
-              className="text-xs text-brand-red flex items-center gap-1 bg-brand-red/10 border border-brand-red/20 px-3.5 py-2 rounded-xl hover:bg-brand-red/15 transition-all cursor-pointer"
+              className="flex-1 sm:flex-none justify-center text-xs text-brand-red flex items-center gap-1 bg-brand-red/10 border border-brand-red/20 px-3.5 py-2 rounded-xl hover:bg-brand-red/15 transition-all cursor-pointer"
             >
               <LogOut className="w-3.5 h-3.5" />
               Disconnect
@@ -315,7 +315,7 @@ export const PatientProfileView: React.FC<PatientProfileViewProps> = ({
           </div>
 
           {/* Statistics Dashboard */}
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
 
             <div 
               className={`bg-dark-200 border rounded-2xl p-5 cursor-pointer transition-all ${statusFilter === "all" ? "border-white shadow-lg" : "border-dark-300 hover:border-dark-400"}`}
@@ -503,7 +503,7 @@ export const PatientProfileView: React.FC<PatientProfileViewProps> = ({
       {/* Security parameters trust disclaimer footer */}
       {editing && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-          <div className="bg-dark-200 border border-dark-300 rounded-3xl p-6 w-full max-w-lg">
+          <div className="bg-dark-200 border border-dark-300 rounded-3xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
             <h2 className="text-xl font-black text-white mb-4">
               Edit Profile
             </h2>

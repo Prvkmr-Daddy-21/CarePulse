@@ -165,7 +165,7 @@ export const LandingView: React.FC<LandingViewProps> = ({
           </div>
 
           {/* Trust indicators */}
-          <div className="grid grid-cols-3 gap-6 border-t border-dark-300 pt-8 max-w-lg">
+          <div className="grid grid-cols-3 gap-3 sm:gap-6 border-t border-dark-300 pt-8 max-w-lg">
             <div className="space-y-1">
               <span className="block text-2xl font-black text-white flex items-center gap-1">
                 <Stethoscope className="w-5 h-5 text-brand-green" />

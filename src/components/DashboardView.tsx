@@ -362,7 +362,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         {activeTab === "appointments" && (
           <>
             {/* Statistics highlights bar */}
-            <div className="grid grid-cols-1 sm:grid-cols-6 gap-4 flex-shrink-0" id="stats-banner-cards">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 flex-shrink-0" id="stats-banner-cards">
               {/* Total */}
               <div
                 className={`bg-dark-200 border rounded-2xl p-5 flex items-center gap-4 transition-all cursor-pointer ${statusFilter === "all" ? "border-purple-500 shadow-xl shadow-purple-500/10" : "border-dark-300 hover:border-purple-500/50"}`}
@@ -449,8 +449,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
             {/* Action filter controls section */}
             <section className="bg-dark-200 border border-dark-300 rounded-2xl p-5 sm:p-6 shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-4 flex-shrink-0">
-              <form onSubmit={handleSearchSubmit} className="flex items-center gap-2 max-w-md w-full">
-                <div className="relative flex-grow">
+              <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row sm:items-center gap-2 max-w-md w-full">
+                <div className="relative w-full sm:flex-grow">
                   <Search className="absolute left-3 top-3.5 w-4 h-4 text-gray-150" />
                   <input
                     type="text"
@@ -462,14 +462,14 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 </div>
                 <button
                   type="submit"
-                  className="px-4 py-3 bg-brand-green hover:bg-brand-green/90 text-dark-100 font-bold text-xs rounded-xl flex items-center gap-1 shadow-md shadow-brand-green/10 transition-all cursor-pointer"
+                  className="w-full sm:w-auto justify-center px-4 py-3 bg-brand-green hover:bg-brand-green/90 text-dark-100 font-bold text-xs rounded-xl flex items-center gap-1 shadow-md shadow-brand-green/10 transition-all cursor-pointer"
                 >
                   Search
                 </button>
               </form>
 
               <div className="flex flex-wrap items-center gap-3">
-                <div className="flex items-center gap-1.5 bg-dark-100 border border-dark-300 rounded-xl p-1">
+                <div className="flex flex-wrap items-center gap-1.5 bg-dark-100 border border-dark-300 rounded-xl p-1">
                   {["all", "pending", "scheduled", "completed", "cancelled"].map((s) => (
                     <button
                       key={s}
@@ -877,7 +877,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       {/* Deactivation Confirmation Modal */}
       {doctorToDeactivate && (
         <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-6">
-          <div className="bg-dark-200 border border-dark-300 rounded-3xl p-6 sm:p-8 max-w-sm w-full shadow-2xl space-y-6 animate-in fade-in zoom-in duration-150">
+          <div className="bg-dark-200 border border-dark-300 rounded-3xl p-6 sm:p-8 max-w-sm w-full shadow-2xl space-y-6 animate-in fade-in zoom-in duration-150 max-h-[90vh] overflow-y-auto">
             <div className="flex flex-col items-center text-center space-y-4">
               <div className="bg-brand-red/10 p-4 rounded-full">
                 <AlertTriangle className="w-8 h-8 text-brand-red" />
@@ -912,7 +912,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-6">
           <form
             onSubmit={handleActionSubmit}
-            className="bg-dark-200 border border-dark-300 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl space-y-6 animate-in fade-in zoom-in duration-150"
+            className="bg-dark-200 border border-dark-300 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl space-y-6 animate-in fade-in zoom-in duration-150 max-h-[90vh] overflow-y-auto"
           >
             <div className="border-b border-dark-300 pb-4">
               <h3 className="text-lg font-black text-neutral-100 flex items-center gap-2">
