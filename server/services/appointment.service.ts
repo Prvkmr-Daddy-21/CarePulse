@@ -265,19 +265,17 @@ export class AppointmentService {
     // Trigger email alert asynchronously
     const patientProfile = await db.patients.findById(updated.patientId);
     if (patientProfile) {
-      try {
-        await NotificationService.sendAppointmentEmail({
-          email: patientProfile.email,
-          patientName: patientProfile.name,
-          doctorName: updated.primaryPhysician,
-          schedule: updated.schedule,
-          type: notificationType,
-          note: updatePayload.note,
-          cancellationReason: updatePayload.cancellationReason,
-        });
-      } catch (err) {
+      NotificationService.sendAppointmentEmail({
+        email: patientProfile.email,
+        patientName: patientProfile.name,
+        doctorName: updated.primaryPhysician,
+        schedule: updated.schedule,
+        type: notificationType,
+        note: updatePayload.note,
+        cancellationReason: updatePayload.cancellationReason,
+      }).catch((err) => {
         console.error("Failed to trigger status update email notification", err);
-      }
+      });
     }
 
     return updated;
@@ -366,18 +364,16 @@ export class AppointmentService {
     // Trigger email alert asynchronously
     const patientProfile = await db.patients.findById(updated.patientId);
     if (patientProfile) {
-      try {
-        await NotificationService.sendAppointmentEmail({
-          email: patientProfile.email,
-          patientName: patientProfile.name,
-          doctorName: updated.primaryPhysician,
-          schedule: data.schedule,
-          type: "rescheduled",
-          note: data.note,
-        });
-      } catch (err) {
+      NotificationService.sendAppointmentEmail({
+        email: patientProfile.email,
+        patientName: patientProfile.name,
+        doctorName: updated.primaryPhysician,
+        schedule: data.schedule,
+        type: "rescheduled",
+        note: data.note,
+      }).catch((err) => {
         console.error("Failed to trigger reschedule email notification", err);
-      }
+      });
     }
 
     return updated;
