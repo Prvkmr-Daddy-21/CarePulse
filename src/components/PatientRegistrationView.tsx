@@ -69,30 +69,22 @@ export const PatientRegistrationView: React.FC<PatientRegistrationViewProps> = (
     async function loadResources() {
       try {
         setIsLoadingDocs(true);
+
         const res = await api.doctors.list();
+
         if (res.success && res.doctors.length > 0) {
           setDoctors(res.doctors);
+
           if (res.doctors[0]) {
             setPrimaryPhysician(res.doctors[0].name);
           }
         } else {
-          // Fallback UI mock doctors list
-          const fallbackDocs: IDoctor[] = [
-            { _id: "doc1", name: "Dr. Catherine Green", email: "green@healthcare.com", specialty: "Cardiologist", phone: "+1 555-0100", status: "active" },
-            { _id: "doc2", name: "Dr. Alexander Smith", email: "smith@healthcare.com", specialty: "Dermatologist", phone: "+1 555-0200", status: "active" },
-            { _id: "doc3", name: "Dr. Jasmine Johnson", email: "johnson@healthcare.com", specialty: "Pediatrician", phone: "+1 555-0300", status: "active" }
-          ];
-          setDoctors(fallbackDocs);
-          setPrimaryPhysician("Dr. Catherine Green");
+          setDoctors([]);
+          setPrimaryPhysician("");
         }
       } catch {
-        // Fallback standard selection
-        const fallbackDocs: IDoctor[] = [
-          { _id: "doc1", name: "Dr. Catherine Green", email: "green@healthcare.com", specialty: "Cardiologist", phone: "+1 555-0100", status: "active" },
-          { _id: "doc2", name: "Dr. Alexander Smith", email: "smith@healthcare.com", specialty: "Dermatologist", phone: "+1 555-0200", status: "active" }
-        ];
-        setDoctors(fallbackDocs);
-        setPrimaryPhysician("Dr. Catherine Green");
+        setDoctors([]);
+        setPrimaryPhysician("");
       } finally {
         setIsLoadingDocs(false);
       }

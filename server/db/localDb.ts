@@ -12,12 +12,7 @@ interface ILocalSchema {
   appointments: IAppointment[];
 }
 
-const DEFAULT_DOCTORS: IDoctor[] = [
-  { _id: "doc1", name: "Dr. Catherine Green", email: "green@healthcare.com", specialty: "Cardiologist", phone: "+1 (555) 019-2834", status: "active" },
-  { _id: "doc2", name: "Dr. Alexander Smith", email: "smith@healthcare.com", specialty: "Dermatologist", phone: "+1 (555) 012-3850", status: "active" },
-  { _id: "doc3", name: "Dr. Jasmine Johnson", email: "johnson@healthcare.com", specialty: "Pediatrician", phone: "+1 (555) 014-9922", status: "active" },
-  { _id: "doc4", name: "Dr. Robert Adams", email: "adams@healthcare.com", specialty: "Neurologist", phone: "+1 (555) 017-7489", status: "active" }
-];
+const DEFAULT_DOCTORS: IDoctor[] = [];
 
 function ensureDirectoryExistence() {
   if (!fs.existsSync(UPLOADS_DIR)) {
