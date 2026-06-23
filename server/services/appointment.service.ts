@@ -91,6 +91,12 @@ export class AppointmentService {
     }
 
     const hour = appointmentDate.getHours();
+    console.log("================================");
+    console.log("RAW SCHEDULE:", validatedData.schedule);
+    console.log("PARSED DATE:", appointmentDate.toString());
+    console.log("ISO DATE:", appointmentDate.toISOString());
+    console.log("HOUR:", hour);
+    console.log("================================");
     if (hour < 9 || hour >= 21) {
       throw {
         status: 400,
