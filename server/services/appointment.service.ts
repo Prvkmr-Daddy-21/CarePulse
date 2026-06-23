@@ -163,18 +163,15 @@ export class AppointmentService {
     });
 
     // Send email alert asynchronously
-    try {
-      await NotificationService.sendAppointmentEmail({
-        email: patient.email,
-        patientName: patient.name,
-        doctorName: validatedData.primaryPhysician,
-        schedule: validatedData.schedule,
-        type: "booked",
-      });
-    } catch (err) {
+    NotificationService.sendAppointmentEmail({
+      email: patient.email,
+      patientName: patient.name,
+      doctorName: validatedData.primaryPhysician,
+      schedule: validatedData.schedule,
+      type: "booked",
+    }).catch((err) => {
       console.error("Failed to trigger email notification", err);
-    }
-
+    });
     return appointment;
   }
 
