@@ -356,7 +356,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       </header>
 
       {/* Main Content Wrapper */}
-      <main className="max-w-7xl mx-auto w-full px-6 py-8 space-y-6 relative z-20 flex-grow flex flex-col">
+      <main className="max-w-7xl mx-auto w-full px-6 py-8 pb-20 sm:pb-8 space-y-6 relative z-20 flex-grow flex flex-col">
 
         {/* ======================= APPOINTMENTS TAB ======================= */}
         {activeTab === "appointments" && (
@@ -805,6 +805,29 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </>
         )}
       </main>
+      {/* Mobile Bottom Navigation */}
+      <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-dark-200 border-t border-dark-300 flex items-stretch">
+        <button
+          onClick={() => setActiveTab("appointments")}
+          className={`flex-1 flex flex-col items-center justify-center gap-1 py-3 text-[10px] font-black uppercase tracking-wider transition-all ${activeTab === "appointments"
+              ? "text-brand-green border-t-2 border-brand-green -mt-px"
+              : "text-dark-500 hover:text-white"
+            }`}
+        >
+          <Calendar className="w-5 h-5" />
+          Appointments
+        </button>
+        <button
+          onClick={() => setActiveTab("doctors")}
+          className={`flex-1 flex flex-col items-center justify-center gap-1 py-3 text-[10px] font-black uppercase tracking-wider transition-all ${activeTab === "doctors"
+              ? "text-brand-green border-t-2 border-brand-green -mt-px"
+              : "text-dark-500 hover:text-white"
+            }`}
+        >
+          <Users className="w-5 h-5" />
+          Doctors
+        </button>
+      </nav>
 
       {/* Add Doctor Modal */}
       {isAddingDoctor && (
