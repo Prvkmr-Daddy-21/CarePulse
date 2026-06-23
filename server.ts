@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 dotenv.config();
-
+console.log("NODE_ENV =", process.env.NODE_ENV);
 import express from "express";
 import path from "path";
 import cors from "cors";
