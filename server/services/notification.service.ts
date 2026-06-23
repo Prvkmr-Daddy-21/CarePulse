@@ -24,10 +24,11 @@ export class NotificationService {
       console.log("SMTP_USER =", process.env.SMTP_USER);
       console.log("SMTP_PASS EXISTS =", !!process.env.SMTP_PASS);
       return nodemailer.createTransport({
-        host,
-        port,
-        secure: port === 465,
-        auth: { user, pass },
+        service: "gmail",
+        auth: {
+          user,
+          pass,
+        },
       });
     }
 
@@ -165,6 +166,9 @@ export class NotificationService {
         console.log(`✉️ Email notification sent successfully to: ${params.email}`);
       } catch (mailingError) {
         console.error("❌ NodeMailer failed to transmit actual email:", mailingError);
+        console.log("EMAIL FALLBACK");
+        console.log("TO:", params.email);
+        console.log("SUBJECT:", subject);
       }
     } else {
       console.log("------------------ CarePulse Notification Log ------------------");
