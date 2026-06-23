@@ -90,19 +90,27 @@ export class AppointmentService {
       };
     }
 
-    const hour = appointmentDate.getHours();
-    console.log("================================");
-    console.log("RAW SCHEDULE:", validatedData.schedule);
-    console.log("PARSED DATE:", appointmentDate.toString());
-    console.log("ISO DATE:", appointmentDate.toISOString());
-    console.log("HOUR:", hour);
-    console.log("================================");
+    const indiaTime = new Date(
+      appointmentDate.toLocaleString("en-US", {
+        timeZone: "Asia/Kolkata",
+      })
+    );
+
+    const hour = indiaTime.getHours();
+
     if (hour < 9 || hour >= 21) {
       throw {
         status: 400,
         message: "Appointments can only be booked between 9:00 AM and 9:00 PM.",
       };
     }
+    console.log("================================");
+    console.log("RAW SCHEDULE:", validatedData.schedule);
+    console.log("PARSED DATE:", appointmentDate.toString());
+    console.log("ISO DATE:", appointmentDate.toISOString());
+    console.log("HOUR:", hour);
+    console.log("================================");
+
 
     const doctorProfile = await db.doctors.findOne({ name: validatedData.primaryPhysician });
     if (doctorProfile && doctorProfile.status !== "active") {
