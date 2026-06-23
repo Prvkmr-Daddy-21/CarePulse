@@ -55,8 +55,8 @@ export class AppointmentController {
         limit: limit ? parseInt(limit as string, 10) : 10,
       });
 
-      res.status(200).json({ 
-        success: true, 
+      res.status(200).json({
+        success: true,
         appointments: result.appointments,
         total: result.total,
         page: result.page,

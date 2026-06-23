@@ -1,15 +1,11 @@
 import React, { useState } from "react";
-import { motion } from "motion/react";
-import { 
-  Activity, 
-  ShieldCheck, 
-  UserPlus, 
-  LogIn, 
-  CalendarCheck, 
+import {
+  Activity,
+  ShieldCheck,
+  UserPlus,
+  LogIn,
+  CalendarCheck,
   ChevronRight,
-  Stethoscope,
-  Heart,
-  Award,
   Mail,
   UserCheck,
   Eye,
@@ -18,13 +14,22 @@ import {
 import { api } from "../services/api";
 
 interface LandingViewProps {
-  onNavigate: (view: "landing" | "login" | "register" | "book" | "profile" | "admin") => void;
+  onNavigate: (
+    view:
+      | "landing"
+      | "login"
+      | "register"
+      | "book"
+      | "profile"
+      | "admin"
+      | "forgot-password"
+  ) => void;
   currentUser: any;
   currentPatient: any;
   onLoginSuccess?: (user: any) => void;
 }
 
-export const LandingView: React.FC<LandingViewProps> = ({ 
+export const LandingView: React.FC<LandingViewProps> = ({
   onNavigate,
   currentUser,
   currentPatient,
@@ -97,20 +102,29 @@ export const LandingView: React.FC<LandingViewProps> = ({
 
       {/* Navigation Header */}
       <header className="max-w-7xl mx-auto w-full px-6 py-6 flex items-center justify-between border-b border-dark-300 relative z-20">
-        <div className="flex items-center gap-2.5 cursor-pointer">
-          <div className="bg-brand-green/25 p-2 rounded-xl border border-brand-green/30">
-            <Activity className="h-5 w-5 text-brand-green" />
+        <div className="flex items-center gap-3 cursor-pointer">
+          <div className="bg-brand-green/15 p-2.5 rounded-xl border border-brand-green/20">
+            <Activity className="h-6 w-6 text-brand-green" />
           </div>
-          <div>
-            <span className="text-lg font-black tracking-tight text-white">
+
+          <div className="flex flex-col">
+            <h1 className="text-xl sm:text-2xl font-black leading-none">
               Care<span className="text-brand-green">Pulse</span>
+            </h1>
+
+            <span className="text-[10px] sm:text-xs text-gray-400 font-semibold tracking-wide">
+              From Booking to Better Health
             </span>
-            <span className="block text-[8px] font-mono tracking-widest text-brand-green uppercase">E-Health Network</span>
+          </div>
+          <div className="hidden sm:flex items-center ml-2">
+            <span className="bg-green-500 text-black font-black text-[10px] sm:text-xs px-2 py-1 rounded-md">
+              SDG 3
+            </span>
           </div>
         </div>
 
         <div className="flex items-center gap-4">
-          <button 
+          <button
             onClick={() => onNavigate("login")}
             className="text-xs text-gray-100 hover:text-white flex items-center gap-1.5 bg-dark-200 border border-dark-300 px-3.5 py-2 rounded-xl hover:bg-dark-300 transition-all cursor-pointer"
           >
@@ -121,38 +135,42 @@ export const LandingView: React.FC<LandingViewProps> = ({
       </header>
 
       {/* Main hero grid section */}
-      <main className="max-w-7xl mx-auto w-full px-6 py-12 md:py-20 grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10 flex-grow">
-        
+      <main className="max-w-7xl mx-auto w-full px-6 py-12 md:py-20 grid grid-cols-1 lg:grid-cols-12 items-center gap-12  relative z-10 flex-grow">
+
         {/* Left column hero titles */}
-        <div className="lg:col-span-7 space-y-8">
-          
+        <div className="lg:col-span-7 space-y-8 text-center lg:text-left">
+
           {/* Trust Banner badge */}
           <div className="inline-flex items-center gap-2 bg-brand-green/10 border border-brand-green/20 rounded-full py-1.5 px-4">
             <ShieldCheck className="w-4 h-4 text-brand-green animate-pulse" />
-            <span className="text-[10px] font-extrabold font-mono text-brand-green uppercase tracking-wider">SANDBOX COMPLIANCE PLATFORM</span>
+            <span className="text-[10px] font-extrabold font-mono text-brand-green uppercase tracking-wider">SDG 3 • GOOD HEALTH & WELL-BEING</span>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl xl:text-6xl font-black tracking-tight text-slate-100 leading-tight">
-            Healthcare Scheduling, <br className="hidden sm:inline" />
-            Designed to be <span className="text-brand-green">Effortless.</span>
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-tight">
+            From Booking
+            <br />
+            to
+            <span className="text-brand-green"> Better Health</span>
           </h1>
 
-          <p className="text-sm sm:text-base text-gray-100 max-w-xl leading-relaxed">
-            Submit scanning diagnostics, verify your health insurance covers, select specialized consultants, and monitor real-time appointment validation alerts with ease.
+          <p className="text-sm sm:text-base text-gray-100 max-w-xl leading-relaxed mx-auto lg:mx-0">
+            CarePulse helps patients schedule appointments, manage healthcare records,
+            connect with doctors, and receive timely medical care through a secure
+            digital healthcare platform.
           </p>
 
           {/* Quick actions box */}
-          <div className="flex flex-col sm:flex-row gap-4 max-w-md pt-2">
+          <div className="flex flex-col sm:flex-row gap-4 max-w-md pt-2 mx-auto lg:mx-0">
             <button
               onClick={handleQuickRedirect}
               className="px-6 py-3.5 bg-brand-green hover:bg-brand-green/90 text-dark-100 text-sm font-black rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-brand-green/15 transition-all cursor-pointer"
               id="hero-register-btn"
             >
               <UserPlus className="w-4.5 h-4.5" />
-              <span>{currentUser ? "Go to Dashboard" : "Register Clinic Account"}</span>
+              <span>{currentUser ? "Go to Dashboard" : "Register Patient Account"}</span>
               <ChevronRight className="w-4 h-4" />
             </button>
-            
+
             {!currentUser && (
               <button
                 onClick={() => onNavigate("login")}
@@ -165,42 +183,50 @@ export const LandingView: React.FC<LandingViewProps> = ({
           </div>
 
           {/* Trust indicators */}
-          <div className="grid grid-cols-3 gap-3 sm:gap-6 border-t border-dark-300 pt-8 max-w-lg">
+          {/* CarePulse Highlights */}
+          <div className="grid grid-cols-3 gap-3 sm:gap-6 border-t border-dark-300 pt-8 max-w-lg mx-auto lg:mx-0">
+
             <div className="space-y-1">
-              <span className="block text-2xl font-black text-white flex items-center gap-1">
-                <Stethoscope className="w-5 h-5 text-brand-green" />
-                <span>4</span>
+              <span className="block text-2xl font-black text-white">
+                24/7
               </span>
-              <span className="text-[10px] uppercase font-mono tracking-wider text-dark-500 font-bold">Active Disciplines</span>
+              <span className="text-[10px] uppercase font-mono tracking-wider text-dark-500 font-bold">
+                Appointment Access
+              </span>
             </div>
+
             <div className="space-y-1">
-              <span className="block text-2xl font-black text-white flex items-center gap-1">
-                <Heart className="w-5 h-5 text-brand-blue" />
-                <span>100%</span>
+              <span className="block text-2xl font-black text-brand-green">
+                SDG 3
               </span>
-              <span className="text-[10px] uppercase font-mono tracking-wider text-dark-500 font-bold">HIPAA Secure</span>
+              <span className="text-[10px] uppercase font-mono tracking-wider text-dark-500 font-bold">
+                Health & Well-being
+              </span>
             </div>
+
             <div className="space-y-1">
-              <span className="block text-2xl font-black text-white flex items-center gap-1">
-                <Award className="w-5 h-5 text-yellow-500" />
-                <span>Smart</span>
+              <span className="block text-2xl font-black text-white">
+                Secure
               </span>
-              <span className="text-[10px] uppercase font-mono tracking-wider text-dark-500 font-bold">Automatic Alerts</span>
+              <span className="text-[10px] uppercase font-mono tracking-wider text-dark-500 font-bold">
+                Patient Records
+              </span>
             </div>
+
           </div>
         </div>
 
         {/* Right column - Fast Login box */}
         <div className="lg:col-span-5 relative">
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] rounded-full bg-brand-green/5 blur-3xl pointer-events-none" />
-          
+
           <div className="relative bg-dark-200 border border-dark-300 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col gap-6">
             <div className="border-b border-dark-300 pb-4">
               <h3 className="text-lg font-bold text-neutral-100 flex items-center gap-2">
                 <CalendarCheck className="w-5 h-5 text-brand-green" />
-                <span>Patient Login Gate</span>
+                <span>Patient Portal</span>
               </h3>
-              <p className="text-xs text-gray-100 mt-1">Already registered? Input credentials to monitor schedule status or edit policy sheets.</p>
+              <p className="text-xs text-gray-100 mt-1">Already registered? Sign in to manage appointments, view records, and track your healthcare journey.</p>
             </div>
 
             {loginErr && (
@@ -234,7 +260,7 @@ export const LandingView: React.FC<LandingViewProps> = ({
                     required
                     value={patientLoginPass}
                     onChange={(e) => setPatientLoginPass(e.target.value)}
-                    placeholder="Input security password"
+                    placeholder="Enter your password"
                     className="w-full bg-dark-100 border border-dark-300 rounded-xl py-3 pl-10 pr-10 text-xs text-white placeholder-dark-500 focus:outline-none focus:border-brand-green transition-all"
                   />
                   <button
@@ -268,15 +294,15 @@ export const LandingView: React.FC<LandingViewProps> = ({
 
             <div className="text-center pt-2 flex flex-col gap-2">
               <span className="text-xs text-gray-100">
-                New physician patient?{" "}
-                <button 
+                New to CarePulse?{" "}
+                <button
                   onClick={() => onNavigate("register")}
                   className="font-extrabold text-brand-green underline hover:text-brand-green/80 cursor-pointer"
                 >
-                  Create Patient File
+                  Register Patient Account
                 </button>
               </span>
-              <button 
+              <button
                 onClick={() => onNavigate("forgot-password")}
                 className="text-xs text-brand-green hover:text-brand-green/80 underline cursor-pointer self-center"
               >
@@ -290,7 +316,7 @@ export const LandingView: React.FC<LandingViewProps> = ({
       {/* Standard Legal Footer */}
       <footer className="border-t border-dark-300 bg-dark-150 relative z-20">
         <div className="max-w-7xl mx-auto w-full px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-dark-500 font-mono">
-          <span>© 2026 CarePulse Group, Inc. All encryption coordinates active.</span>
+          <span>© 2026 CarePulse. Advancing SDG 3 – Good Health & Well-being through accessible digital healthcare.</span>
           <div className="flex items-center gap-4">
             <span className="hover:text-white cursor-pointer transition-colors">Privacy Ordinance</span>
             <span className="hover:text-white cursor-pointer transition-colors font-semibold flex items-center gap-1">
