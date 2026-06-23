@@ -238,7 +238,7 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
       </header>
 
       {/* Content wrapper */}
-      <main className="max-w-7xl mx-auto w-full px-6 py-8 space-y-6 relative z-20 flex-grow flex flex-col h-0">
+      <main className="max-w-7xl mx-auto w-full px-6 py-8 space-y-6 relative z-20 flex-grow flex flex-col">
         
         {doctorProfile?.status === "inactive" && (
           <div className="bg-brand-red/10 border border-brand-red border-dashed rounded-xl p-4 flex items-center justify-center gap-2 flex-shrink-0">
@@ -413,7 +413,7 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
                   </span>
                 </div>
               )}
-              <div className="overflow-x-auto flex-grow overflow-y-auto">
+              <div className="overflow-x-auto flex-grow">
                 <table className="w-full border-collapse text-left relative" id="schedules-data-table">
                 <thead className="sticky top-0 z-10">
                   <tr className="bg-dark-200 border-b border-dark-300 text-[10px] uppercase font-mono tracking-widest text-dark-500 font-black">

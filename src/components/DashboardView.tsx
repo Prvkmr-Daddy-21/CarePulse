@@ -356,7 +356,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       </header>
 
       {/* Main Content Wrapper */}
-      <main className="max-w-7xl mx-auto w-full px-6 py-8 space-y-6 relative z-20 flex-grow flex flex-col h-0">
+      <main className="max-w-7xl mx-auto w-full px-6 py-8 space-y-6 relative z-20 flex-grow flex flex-col">
 
         {/* ======================= APPOINTMENTS TAB ======================= */}
         {activeTab === "appointments" && (
@@ -513,7 +513,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                       Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1}–{Math.min(currentPage * ITEMS_PER_PAGE, stats[statusFilter === "all" ? "total" : statusFilter as keyof typeof stats] || 0)} of {stats[statusFilter === "all" ? "total" : statusFilter as keyof typeof stats] || 0} appointments
                     </span>
                   </div>
-                  <div className="overflow-x-auto flex-grow overflow-y-auto">
+                  <div className="overflow-x-auto flex-grow">
                     <table className="w-full border-collapse text-left relative">
                       <thead className="sticky top-0 z-10">
                         <tr className="bg-dark-200 border-b border-dark-300 text-[10px] uppercase font-mono tracking-widest text-dark-500 font-black">
@@ -716,7 +716,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                       Showing {docStartIndex + 1}–{Math.min(docStartIndex + ITEMS_PER_PAGE, totalDoctorsFiltered)} of {totalDoctorsFiltered} doctors
                     </span>
                   </div>
-                  <div className="overflow-x-auto flex-grow overflow-y-auto">
+                  <div className="overflow-x-auto flex-grow">
                     <table className="w-full border-collapse text-left relative">
                       <thead className="sticky top-0 z-10">
                         <tr className="bg-dark-200 border-b border-dark-300 text-[10px] uppercase font-mono tracking-widest text-dark-500 font-black">
