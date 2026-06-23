@@ -47,22 +47,12 @@ export const AppointmentBookingView: React.FC<AppointmentBookingViewProps> = ({
           setDoctors(res.doctors);
           setPrimaryPhysician(res.doctors[0].name);
         } else {
-          // Fallback UI mock doctors list
-          const fallbackDocs: IDoctor[] = [
-            { _id: "doc1", name: "Dr. Catherine Green", email: "green@healthcare.com", specialty: "Cardiologist", phone: "+1 555-0100", status: "active" },
-            { _id: "doc2", name: "Dr. Alexander Smith", email: "smith@healthcare.com", specialty: "Dermatologist", phone: "+1 555-0200", status: "active" },
-            { _id: "doc3", name: "Dr. Jasmine Johnson", email: "johnson@healthcare.com", specialty: "Pediatrician", phone: "+1 555-0300", status: "active" }
-          ];
-          setDoctors(fallbackDocs);
-          setPrimaryPhysician("Dr. Catherine Green");
+          setDoctors([]);
+          setPrimaryPhysician("");
         }
       } catch {
-        const fallbackDocs: IDoctor[] = [
-          { _id: "doc1", name: "Dr. Catherine Green", email: "green@healthcare.com", specialty: "Cardiologist", phone: "+1 555-0100", status: "active" },
-          { _id: "doc2", name: "Dr. Alexander Smith", email: "smith@healthcare.com", specialty: "Dermatologist", phone: "+1 555-0200", status: "active" }
-        ];
-        setDoctors(fallbackDocs);
-        setPrimaryPhysician("Dr. Catherine Green");
+        setDoctors([]);
+        setPrimaryPhysician("");
       } finally {
         setIsLoadingDocs(false);
       }
@@ -298,7 +288,7 @@ export const AppointmentBookingView: React.FC<AppointmentBookingViewProps> = ({
                 className="w-full bg-dark-100 border border-dark-300 rounded-xl py-3 px-4 text-xs text-white focus:outline-none focus:border-brand-green transition-all mb-4"
                 id="book-input-date"
               />
-              
+
               {selectedDate && primaryPhysician && (
                 <div className="space-y-2">
                   <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Available Time Slots</label>
@@ -322,7 +312,7 @@ export const AppointmentBookingView: React.FC<AppointmentBookingViewProps> = ({
                   )}
                 </div>
               )}
-              
+
               <p className="text-xs text-gray-400 mt-2">
                 Appointments can only be booked within the next 6 months.
               </p>
