@@ -16,6 +16,7 @@ import {
   FileMinus
 } from "lucide-react";
 import { api, IAppointment, IDoctor } from "../services/api";
+import { DoctorInfoPanel } from "./DoctorInfoPanel";
 
 interface DoctorDashboardViewProps {
   onNavigate: (view: "landing" | "login" | "register" | "book" | "profile" | "admin" | "doctor") => void;
@@ -55,6 +56,19 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
   const [selectedSlot, setSelectedSlot] = useState("");
   const [availableSlots, setAvailableSlots] = useState<string[]>([]);
   const [isLoadingSlots, setIsLoadingSlots] = useState(false);
+
+  const [activeDoctorProfile, setActiveDoctorProfile] = useState<IDoctor | null>(doctorProfile || null);
+
+  useEffect(() => {
+    if (!doctorProfile && currentUser?.email) {
+      api.doctors.list().then(res => {
+        if (res.success) {
+          const doc = res.doctors.find(d => d.email === currentUser.email);
+          if (doc) setActiveDoctorProfile(doc);
+        }
+      }).catch(console.error);
+    }
+  }, [doctorProfile, currentUser]);
 
   async function loadData() {
     try {
@@ -319,6 +333,9 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
           </div>
         </div>
 
+        {/* Professional Doctor Information Panel */}
+        <DoctorInfoPanel doctor={activeDoctorProfile} stats={stats} />
+
         {/* Action filter controls section */}
         <section className="bg-dark-200 border border-dark-300 rounded-2xl p-5 sm:p-6 shadow-2xl flex flex-col md:flex-row md:items-center justify-between gap-4 flex-shrink-0">
           {/* Left - Search */}
@@ -371,7 +388,7 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
         </section>
 
         {/* Database grid panel table */}
-        <section className="bg-dark-200 border border-dark-300 rounded-2xl overflow-hidden shadow-2xl flex-grow flex flex-col min-h-0">
+        <section className="bg-dark-200 border border-dark-300 rounded-2xl overflow-hidden shadow-2xl flex-grow flex flex-col min-h-[400px]">
           {isLoading ? (
             <div className="p-12 text-center text-dark-500 font-mono space-y-4">
               <div className="w-8 h-8 border-3 border-brand-green border-t-transparent rounded-full animate-spin mx-auto" />
