@@ -45,7 +45,7 @@ export class AppointmentService {
 
     const availableSlots: string[] = [];
     const now = new Date();
-    
+
     for (let i = 9; i < 21; i++) {
       // Don't show slots in the past for today
       if (
@@ -56,7 +56,7 @@ export class AppointmentService {
       ) {
         continue;
       }
-      
+
       const count = bookedSlotCounts[i] || 0;
       if (count < MAX_PATIENTS_PER_SLOT) {
         availableSlots.push(`${i.toString().padStart(2, "0")}:00`);
@@ -70,7 +70,9 @@ export class AppointmentService {
 
     const appointmentDate = new Date(validatedData.schedule);
     const now = new Date();
-
+    console.log("RAW SCHEDULE:", validatedData.schedule);
+    console.log("PARSED DATE:", appointmentDate);
+    console.log("HOUR:", appointmentDate.getHours());
     if (appointmentDate < now) {
       throw {
         status: 400,
@@ -107,7 +109,7 @@ export class AppointmentService {
 
     const existingAppointments = await db.appointments.find();
 
-    const isPatientAlreadyBooked = existingAppointments.some(a => 
+    const isPatientAlreadyBooked = existingAppointments.some(a =>
       a.patientId === validatedData.patientId &&
       (a.status === "pending" || a.status === "scheduled" || a.status === "completed") &&
       new Date(a.schedule).getTime() === appointmentDate.getTime() &&
@@ -118,7 +120,7 @@ export class AppointmentService {
       throw { status: 400, message: "You already have an appointment with this doctor at this time." };
     }
 
-    const bookedCount = existingAppointments.filter(a => 
+    const bookedCount = existingAppointments.filter(a =>
       (a.status === "pending" || a.status === "scheduled" || a.status === "completed") &&
       new Date(a.schedule).getTime() === appointmentDate.getTime() &&
       (a.primaryPhysician === validatedData.primaryPhysician || (doctorId && a.doctorId === doctorId))
@@ -204,7 +206,7 @@ export class AppointmentService {
     const limit = filters.limit || 10;
     const totalPages = Math.ceil(total / limit);
     const startIndex = (page - 1) * limit;
-    
+
     const paginatedList = list.slice(startIndex, startIndex + limit);
 
     return {
@@ -297,7 +299,8 @@ export class AppointmentService {
         message: "Appointments can only be rescheduled within 6 months",
       };
     }
-
+    console.log("appointmentDate =", appointmentDate);
+    console.log("hour =", appointmentDate.getHours());
     const hour = appointmentDate.getHours();
     if (hour < 9 || hour >= 21) {
       throw {
@@ -313,7 +316,7 @@ export class AppointmentService {
 
     const existingAppointments = await db.appointments.find();
 
-    const isPatientAlreadyBooked = existingAppointments.some(a => 
+    const isPatientAlreadyBooked = existingAppointments.some(a =>
       a._id !== id &&
       a.patientId === appointment.patientId &&
       (a.status === "pending" || a.status === "scheduled" || a.status === "completed") &&
@@ -325,7 +328,7 @@ export class AppointmentService {
       throw { status: 400, message: "You already have an appointment with this doctor at this time." };
     }
 
-    const bookedCount = existingAppointments.filter(a => 
+    const bookedCount = existingAppointments.filter(a =>
       a._id !== id &&
       (a.status === "pending" || a.status === "scheduled" || a.status === "completed") &&
       new Date(a.schedule).getTime() === appointmentDate.getTime() &&
