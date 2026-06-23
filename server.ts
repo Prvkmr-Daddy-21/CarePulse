@@ -12,7 +12,7 @@ import { errorMiddleware } from "./server/middleware/error.middleware";
 
 async function startServer() {
   const app = express();
-  const PORT = 3000;
+  const PORT = Number(process.env.PORT) || 3000;
 
   // Trust proxy for accurate rate-limiting behind Nginx reverse proxy
   app.set("trust proxy", 1);
