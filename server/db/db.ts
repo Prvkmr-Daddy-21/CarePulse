@@ -6,12 +6,7 @@ import { IUser, IDoctor, IPatient, IAppointment } from "../models/types";
 
 let isMongoConnected = false;
 
-const DEFAULT_DOCTORS: Omit<IDoctor, "_id">[] = [
-  { name: "Dr. Catherine Green", email: "green@healthcare.com", specialty: "Cardiologist", phone: "+1 (555) 019-2834", status: "active" },
-  { name: "Dr. Jasmine Johnson", email: "johnson@healthcare.com", specialty: "Pediatrician", phone: "+1 (555) 014-9922", status: "active" },
-  { name: "Dr. Alexander Smith", email: "smith@healthcare.com", specialty: "Dermatologist", phone: "+1 (555) 012-3850", status: "active" },
-  { name: "Dr. Robert Adams", email: "adams@healthcare.com", specialty: "Neurologist", phone: "+1 (555) 017-7489", status: "active" }
-];
+const DEFAULT_DOCTORS: Omit<IDoctor, "_id">[] = [];
 
 export async function connectDatabase() {
   const mongoUri = process.env.MONGODB_URI;
