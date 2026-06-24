@@ -60,7 +60,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const [doctorCurrentPage, setDoctorCurrentPage] = useState(1);
   const [bloodRequests, setBloodRequests] = useState<any[]>([]);
   const [bloodDonors, setBloodDonors] = useState<any[]>([]);
-  
+
   // Blood Bank Filters & Pagination
   const [bloodSearchTerm, setBloodSearchTerm] = useState("");
   const [bloodStatusFilter, setBloodStatusFilter] = useState("all");
@@ -74,7 +74,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const [isSubmittingDoctor, setIsSubmittingDoctor] = useState(false);
   const [deletingDoctor, setDeletingDoctor] = useState<IDoctor | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
-  
+
   const [newDoctor, setNewDoctor] = useState({
     name: "",
     email: "",
@@ -371,15 +371,15 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
   // BLOOD BANK LOGIC
   const priorityValue: Record<string, number> = { critical: 3, urgent: 2, normal: 1 };
-  
+
   const filteredBloodRequests = bloodRequests.filter(req => {
-    const matchesSearch = req.patientName?.toLowerCase().includes(bloodSearchTerm.toLowerCase()) || 
-                          req.hospitalName?.toLowerCase().includes(bloodSearchTerm.toLowerCase()) || 
-                          req.bloodGroup?.toLowerCase().includes(bloodSearchTerm.toLowerCase());
+    const matchesSearch = req.patientName?.toLowerCase().includes(bloodSearchTerm.toLowerCase()) ||
+      req.hospitalName?.toLowerCase().includes(bloodSearchTerm.toLowerCase()) ||
+      req.bloodGroup?.toLowerCase().includes(bloodSearchTerm.toLowerCase());
     const matchesStatus = bloodStatusFilter === "all" || req.status === bloodStatusFilter;
     const matchesPriority = bloodPriorityFilter === "all" || req.urgency === bloodPriorityFilter;
     const matchesGroup = bloodGroupFilter === "all" || req.bloodGroup === bloodGroupFilter;
-    
+
     return matchesSearch && matchesStatus && matchesPriority && matchesGroup;
   }).sort((a, b) => {
     const pA = priorityValue[a.urgency] || 0;
@@ -958,517 +958,517 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 </div>
               )}
             </section>
-        {/* ======================= BLOOD BANK TAB ======================= */}
-        {activeTab === "blood" && (
-          <div className="space-y-8 animate-in fade-in duration-300">
-            <section className="bg-dark-200 border border-dark-300 rounded-3xl p-6 md:p-8 shadow-2xl">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-black flex items-center gap-2">
-                  <span className="bg-brand-red/20 text-brand-red p-2 rounded-xl">
-                    <Activity className="w-5 h-5" />
-                  </span>
-                  Blood Requests
-                </h2>
-              </div>
-
-              {/* Analytics Cards */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                <div className="bg-dark-100 p-4 rounded-2xl border border-dark-300 flex flex-col gap-1">
-                  <span className="text-[10px] uppercase font-bold text-dark-500 tracking-wider">Total Requests</span>
-                  <span className="text-2xl font-black text-white">{bloodStats.totalReqs}</span>
-                </div>
-                <div className="bg-dark-100 p-4 rounded-2xl border border-brand-red/20 flex flex-col gap-1">
-                  <span className="text-[10px] uppercase font-bold text-brand-red tracking-wider">Critical</span>
-                  <span className="text-2xl font-black text-brand-red">{bloodStats.criticalReqs}</span>
-                </div>
-                <div className="bg-dark-100 p-4 rounded-2xl border border-brand-orange/20 flex flex-col gap-1">
-                  <span className="text-[10px] uppercase font-bold text-brand-orange tracking-wider">Urgent</span>
-                  <span className="text-2xl font-black text-brand-orange">{bloodStats.urgentReqs}</span>
-                </div>
-                <div className="bg-dark-100 p-4 rounded-2xl border border-brand-green/20 flex flex-col gap-1">
-                  <span className="text-[10px] uppercase font-bold text-brand-green tracking-wider">Fulfilled</span>
-                  <span className="text-2xl font-black text-brand-green">{bloodStats.fulfilledReqs}</span>
-                </div>
-                <div className="bg-dark-100 p-4 rounded-2xl border border-dark-300 flex flex-col gap-1">
-                  <span className="text-[10px] uppercase font-bold text-dark-500 tracking-wider">Available Donors</span>
-                  <span className="text-2xl font-black text-white">{bloodStats.availableDonors}</span>
-                </div>
-              </div>
-
-              {/* Filters & Search */}
-              <div className="flex flex-col md:flex-row gap-4 mb-6">
-                <input
-                  type="text"
-                  placeholder="Search Patient, Hospital, Blood Group..."
-                  value={bloodSearchTerm}
-                  onChange={(e) => {
-                    setBloodSearchTerm(e.target.value);
-                    setBloodCurrentPage(1);
-                  }}
-                  className="flex-1 bg-dark-100 border border-dark-300 rounded-xl py-3 px-4 text-xs font-bold text-white focus:border-brand-green focus:outline-none transition-all"
-                />
-                <select
-                  value={bloodStatusFilter}
-                  onChange={(e) => {
-                    setBloodStatusFilter(e.target.value);
-                    setBloodCurrentPage(1);
-                  }}
-                  className="bg-dark-100 border border-dark-300 rounded-xl py-3 px-4 text-xs font-bold text-white focus:border-brand-green focus:outline-none transition-all"
-                >
-                  <option value="all">All Statuses</option>
-                  <option value="pending">Pending</option>
-                  <option value="approved">Approved</option>
-                  <option value="fulfilled">Fulfilled</option>
-                  <option value="rejected">Rejected</option>
-                </select>
-                <select
-                  value={bloodPriorityFilter}
-                  onChange={(e) => {
-                    setBloodPriorityFilter(e.target.value);
-                    setBloodCurrentPage(1);
-                  }}
-                  className="bg-dark-100 border border-dark-300 rounded-xl py-3 px-4 text-xs font-bold text-white focus:border-brand-green focus:outline-none transition-all"
-                >
-                  <option value="all">All Priorities</option>
-                  <option value="critical">Critical</option>
-                  <option value="urgent">Urgent</option>
-                  <option value="normal">Normal</option>
-                </select>
-                <select
-                  value={bloodGroupFilter}
-                  onChange={(e) => {
-                    setBloodGroupFilter(e.target.value);
-                    setBloodCurrentPage(1);
-                  }}
-                  className="bg-dark-100 border border-dark-300 rounded-xl py-3 px-4 text-xs font-bold text-white focus:border-brand-green focus:outline-none transition-all"
-                >
-                  <option value="all">All Blood Groups</option>
-                  <option value="A+">A+</option>
-                  <option value="A-">A-</option>
-                  <option value="B+">B+</option>
-                  <option value="B-">B-</option>
-                  <option value="AB+">AB+</option>
-                  <option value="AB-">AB-</option>
-                  <option value="O+">O+</option>
-                  <option value="O-">O-</option>
-                </select>
-              </div>
-
-              {filteredBloodRequests.length === 0 ? (
-                <div className="p-8 border border-dark-300 border-dashed rounded-2xl flex flex-col items-center justify-center text-center bg-dark-100/50">
-                  <span className="text-sm font-bold text-dark-500">No active blood requests</span>
-                </div>
-              ) : (
-                <div className="overflow-x-auto rounded-2xl border border-dark-300 bg-dark-100">
-                  <table className="w-full text-left border-collapse">
-                    <thead>
-                      <tr className="bg-dark-200 border-b border-dark-300">
-                        <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500">Date</th>
-                        <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500">Patient</th>
-                        <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500">Blood Group</th>
-                        <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500">Units</th>
-                        <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500">Urgency</th>
-                        <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500">Hospital</th>
-                        <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500">Status</th>
-                        <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500 text-right">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-dark-300">
-                      {paginatedBloodRequests.map((req, i) => (
-                        <tr key={i} className="hover:bg-dark-200/50 transition-colors">
-                          <td className="py-3 px-5 text-sm text-gray-400">{new Date(req.requestDate || new Date()).toLocaleDateString()}</td>
-                          <td className="py-3 px-5 text-sm font-bold text-white">{req.patientName}</td>
-                          <td className="py-3 px-5 text-sm font-bold text-brand-red">{req.bloodGroup}</td>
-                          <td className="py-3 px-5 text-sm text-gray-300">{req.unitsRequired}</td>
-                          <td className="py-3 px-5">
-                            <span className={`text-[10px] uppercase font-bold tracking-wider px-2 py-1 rounded-md ${req.urgency === 'critical' ? 'bg-red-500/10 text-red-500' : req.urgency === 'urgent' ? 'bg-orange-500/10 text-orange-500' : 'bg-brand-blue/10 text-brand-blue'}`}>
-                              {req.urgency}
-                            </span>
-                          </td>
-                          <td className="py-3 px-5 text-sm text-gray-300">{req.hospitalName}</td>
-                          <td className="py-3 px-5 text-sm">
-                            <span className={`text-[10px] uppercase font-bold tracking-wider px-2 py-1 rounded-md ${req.status === 'pending' ? 'bg-brand-orange/10 text-brand-orange' : req.status === 'fulfilled' ? 'bg-brand-green/10 text-brand-green' : req.status === 'approved' ? 'bg-cyan-500/10 text-cyan-400' : 'bg-dark-300 text-gray-300'}`}>
-                              {req.status}
-                            </span>
-                          </td>
-                          <td className="py-3 px-5 text-right">
-                            {req.status === 'pending' && (
-                              <div className="flex justify-end gap-2">
-                                <button onClick={() => handleBloodRequestAction(req._id, 'approved', 'Approve')} className="text-[10px] bg-brand-green/20 text-brand-green px-2 py-1 rounded hover:bg-brand-green/30">Approve</button>
-                                <button onClick={() => handleBloodRequestAction(req._id, 'rejected', 'Reject')} className="text-[10px] bg-brand-red/20 text-brand-red px-2 py-1 rounded hover:bg-brand-red/30">Reject</button>
-                              </div>
-                            )}
-                            {req.status === 'approved' && (
-                              <button onClick={() => handleBloodRequestAction(req._id, 'fulfilled', 'Mark Fulfilled')} className="text-[10px] bg-brand-blue/20 text-brand-blue px-2 py-1 rounded hover:bg-brand-blue/30">Mark Fulfilled</button>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-
-              {bloodTotalPages > 1 && (
-                <div className="flex items-center justify-between mt-6 bg-dark-100 p-4 rounded-2xl border border-dark-300">
-                  <button
-                    onClick={() => setBloodCurrentPage((prev) => Math.max(1, prev - 1))}
-                    disabled={bloodCurrentPage === 1}
-                    className="px-4 py-2 bg-dark-200 hover:bg-dark-300 border border-dark-400 text-xs font-bold text-white rounded-xl transition-all disabled:opacity-50 cursor-pointer"
-                  >
-                    Previous
-                  </button>
-                  <span className="text-[10px] text-dark-500 font-bold uppercase tracking-widest">
-                    Page {bloodCurrentPage} of {bloodTotalPages}
-                  </span>
-                  <button
-                    onClick={() => setBloodCurrentPage((prev) => Math.min(bloodTotalPages, prev + 1))}
-                    disabled={bloodCurrentPage === bloodTotalPages}
-                    className="px-4 py-2 bg-dark-200 hover:bg-dark-300 border border-dark-400 text-xs font-bold text-white rounded-xl transition-all disabled:opacity-50 cursor-pointer"
-                  >
-                    Next
-                  </button>
-                </div>
-              )}
-            </section>
-
-            <section className="bg-dark-200 border border-dark-300 rounded-3xl p-6 md:p-8 shadow-2xl">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-black flex items-center gap-2">
-                  <span className="bg-brand-red/20 text-brand-red p-2 rounded-xl">
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg>
-                  </span>
-                  Blood Donors
-                </h2>
-              </div>
-              {bloodDonors.length === 0 ? (
-                <div className="p-8 border border-dark-300 border-dashed rounded-2xl flex flex-col items-center justify-center text-center bg-dark-100/50">
-                  <span className="text-sm font-bold text-dark-500">No active blood donors</span>
-                </div>
-              ) : (
-                <div className="overflow-x-auto rounded-2xl border border-dark-300 bg-dark-100">
-                  <table className="w-full text-left border-collapse">
-                    <thead>
-                      <tr className="bg-dark-200 border-b border-dark-300">
-                        <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500">Donor Name</th>
-                        <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500">Blood Group</th>
-                        <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500">Status</th>
-                        <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500">Medical Notes</th>
-                        <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500 text-right">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-dark-300">
-                      {bloodDonors.map((donor, i) => (
-                        <tr key={i} className="hover:bg-dark-200/50 transition-colors">
-                          <td className="py-3 px-5 text-sm font-bold text-white">{donor.patientName}</td>
-                          <td className="py-3 px-5 text-sm font-bold text-brand-red">{donor.bloodGroup}</td>
-                          <td className="py-3 px-5 text-sm">
-                            <span className={`text-[10px] uppercase font-bold tracking-wider px-2 py-1 rounded-md ${donor.status === 'eligible' || donor.status === 'active' ? 'bg-brand-green/10 text-brand-green' : 'bg-brand-orange/10 text-brand-orange'}`}>
-                              {donor.status}
-                            </span>
-                          </td>
-                          <td className="py-3 px-5 text-xs text-gray-400 max-w-[300px] truncate">{donor.medicalConditions || 'None'}</td>
-                          <td className="py-3 px-5 text-right flex justify-end gap-2">
-                            {donor.status === 'eligible' || donor.status === 'ineligible' ? (
-                              <>
-                                <button onClick={() => handleBloodDonorAction(donor._id, 'active', 'Activate')} className="text-[10px] bg-brand-green/20 text-brand-green px-2 py-1 rounded hover:bg-brand-green/30">Activate</button>
-                                <button onClick={() => handleBloodDonorAction(donor._id, 'inactive', 'Deactivate')} className="text-[10px] bg-brand-red/20 text-brand-red px-2 py-1 rounded hover:bg-brand-red/30">Deactivate</button>
-                              </>
-                            ) : (
-                              <button onClick={() => handleBloodDonorAction(donor._id, donor.status === 'active' ? 'inactive' : 'active', 'Toggle Availability')} className="text-[10px] bg-brand-blue/20 text-brand-blue px-2 py-1 rounded hover:bg-brand-blue/30">Toggle Availability</button>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </section>
-          </div>
-        )}
-      </main>
-      {/* Mobile Bottom Navigation */}
-      <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-dark-200 border-t border-dark-300 flex items-stretch">
-        <button
-          onClick={() => setActiveTab("appointments")}
-          className={`flex-1 flex flex-col items-center justify-center gap-1 py-3 text-[10px] font-black uppercase tracking-wider transition-all ${activeTab === "appointments"
-            ? "text-brand-green border-t-2 border-brand-green -mt-px"
-            : "text-dark-500 hover:text-white"
-            }`}
-        >
-          <Calendar className="w-5 h-5" />
-          Appointments
-        </button>
-        <button
-          onClick={() => setActiveTab("doctors")}
-          className={`flex-1 flex flex-col items-center justify-center gap-1 py-3 text-[10px] font-black uppercase tracking-wider transition-all ${activeTab === "doctors"
-            ? "text-brand-green border-t-2 border-brand-green -mt-px"
-            : "text-dark-500 hover:text-white"
-            }`}
-        >
-          <Users className="w-5 h-5" />
-          Doctors
-        </button>
-      </nav>
-
-      {/* Add Doctor Modal */}
-      {isAddingDoctor && (
-        <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-6">
-          <form
-            onSubmit={handleAddDoctorSubmit}
-            className="bg-dark-200 border border-dark-300 rounded-3xl p-6 sm:p-8 max-w-xl w-full shadow-2xl space-y-5 animate-in fade-in zoom-in duration-150 max-h-[90vh] overflow-y-auto"
-          >
-            <div className="border-b border-dark-300 pb-4">
-              <h3 className="text-lg font-black text-neutral-100 flex items-center gap-2">
-                <UserPlus className="text-brand-green w-5 h-5" />
-                <span>{editingDoctorId ? "Edit Specialist" : "Onboard New Specialist"}</span>
-              </h3>
-              <p className="text-xs text-slate-100 mt-1">
-                {editingDoctorId ? "Update existing details for this doctor profile." : "Enter details to create a new doctor profile and system account."}
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Full Name</label>
-                <input required type="text" value={newDoctor.name} onChange={e => setNewDoctor({ ...newDoctor, name: e.target.value })} placeholder="Dr. John Doe" className="w-full bg-dark-100 border border-dark-300 rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:border-brand-green transition-all" />
-              </div>
-              <div className="space-y-1">
-                <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Specialty</label>
-                <select value={newDoctor.specialty} onChange={e => setNewDoctor({ ...newDoctor, specialty: e.target.value })} className="w-full bg-dark-100 border border-dark-300 rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:border-brand-green transition-all appearance-none cursor-pointer">
-                  <option>General Medicine</option>
-                  <option>Cardiologist</option>
-                  <option>Pediatrician</option>
-                  <option>Dermatologist</option>
-                  <option>Neurologist</option>
-                  <option>Psychiatrist</option>
-                  <option>Orthopedic Surgeon</option>
-                </select>
-              </div>
-              <div className="space-y-1">
-                <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Email Address</label>
-                <input required type="email" value={newDoctor.email} onChange={e => setNewDoctor({ ...newDoctor, email: e.target.value })} placeholder="doctor@MediConnect.com" className="w-full bg-dark-100 border border-dark-300 rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:border-brand-green transition-all" />
-              </div>
-              <div className="space-y-1">
-                <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">System Password</label>
-                <input required={!editingDoctorId} type="password" value={newDoctor.password} onChange={e => setNewDoctor({ ...newDoctor, password: e.target.value })} placeholder={editingDoctorId ? "Leave blank to keep current" : "********"} className="w-full bg-dark-100 border border-dark-300 rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:border-brand-green transition-all" />
-              </div>
-              <div className="space-y-1">
-                <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Phone Number</label>
-                <input required type="text" value={newDoctor.phone} onChange={e => setNewDoctor({ ...newDoctor, phone: e.target.value })} placeholder="+1 (555) 000-0000" className="w-full bg-dark-100 border border-dark-300 rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:border-brand-green transition-all" />
-              </div>
-              <div className="space-y-1">
-                <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Experience (Years)</label>
-                <input type="text" value={newDoctor.experience} onChange={e => setNewDoctor({ ...newDoctor, experience: e.target.value })} placeholder="e.g. 10 Years" className="w-full bg-dark-100 border border-dark-300 rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:border-brand-green transition-all" />
-              </div>
-              <div className="space-y-1 sm:col-span-2">
-                <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Qualifications</label>
-                <input type="text" value={newDoctor.qualification} onChange={e => setNewDoctor({ ...newDoctor, qualification: e.target.value })} placeholder="MBBS, MD - Cardiology" className="w-full bg-dark-100 border border-dark-300 rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:border-brand-green transition-all" />
-              </div>
-              <div className="space-y-1 sm:col-span-2">
-                <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Consultation Fee</label>
-                <input type="number" value={newDoctor.consultationFee} onChange={e => setNewDoctor({ ...newDoctor, consultationFee: parseFloat(e.target.value) || 0 })} placeholder="e.g. 500" className="w-full bg-dark-100 border border-dark-300 rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:border-brand-green transition-all" />
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between border-t border-dark-300 pt-5">
-              <button type="button" onClick={() => setIsAddingDoctor(false)} className="px-4 py-2 bg-dark-300 hover:bg-dark-400 border border-dark-400 text-xs font-bold rounded-xl transition-all cursor-pointer">
-                Cancel
-              </button>
-              <button type="submit" disabled={isSubmittingDoctor} className="px-5 py-2.5 text-dark-100 text-xs font-black uppercase tracking-wider rounded-xl flex items-center gap-1 shadow-lg bg-brand-green hover:bg-brand-green/90 shadow-brand-green/10 cursor-pointer disabled:opacity-50 transition-all">
-                {isSubmittingDoctor ? "Processing..." : (editingDoctorId ? "Save Profile" : "Create Doctor Profile")}
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
-
-      {/* Deactivation Confirmation Modal */}
-      {doctorToDeactivate && (
-        <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-6">
-          <div className="bg-dark-200 border border-dark-300 rounded-3xl p-6 sm:p-8 max-w-sm w-full shadow-2xl space-y-6 animate-in fade-in zoom-in duration-150 max-h-[90vh] overflow-y-auto">
-            <div className="flex flex-col items-center text-center space-y-4">
-              <div className="bg-brand-red/10 p-4 rounded-full">
-                <AlertTriangle className="w-8 h-8 text-brand-red" />
-              </div>
-              <div>
-                <h3 className="text-xl font-black text-white">Deactivate Doctor?</h3>
-                <p className="text-xs text-dark-500 mt-2">
-                  The doctor <strong>{doctorToDeactivate.name}</strong> will no longer be available for new appointments. Existing appointments will remain active.
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 w-full">
-              <button
-                onClick={() => setDoctorToDeactivate(null)}
-                className="flex-1 px-4 py-3 bg-dark-300 hover:bg-dark-400 border border-dark-400 text-xs font-bold text-white rounded-xl transition-all cursor-pointer"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={confirmDeactivate}
-                className="flex-1 px-4 py-3 bg-brand-red hover:bg-brand-red/90 text-dark-100 text-xs font-black uppercase tracking-wider rounded-xl transition-all shadow-lg shadow-brand-red/10 cursor-pointer"
-              >
-                Deactivate
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Scheduling Action Modal */}
-      {actionTarget && actionType && (
-        <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-6">
-          <form
-            onSubmit={handleActionSubmit}
-            className="bg-dark-200 border border-dark-300 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl space-y-6 animate-in fade-in zoom-in duration-150 max-h-[90vh] overflow-y-auto"
-          >
-            <div className="border-b border-dark-300 pb-4">
-              <h3 className="text-lg font-black text-neutral-100 flex items-center gap-2">
-                {actionType === "schedule" || actionType === "reschedule" || actionType === "complete" ? <CheckCircle className="text-brand-green w-5 h-5" /> : <XOctagon className="text-brand-red w-5 h-5" />}
-                <span>{actionType === "reschedule" ? "Reschedule Appointment" : actionType === "schedule" ? "Confirm Appointment" : actionType === "complete" ? "Complete Appointment" : "Cancel Appointment"}</span>
-              </h3>
-              <p className="text-xs text-slate-100 mt-1">Updating state for <strong>{actionTarget.patientName}</strong>.</p>
-            </div>
-
-            {actionType === "reschedule" ? (
-              <div className="space-y-2">
-                <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">New Appointment Date</label>
-                <input
-                  type="date"
-                  value={selectedDate}
-                  onChange={(e) => setSelectedDate(e.target.value)}
-                  min={(() => {
-                    const now = new Date();
-                    const offset = now.getTimezoneOffset();
-                    return new Date(now.getTime() - offset * 60000).toISOString().split('T')[0];
-                  })()}
-                  max={(() => {
-                    const d = new Date();
-                    d.setMonth(d.getMonth() + 6);
-                    const offset = d.getTimezoneOffset();
-                    return new Date(d.getTime() - offset * 60000).toISOString().split('T')[0];
-                  })()}
-                  className="w-full bg-dark-100 border border-dark-300 rounded-xl py-3 px-4 text-xs text-white mb-3"
-                  required
-                />
-                {selectedDate && (
-                  <div className="space-y-2 mt-2">
-                    <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Available Slots</label>
-                    {isLoadingSlots ? (
-                      <div className="h-10 w-full bg-dark-100 animate-pulse rounded-xl" />
-                    ) : availableSlots.length === 0 ? (
-                      <p className="text-brand-red text-xs font-semibold">No slots available.</p>
-                    ) : (
-                      <div className="grid grid-cols-4 gap-2 mb-3">
-                        {availableSlots.map(slot => (
-                          <button
-                            type="button"
-                            key={slot}
-                            onClick={() => setSelectedSlot(slot)}
-                            className={`py-2 rounded-lg text-xs font-bold transition-all ${selectedSlot === slot ? 'bg-brand-green text-dark-100 shadow-md' : 'bg-dark-100 border border-dark-300 text-gray-150 hover:border-brand-green/50'}`}
-                          >
-                            {slot}
-                          </button>
-                        ))}
-                      </div>
-                    )}
+            {/* ======================= BLOOD BANK TAB ======================= */}
+            {activeTab === "blood" && (
+              <div className="space-y-8 animate-in fade-in duration-300">
+                <section className="bg-dark-200 border border-dark-300 rounded-3xl p-6 md:p-8 shadow-2xl">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-xl font-black flex items-center gap-2">
+                      <span className="bg-brand-red/20 text-brand-red p-2 rounded-xl">
+                        <Activity className="w-5 h-5" />
+                      </span>
+                      Blood Requests
+                    </h2>
                   </div>
-                )}
-                <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Notes</label>
-                <textarea
-                  required
-                  value={note}
-                  onChange={(e) => setNote(e.target.value)}
-                  rows={3}
-                  className="w-full bg-dark-100 border border-dark-300 rounded-xl py-3 px-4 text-xs text-white focus:border-brand-green transition-all resize-none"
-                />
-              </div>
-            ) : actionType === "schedule" ? (
-              <div className="space-y-2">
-                <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Confirmation Notes</label>
-                <textarea
-                  value={note}
-                  onChange={(e) => setNote(e.target.value)}
-                  rows={3}
-                  className="w-full bg-dark-100 border border-dark-300 rounded-xl py-3 px-4 text-xs text-white focus:border-brand-green transition-all resize-none"
-                />
-              </div>
-            ) : actionType === "complete" ? (
-              <div className="space-y-2">
-                <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Completion Notes</label>
-                <textarea
-                  required
-                  value={note}
-                  onChange={(e) => setNote(e.target.value)}
-                  rows={3}
-                  className="w-full bg-dark-100 border border-dark-300 rounded-xl py-3 px-4 text-xs text-white focus:border-brand-green transition-all resize-none"
-                />
-              </div>
-            ) : (
-              <div className="space-y-2">
-                <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Reason for Cancellation</label>
-                <textarea
-                  required
-                  value={cancellationReason}
-                  onChange={(e) => setCancellationReason(e.target.value)}
-                  rows={4}
-                  className="w-full bg-dark-100 border border-dark-300 rounded-xl py-3 px-4 text-xs text-white focus:border-brand-green transition-all resize-none"
-                />
+
+                  {/* Analytics Cards */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    <div className="bg-dark-100 p-4 rounded-2xl border border-dark-300 flex flex-col gap-1">
+                      <span className="text-[10px] uppercase font-bold text-dark-500 tracking-wider">Total Requests</span>
+                      <span className="text-2xl font-black text-white">{bloodStats.totalReqs}</span>
+                    </div>
+                    <div className="bg-dark-100 p-4 rounded-2xl border border-brand-red/20 flex flex-col gap-1">
+                      <span className="text-[10px] uppercase font-bold text-brand-red tracking-wider">Critical</span>
+                      <span className="text-2xl font-black text-brand-red">{bloodStats.criticalReqs}</span>
+                    </div>
+                    <div className="bg-dark-100 p-4 rounded-2xl border border-brand-orange/20 flex flex-col gap-1">
+                      <span className="text-[10px] uppercase font-bold text-brand-orange tracking-wider">Urgent</span>
+                      <span className="text-2xl font-black text-brand-orange">{bloodStats.urgentReqs}</span>
+                    </div>
+                    <div className="bg-dark-100 p-4 rounded-2xl border border-brand-green/20 flex flex-col gap-1">
+                      <span className="text-[10px] uppercase font-bold text-brand-green tracking-wider">Fulfilled</span>
+                      <span className="text-2xl font-black text-brand-green">{bloodStats.fulfilledReqs}</span>
+                    </div>
+                    <div className="bg-dark-100 p-4 rounded-2xl border border-dark-300 flex flex-col gap-1">
+                      <span className="text-[10px] uppercase font-bold text-dark-500 tracking-wider">Available Donors</span>
+                      <span className="text-2xl font-black text-white">{bloodStats.availableDonors}</span>
+                    </div>
+                  </div>
+
+                  {/* Filters & Search */}
+                  <div className="flex flex-col md:flex-row gap-4 mb-6">
+                    <input
+                      type="text"
+                      placeholder="Search Patient, Hospital, Blood Group..."
+                      value={bloodSearchTerm}
+                      onChange={(e) => {
+                        setBloodSearchTerm(e.target.value);
+                        setBloodCurrentPage(1);
+                      }}
+                      className="flex-1 bg-dark-100 border border-dark-300 rounded-xl py-3 px-4 text-xs font-bold text-white focus:border-brand-green focus:outline-none transition-all"
+                    />
+                    <select
+                      value={bloodStatusFilter}
+                      onChange={(e) => {
+                        setBloodStatusFilter(e.target.value);
+                        setBloodCurrentPage(1);
+                      }}
+                      className="bg-dark-100 border border-dark-300 rounded-xl py-3 px-4 text-xs font-bold text-white focus:border-brand-green focus:outline-none transition-all"
+                    >
+                      <option value="all">All Statuses</option>
+                      <option value="pending">Pending</option>
+                      <option value="approved">Approved</option>
+                      <option value="fulfilled">Fulfilled</option>
+                      <option value="rejected">Rejected</option>
+                    </select>
+                    <select
+                      value={bloodPriorityFilter}
+                      onChange={(e) => {
+                        setBloodPriorityFilter(e.target.value);
+                        setBloodCurrentPage(1);
+                      }}
+                      className="bg-dark-100 border border-dark-300 rounded-xl py-3 px-4 text-xs font-bold text-white focus:border-brand-green focus:outline-none transition-all"
+                    >
+                      <option value="all">All Priorities</option>
+                      <option value="critical">Critical</option>
+                      <option value="urgent">Urgent</option>
+                      <option value="normal">Normal</option>
+                    </select>
+                    <select
+                      value={bloodGroupFilter}
+                      onChange={(e) => {
+                        setBloodGroupFilter(e.target.value);
+                        setBloodCurrentPage(1);
+                      }}
+                      className="bg-dark-100 border border-dark-300 rounded-xl py-3 px-4 text-xs font-bold text-white focus:border-brand-green focus:outline-none transition-all"
+                    >
+                      <option value="all">All Blood Groups</option>
+                      <option value="A+">A+</option>
+                      <option value="A-">A-</option>
+                      <option value="B+">B+</option>
+                      <option value="B-">B-</option>
+                      <option value="AB+">AB+</option>
+                      <option value="AB-">AB-</option>
+                      <option value="O+">O+</option>
+                      <option value="O-">O-</option>
+                    </select>
+                  </div>
+
+                  {filteredBloodRequests.length === 0 ? (
+                    <div className="p-8 border border-dark-300 border-dashed rounded-2xl flex flex-col items-center justify-center text-center bg-dark-100/50">
+                      <span className="text-sm font-bold text-dark-500">No active blood requests</span>
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto rounded-2xl border border-dark-300 bg-dark-100">
+                      <table className="w-full text-left border-collapse">
+                        <thead>
+                          <tr className="bg-dark-200 border-b border-dark-300">
+                            <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500">Date</th>
+                            <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500">Patient</th>
+                            <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500">Blood Group</th>
+                            <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500">Units</th>
+                            <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500">Urgency</th>
+                            <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500">Hospital</th>
+                            <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500">Status</th>
+                            <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500 text-right">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-dark-300">
+                          {paginatedBloodRequests.map((req, i) => (
+                            <tr key={i} className="hover:bg-dark-200/50 transition-colors">
+                              <td className="py-3 px-5 text-sm text-gray-400">{new Date(req.requestDate || new Date()).toLocaleDateString()}</td>
+                              <td className="py-3 px-5 text-sm font-bold text-white">{req.patientName}</td>
+                              <td className="py-3 px-5 text-sm font-bold text-brand-red">{req.bloodGroup}</td>
+                              <td className="py-3 px-5 text-sm text-gray-300">{req.unitsRequired}</td>
+                              <td className="py-3 px-5">
+                                <span className={`text-[10px] uppercase font-bold tracking-wider px-2 py-1 rounded-md ${req.urgency === 'critical' ? 'bg-red-500/10 text-red-500' : req.urgency === 'urgent' ? 'bg-orange-500/10 text-orange-500' : 'bg-brand-blue/10 text-brand-blue'}`}>
+                                  {req.urgency}
+                                </span>
+                              </td>
+                              <td className="py-3 px-5 text-sm text-gray-300">{req.hospitalName}</td>
+                              <td className="py-3 px-5 text-sm">
+                                <span className={`text-[10px] uppercase font-bold tracking-wider px-2 py-1 rounded-md ${req.status === 'pending' ? 'bg-brand-orange/10 text-brand-orange' : req.status === 'fulfilled' ? 'bg-brand-green/10 text-brand-green' : req.status === 'approved' ? 'bg-cyan-500/10 text-cyan-400' : 'bg-dark-300 text-gray-300'}`}>
+                                  {req.status}
+                                </span>
+                              </td>
+                              <td className="py-3 px-5 text-right">
+                                {req.status === 'pending' && (
+                                  <div className="flex justify-end gap-2">
+                                    <button onClick={() => handleBloodRequestAction(req._id, 'approved', 'Approve')} className="text-[10px] bg-brand-green/20 text-brand-green px-2 py-1 rounded hover:bg-brand-green/30">Approve</button>
+                                    <button onClick={() => handleBloodRequestAction(req._id, 'rejected', 'Reject')} className="text-[10px] bg-brand-red/20 text-brand-red px-2 py-1 rounded hover:bg-brand-red/30">Reject</button>
+                                  </div>
+                                )}
+                                {req.status === 'approved' && (
+                                  <button onClick={() => handleBloodRequestAction(req._id, 'fulfilled', 'Mark Fulfilled')} className="text-[10px] bg-brand-blue/20 text-brand-blue px-2 py-1 rounded hover:bg-brand-blue/30">Mark Fulfilled</button>
+                                )}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+
+                  {bloodTotalPages > 1 && (
+                    <div className="flex items-center justify-between mt-6 bg-dark-100 p-4 rounded-2xl border border-dark-300">
+                      <button
+                        onClick={() => setBloodCurrentPage((prev) => Math.max(1, prev - 1))}
+                        disabled={bloodCurrentPage === 1}
+                        className="px-4 py-2 bg-dark-200 hover:bg-dark-300 border border-dark-400 text-xs font-bold text-white rounded-xl transition-all disabled:opacity-50 cursor-pointer"
+                      >
+                        Previous
+                      </button>
+                      <span className="text-[10px] text-dark-500 font-bold uppercase tracking-widest">
+                        Page {bloodCurrentPage} of {bloodTotalPages}
+                      </span>
+                      <button
+                        onClick={() => setBloodCurrentPage((prev) => Math.min(bloodTotalPages, prev + 1))}
+                        disabled={bloodCurrentPage === bloodTotalPages}
+                        className="px-4 py-2 bg-dark-200 hover:bg-dark-300 border border-dark-400 text-xs font-bold text-white rounded-xl transition-all disabled:opacity-50 cursor-pointer"
+                      >
+                        Next
+                      </button>
+                    </div>
+                  )}
+                </section>
+
+                <section className="bg-dark-200 border border-dark-300 rounded-3xl p-6 md:p-8 shadow-2xl">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-xl font-black flex items-center gap-2">
+                      <span className="bg-brand-red/20 text-brand-red p-2 rounded-xl">
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg>
+                      </span>
+                      Blood Donors
+                    </h2>
+                  </div>
+                  {bloodDonors.length === 0 ? (
+                    <div className="p-8 border border-dark-300 border-dashed rounded-2xl flex flex-col items-center justify-center text-center bg-dark-100/50">
+                      <span className="text-sm font-bold text-dark-500">No active blood donors</span>
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto rounded-2xl border border-dark-300 bg-dark-100">
+                      <table className="w-full text-left border-collapse">
+                        <thead>
+                          <tr className="bg-dark-200 border-b border-dark-300">
+                            <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500">Donor Name</th>
+                            <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500">Blood Group</th>
+                            <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500">Status</th>
+                            <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500">Medical Notes</th>
+                            <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500 text-right">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-dark-300">
+                          {bloodDonors.map((donor, i) => (
+                            <tr key={i} className="hover:bg-dark-200/50 transition-colors">
+                              <td className="py-3 px-5 text-sm font-bold text-white">{donor.patientName}</td>
+                              <td className="py-3 px-5 text-sm font-bold text-brand-red">{donor.bloodGroup}</td>
+                              <td className="py-3 px-5 text-sm">
+                                <span className={`text-[10px] uppercase font-bold tracking-wider px-2 py-1 rounded-md ${donor.status === 'eligible' || donor.status === 'active' ? 'bg-brand-green/10 text-brand-green' : 'bg-brand-orange/10 text-brand-orange'}`}>
+                                  {donor.status}
+                                </span>
+                              </td>
+                              <td className="py-3 px-5 text-xs text-gray-400 max-w-[300px] truncate">{donor.medicalConditions || 'None'}</td>
+                              <td className="py-3 px-5 text-right flex justify-end gap-2">
+                                {donor.status === 'eligible' || donor.status === 'ineligible' ? (
+                                  <>
+                                    <button onClick={() => handleBloodDonorAction(donor._id, 'active', 'Activate')} className="text-[10px] bg-brand-green/20 text-brand-green px-2 py-1 rounded hover:bg-brand-green/30">Activate</button>
+                                    <button onClick={() => handleBloodDonorAction(donor._id, 'inactive', 'Deactivate')} className="text-[10px] bg-brand-red/20 text-brand-red px-2 py-1 rounded hover:bg-brand-red/30">Deactivate</button>
+                                  </>
+                                ) : (
+                                  <button onClick={() => handleBloodDonorAction(donor._id, donor.status === 'active' ? 'inactive' : 'active', 'Toggle Availability')} className="text-[10px] bg-brand-blue/20 text-brand-blue px-2 py-1 rounded hover:bg-brand-blue/30">Toggle Availability</button>
+                                )}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </section>
               </div>
             )}
+          </main>
+        {/* Mobile Bottom Navigation */}
+        <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-dark-200 border-t border-dark-300 flex items-stretch">
+          <button
+            onClick={() => setActiveTab("appointments")}
+            className={`flex-1 flex flex-col items-center justify-center gap-1 py-3 text-[10px] font-black uppercase tracking-wider transition-all ${activeTab === "appointments"
+              ? "text-brand-green border-t-2 border-brand-green -mt-px"
+              : "text-dark-500 hover:text-white"
+              }`}
+          >
+            <Calendar className="w-5 h-5" />
+            Appointments
+          </button>
+          <button
+            onClick={() => setActiveTab("doctors")}
+            className={`flex-1 flex flex-col items-center justify-center gap-1 py-3 text-[10px] font-black uppercase tracking-wider transition-all ${activeTab === "doctors"
+              ? "text-brand-green border-t-2 border-brand-green -mt-px"
+              : "text-dark-500 hover:text-white"
+              }`}
+          >
+            <Users className="w-5 h-5" />
+            Doctors
+          </button>
+        </nav>
 
-            <div className="flex justify-between border-t border-dark-300 pt-5">
-              <button type="button" onClick={() => { setActionTarget(null); setActionType(null); }} className="px-4 py-2 bg-dark-300 hover:bg-dark-400 border border-dark-400 text-xs font-bold rounded-xl transition-all cursor-pointer">
-                Close
-              </button>
-              <button type="submit" disabled={isActionSubmitting} className={`px-5 py-2 text-dark-100 text-xs font-black uppercase rounded-xl flex items-center gap-1 cursor-pointer transition-all ${actionType === "schedule" || actionType === "reschedule" || actionType === "complete" ? "bg-brand-green" : "bg-brand-red"}`}>
-                {isActionSubmitting ? "Processing..." : (actionType === "reschedule" ? "Reschedule" : actionType === "schedule" ? "Confirm" : actionType === "complete" ? "Complete" : "Submit")}
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
-
-      {/* Delete Doctor Modal */}
-      {deletingDoctor && (
-        <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-6">
-          <div className="bg-dark-200 border border-brand-red/30 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl space-y-5 animate-in fade-in zoom-in duration-150 relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-red to-orange-500"></div>
-            
-            <div className="text-center">
-              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-brand-red/20 mb-4">
-                <svg className="h-6 w-6 text-brand-red" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
+        {/* Add Doctor Modal */}
+        {isAddingDoctor && (
+          <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-6">
+            <form
+              onSubmit={handleAddDoctorSubmit}
+              className="bg-dark-200 border border-dark-300 rounded-3xl p-6 sm:p-8 max-w-xl w-full shadow-2xl space-y-5 animate-in fade-in zoom-in duration-150 max-h-[90vh] overflow-y-auto"
+            >
+              <div className="border-b border-dark-300 pb-4">
+                <h3 className="text-lg font-black text-neutral-100 flex items-center gap-2">
+                  <UserPlus className="text-brand-green w-5 h-5" />
+                  <span>{editingDoctorId ? "Edit Specialist" : "Onboard New Specialist"}</span>
+                </h3>
+                <p className="text-xs text-slate-100 mt-1">
+                  {editingDoctorId ? "Update existing details for this doctor profile." : "Enter details to create a new doctor profile and system account."}
+                </p>
               </div>
-              <h3 className="text-xl font-black text-white">Delete Doctor</h3>
-              <p className="text-sm text-dark-500 mt-2">
-                Are you sure you want to delete <span className="font-bold text-white">{deletingDoctor.name}</span>? 
-                This action is permanent and cannot be undone. Associated appointments will lose their primary physician reference.
-              </p>
-            </div>
-            
-            <div className="flex gap-3 pt-4">
-              <button
-                onClick={() => setDeletingDoctor(null)}
-                disabled={isDeleting}
-                className="flex-1 py-3 px-4 bg-dark-100 hover:bg-dark-300 text-white text-sm font-bold rounded-xl transition-all border border-dark-400 disabled:opacity-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleDeleteDoctor}
-                disabled={isDeleting}
-                className="flex-1 py-3 px-4 bg-brand-red hover:bg-brand-red/90 text-white text-sm font-bold rounded-xl transition-all shadow-lg shadow-brand-red/20 disabled:opacity-50 flex items-center justify-center gap-2"
-              >
-                {isDeleting ? "Deleting..." : "Delete Permanently"}
-              </button>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Full Name</label>
+                  <input required type="text" value={newDoctor.name} onChange={e => setNewDoctor({ ...newDoctor, name: e.target.value })} placeholder="Dr. John Doe" className="w-full bg-dark-100 border border-dark-300 rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:border-brand-green transition-all" />
+                </div>
+                <div className="space-y-1">
+                  <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Specialty</label>
+                  <select value={newDoctor.specialty} onChange={e => setNewDoctor({ ...newDoctor, specialty: e.target.value })} className="w-full bg-dark-100 border border-dark-300 rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:border-brand-green transition-all appearance-none cursor-pointer">
+                    <option>General Medicine</option>
+                    <option>Cardiologist</option>
+                    <option>Pediatrician</option>
+                    <option>Dermatologist</option>
+                    <option>Neurologist</option>
+                    <option>Psychiatrist</option>
+                    <option>Orthopedic Surgeon</option>
+                  </select>
+                </div>
+                <div className="space-y-1">
+                  <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Email Address</label>
+                  <input required type="email" value={newDoctor.email} onChange={e => setNewDoctor({ ...newDoctor, email: e.target.value })} placeholder="doctor@MediConnect.com" className="w-full bg-dark-100 border border-dark-300 rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:border-brand-green transition-all" />
+                </div>
+                <div className="space-y-1">
+                  <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">System Password</label>
+                  <input required={!editingDoctorId} type="password" value={newDoctor.password} onChange={e => setNewDoctor({ ...newDoctor, password: e.target.value })} placeholder={editingDoctorId ? "Leave blank to keep current" : "********"} className="w-full bg-dark-100 border border-dark-300 rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:border-brand-green transition-all" />
+                </div>
+                <div className="space-y-1">
+                  <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Phone Number</label>
+                  <input required type="text" value={newDoctor.phone} onChange={e => setNewDoctor({ ...newDoctor, phone: e.target.value })} placeholder="+1 (555) 000-0000" className="w-full bg-dark-100 border border-dark-300 rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:border-brand-green transition-all" />
+                </div>
+                <div className="space-y-1">
+                  <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Experience (Years)</label>
+                  <input type="text" value={newDoctor.experience} onChange={e => setNewDoctor({ ...newDoctor, experience: e.target.value })} placeholder="e.g. 10 Years" className="w-full bg-dark-100 border border-dark-300 rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:border-brand-green transition-all" />
+                </div>
+                <div className="space-y-1 sm:col-span-2">
+                  <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Qualifications</label>
+                  <input type="text" value={newDoctor.qualification} onChange={e => setNewDoctor({ ...newDoctor, qualification: e.target.value })} placeholder="MBBS, MD - Cardiology" className="w-full bg-dark-100 border border-dark-300 rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:border-brand-green transition-all" />
+                </div>
+                <div className="space-y-1 sm:col-span-2">
+                  <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Consultation Fee</label>
+                  <input type="number" value={newDoctor.consultationFee} onChange={e => setNewDoctor({ ...newDoctor, consultationFee: parseFloat(e.target.value) || 0 })} placeholder="e.g. 500" className="w-full bg-dark-100 border border-dark-300 rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:border-brand-green transition-all" />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between border-t border-dark-300 pt-5">
+                <button type="button" onClick={() => setIsAddingDoctor(false)} className="px-4 py-2 bg-dark-300 hover:bg-dark-400 border border-dark-400 text-xs font-bold rounded-xl transition-all cursor-pointer">
+                  Cancel
+                </button>
+                <button type="submit" disabled={isSubmittingDoctor} className="px-5 py-2.5 text-dark-100 text-xs font-black uppercase tracking-wider rounded-xl flex items-center gap-1 shadow-lg bg-brand-green hover:bg-brand-green/90 shadow-brand-green/10 cursor-pointer disabled:opacity-50 transition-all">
+                  {isSubmittingDoctor ? "Processing..." : (editingDoctorId ? "Save Profile" : "Create Doctor Profile")}
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {/* Deactivation Confirmation Modal */}
+        {doctorToDeactivate && (
+          <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-6">
+            <div className="bg-dark-200 border border-dark-300 rounded-3xl p-6 sm:p-8 max-w-sm w-full shadow-2xl space-y-6 animate-in fade-in zoom-in duration-150 max-h-[90vh] overflow-y-auto">
+              <div className="flex flex-col items-center text-center space-y-4">
+                <div className="bg-brand-red/10 p-4 rounded-full">
+                  <AlertTriangle className="w-8 h-8 text-brand-red" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-black text-white">Deactivate Doctor?</h3>
+                  <p className="text-xs text-dark-500 mt-2">
+                    The doctor <strong>{doctorToDeactivate.name}</strong> will no longer be available for new appointments. Existing appointments will remain active.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 w-full">
+                <button
+                  onClick={() => setDoctorToDeactivate(null)}
+                  className="flex-1 px-4 py-3 bg-dark-300 hover:bg-dark-400 border border-dark-400 text-xs font-bold text-white rounded-xl transition-all cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmDeactivate}
+                  className="flex-1 px-4 py-3 bg-brand-red hover:bg-brand-red/90 text-dark-100 text-xs font-black uppercase tracking-wider rounded-xl transition-all shadow-lg shadow-brand-red/10 cursor-pointer"
+                >
+                  Deactivate
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+
+        {/* Scheduling Action Modal */}
+        {actionTarget && actionType && (
+          <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-6">
+            <form
+              onSubmit={handleActionSubmit}
+              className="bg-dark-200 border border-dark-300 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl space-y-6 animate-in fade-in zoom-in duration-150 max-h-[90vh] overflow-y-auto"
+            >
+              <div className="border-b border-dark-300 pb-4">
+                <h3 className="text-lg font-black text-neutral-100 flex items-center gap-2">
+                  {actionType === "schedule" || actionType === "reschedule" || actionType === "complete" ? <CheckCircle className="text-brand-green w-5 h-5" /> : <XOctagon className="text-brand-red w-5 h-5" />}
+                  <span>{actionType === "reschedule" ? "Reschedule Appointment" : actionType === "schedule" ? "Confirm Appointment" : actionType === "complete" ? "Complete Appointment" : "Cancel Appointment"}</span>
+                </h3>
+                <p className="text-xs text-slate-100 mt-1">Updating state for <strong>{actionTarget.patientName}</strong>.</p>
+              </div>
+
+              {actionType === "reschedule" ? (
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">New Appointment Date</label>
+                  <input
+                    type="date"
+                    value={selectedDate}
+                    onChange={(e) => setSelectedDate(e.target.value)}
+                    min={(() => {
+                      const now = new Date();
+                      const offset = now.getTimezoneOffset();
+                      return new Date(now.getTime() - offset * 60000).toISOString().split('T')[0];
+                    })()}
+                    max={(() => {
+                      const d = new Date();
+                      d.setMonth(d.getMonth() + 6);
+                      const offset = d.getTimezoneOffset();
+                      return new Date(d.getTime() - offset * 60000).toISOString().split('T')[0];
+                    })()}
+                    className="w-full bg-dark-100 border border-dark-300 rounded-xl py-3 px-4 text-xs text-white mb-3"
+                    required
+                  />
+                  {selectedDate && (
+                    <div className="space-y-2 mt-2">
+                      <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Available Slots</label>
+                      {isLoadingSlots ? (
+                        <div className="h-10 w-full bg-dark-100 animate-pulse rounded-xl" />
+                      ) : availableSlots.length === 0 ? (
+                        <p className="text-brand-red text-xs font-semibold">No slots available.</p>
+                      ) : (
+                        <div className="grid grid-cols-4 gap-2 mb-3">
+                          {availableSlots.map(slot => (
+                            <button
+                              type="button"
+                              key={slot}
+                              onClick={() => setSelectedSlot(slot)}
+                              className={`py-2 rounded-lg text-xs font-bold transition-all ${selectedSlot === slot ? 'bg-brand-green text-dark-100 shadow-md' : 'bg-dark-100 border border-dark-300 text-gray-150 hover:border-brand-green/50'}`}
+                            >
+                              {slot}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Notes</label>
+                  <textarea
+                    required
+                    value={note}
+                    onChange={(e) => setNote(e.target.value)}
+                    rows={3}
+                    className="w-full bg-dark-100 border border-dark-300 rounded-xl py-3 px-4 text-xs text-white focus:border-brand-green transition-all resize-none"
+                  />
+                </div>
+              ) : actionType === "schedule" ? (
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Confirmation Notes</label>
+                  <textarea
+                    value={note}
+                    onChange={(e) => setNote(e.target.value)}
+                    rows={3}
+                    className="w-full bg-dark-100 border border-dark-300 rounded-xl py-3 px-4 text-xs text-white focus:border-brand-green transition-all resize-none"
+                  />
+                </div>
+              ) : actionType === "complete" ? (
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Completion Notes</label>
+                  <textarea
+                    required
+                    value={note}
+                    onChange={(e) => setNote(e.target.value)}
+                    rows={3}
+                    className="w-full bg-dark-100 border border-dark-300 rounded-xl py-3 px-4 text-xs text-white focus:border-brand-green transition-all resize-none"
+                  />
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Reason for Cancellation</label>
+                  <textarea
+                    required
+                    value={cancellationReason}
+                    onChange={(e) => setCancellationReason(e.target.value)}
+                    rows={4}
+                    className="w-full bg-dark-100 border border-dark-300 rounded-xl py-3 px-4 text-xs text-white focus:border-brand-green transition-all resize-none"
+                  />
+                </div>
+              )}
+
+              <div className="flex justify-between border-t border-dark-300 pt-5">
+                <button type="button" onClick={() => { setActionTarget(null); setActionType(null); }} className="px-4 py-2 bg-dark-300 hover:bg-dark-400 border border-dark-400 text-xs font-bold rounded-xl transition-all cursor-pointer">
+                  Close
+                </button>
+                <button type="submit" disabled={isActionSubmitting} className={`px-5 py-2 text-dark-100 text-xs font-black uppercase rounded-xl flex items-center gap-1 cursor-pointer transition-all ${actionType === "schedule" || actionType === "reschedule" || actionType === "complete" ? "bg-brand-green" : "bg-brand-red"}`}>
+                  {isActionSubmitting ? "Processing..." : (actionType === "reschedule" ? "Reschedule" : actionType === "schedule" ? "Confirm" : actionType === "complete" ? "Complete" : "Submit")}
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {/* Delete Doctor Modal */}
+        {deletingDoctor && (
+          <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-6">
+            <div className="bg-dark-200 border border-brand-red/30 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl space-y-5 animate-in fade-in zoom-in duration-150 relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-red to-orange-500"></div>
+
+              <div className="text-center">
+                <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-brand-red/20 mb-4">
+                  <svg className="h-6 w-6 text-brand-red" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-black text-white">Delete Doctor</h3>
+                <p className="text-sm text-dark-500 mt-2">
+                  Are you sure you want to delete <span className="font-bold text-white">{deletingDoctor.name}</span>?
+                  This action is permanent and cannot be undone. Associated appointments will lose their primary physician reference.
+                </p>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  onClick={() => setDeletingDoctor(null)}
+                  disabled={isDeleting}
+                  className="flex-1 py-3 px-4 bg-dark-100 hover:bg-dark-300 text-white text-sm font-bold rounded-xl transition-all border border-dark-400 disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeleteDoctor}
+                  disabled={isDeleting}
+                  className="flex-1 py-3 px-4 bg-brand-red hover:bg-brand-red/90 text-white text-sm font-bold rounded-xl transition-all shadow-lg shadow-brand-red/20 disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {isDeleting ? "Deleting..." : "Delete Permanently"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
     </div>
   );
 };
