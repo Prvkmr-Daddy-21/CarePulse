@@ -182,6 +182,12 @@ export const api = {
         headers: getHeaders(),
         body: JSON.stringify(payload),
       });
+    },
+    remove: async (id: string) => {
+      return request<{ success: boolean; message: string }>(`${API_BASE}/doctors/${id}`, {
+        method: "DELETE",
+        headers: getHeaders(),
+      });
     }
   },
 

@@ -138,5 +138,44 @@ export class DoctorController {
       next(err);
     }
   }
+
+  static async deleteDoctor(req: any, res: Response, next: NextFunction): Promise<void> {
+    try {
+      if (req.user?.role !== "admin") {
+        res.status(403).json({ error: "Forbidden: Only administrators can delete doctors." });
+        return;
+      }
+
+      const { id } = req.params;
+
+      const doctor = await db.doctors.findById(id);
+      if (!doctor) {
+        res.status(404).json({ error: "Doctor not found." });
+        return;
+      }
+
+      // Check if this is the last active doctor
+      if (doctor.status === "active") {
+        const activeDoctors = await db.doctors.find({ status: "active" });
+        if (activeDoctors.length <= 1) {
+          res.status(400).json({ error: "Cannot delete the last active doctor in the system." });
+          return;
+        }
+      }
+
+      // Find the associated user account using the email to delete it too
+      if (doctor.email) {
+        const user = await db.users.findOne({ email: doctor.email });
+        if (user) {
+          await db.users.findByIdAndDelete(user._id);
+        }
+      }
+
+      await db.doctors.findByIdAndDelete(id);
+      res.status(200).json({ success: true, message: "Doctor deleted successfully." });
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 export default DoctorController;

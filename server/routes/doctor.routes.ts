@@ -24,4 +24,12 @@ router.put(
     authorizeRoles(["admin"]),
     DoctorController.updateDoctor
 );
+
+// Delete doctor
+router.delete(
+    "/:id",
+    authMiddleware,
+    authorizeRoles(["admin"]),
+    DoctorController.deleteDoctor
+);
 export default router;

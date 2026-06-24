@@ -10,6 +10,9 @@ interface BloodServicesViewProps {
 export const BloodServicesView: React.FC<BloodServicesViewProps> = ({ onNavigate, currentPatient }) => {
   const [activeTab, setActiveTab] = useState<"donate" | "request">("donate");
   const [bloodGroup, setBloodGroup] = useState(currentPatient?.bloodType || "");
+  const [age, setAge] = useState<number | "">("");
+  const [gender, setGender] = useState("");
+  const [address, setAddress] = useState("");
   const [medicalConditions, setMedicalConditions] = useState("");
   const [unitsRequired, setUnitsRequired] = useState(1);
   const [urgency, setUrgency] = useState<"normal" | "urgent" | "critical">("normal");
@@ -29,6 +32,9 @@ export const BloodServicesView: React.FC<BloodServicesViewProps> = ({ onNavigate
       const res = await api.blood.addDonor({
         patientId: currentPatient._id,
         patientName: currentPatient.name,
+        age: age ? Number(age) : undefined,
+        gender: gender || undefined,
+        address: address || undefined,
         bloodGroup,
         medicalConditions,
       });
@@ -103,21 +109,19 @@ export const BloodServicesView: React.FC<BloodServicesViewProps> = ({ onNavigate
           <div className="flex gap-4 mb-8">
             <button
               onClick={() => { setActiveTab("donate"); setSuccessMsg(""); setErrorMsg(""); }}
-              className={`flex-1 py-3 rounded-xl font-black uppercase tracking-wider text-xs transition-all ${
-                activeTab === "donate"
+              className={`flex-1 py-3 rounded-xl font-black uppercase tracking-wider text-xs transition-all ${activeTab === "donate"
                   ? "bg-brand-red text-white shadow-lg shadow-brand-red/20"
                   : "bg-dark-100 text-dark-500 border border-dark-300 hover:text-white"
-              }`}
+                }`}
             >
               <Heart className="w-4 h-4 inline mr-2" /> Register as Donor
             </button>
             <button
               onClick={() => { setActiveTab("request"); setSuccessMsg(""); setErrorMsg(""); }}
-              className={`flex-1 py-3 rounded-xl font-black uppercase tracking-wider text-xs transition-all ${
-                activeTab === "request"
+              className={`flex-1 py-3 rounded-xl font-black uppercase tracking-wider text-xs transition-all ${activeTab === "request"
                   ? "bg-brand-red text-white shadow-lg shadow-brand-red/20"
                   : "bg-dark-100 text-dark-500 border border-dark-300 hover:text-white"
-              }`}
+                }`}
             >
               <AlertTriangle className="w-4 h-4 inline mr-2" /> Request Blood
             </button>
@@ -151,6 +155,48 @@ export const BloodServicesView: React.FC<BloodServicesViewProps> = ({ onNavigate
                     <option key={g} value={g}>{g}</option>
                   ))}
                 </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[10px] uppercase font-black tracking-widest text-dark-500 mb-2">Age</label>
+                  <input
+                    type="number"
+                    min="18"
+                    max="65"
+                    required
+                    value={age}
+                    onChange={(e) => setAge(e.target.value === "" ? "" : Number(e.target.value))}
+                    className="w-full bg-dark-100 border border-dark-300 rounded-xl px-4 py-3.5 text-sm font-medium text-white focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red transition-all"
+                    placeholder="e.g. 25"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] uppercase font-black tracking-widest text-dark-500 mb-2">Gender</label>
+                  <select
+                    required
+                    value={gender}
+                    onChange={(e) => setGender(e.target.value)}
+                    className="w-full bg-dark-100 border border-dark-300 rounded-xl px-4 py-3.5 text-sm font-medium text-white focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red transition-all"
+                  >
+                    <option value="">Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[10px] uppercase font-black tracking-widest text-dark-500 mb-2">Residential Address</label>
+                <input
+                  type="text"
+                  required
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  className="w-full bg-dark-100 border border-dark-300 rounded-xl px-4 py-3 text-sm font-medium text-white focus:outline-none focus:border-brand-red focus:ring-1 focus:ring-brand-red transition-all"
+                  placeholder="Street, City, Zip Code"
+                />
               </div>
 
               <div>
@@ -214,11 +260,10 @@ export const BloodServicesView: React.FC<BloodServicesViewProps> = ({ onNavigate
                       key={u}
                       type="button"
                       onClick={() => setUrgency(u as any)}
-                      className={`flex-1 py-3 border rounded-xl text-xs font-bold uppercase tracking-wider capitalize ${
-                        urgency === u
+                      className={`flex-1 py-3 border rounded-xl text-xs font-bold uppercase tracking-wider capitalize ${urgency === u
                           ? "bg-brand-red/10 border-brand-red text-brand-red"
                           : "bg-dark-100 border-dark-300 text-dark-500 hover:border-dark-400"
-                      }`}
+                        }`}
                     >
                       {u}
                     </button>

@@ -77,6 +77,9 @@ export const AppointmentModel = mongoose.models.Appointment || mongoose.model<IA
 const BloodDonorSchema = new Schema({
   patientId: { type: String, required: true },
   patientName: { type: String, required: true },
+  age: { type: Number },
+  gender: { type: String, enum: ["Male", "Female", "Other"] },
+  address: { type: String },
   bloodGroup: { type: String, required: true },
   lastDonationDate: { type: Date },
   status: { type: String, enum: ["eligible", "ineligible", "active", "inactive"], default: "eligible" },

@@ -45,6 +45,14 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
     setLocalBloodRequests(bloodRequests);
     setLocalBloodDonors(bloodDonors);
   }, [bloodRequests, bloodDonors]);
+
+  // Blood Filters State
+  const [bloodSearchTerm, setBloodSearchTerm] = useState("");
+  const [bloodStatusFilter, setBloodStatusFilter] = useState("all");
+  const [bloodPriorityFilter, setBloodPriorityFilter] = useState("all");
+  const [bloodGroupFilter, setBloodGroupFilter] = useState("all");
+  const [bloodCurrentPage, setBloodCurrentPage] = useState(1);
+  const BLOOD_ITEMS_PER_PAGE = 5; // Maybe 5 for doctor dashboard to keep it compact
   const [appointments, setAppointments] = useState<IAppointment[]>([]);
   const [stats, setStats] = useState({ total: 0, pending: 0, scheduled: 0, completed: 0, cancelled: 0 });
   const [totalPages, setTotalPages] = useState(1);
@@ -147,6 +155,38 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
     setActionType(action);
     setNote(apt.note || "");
     setCancellationReason(apt.cancellationReason || "");
+  };
+
+  // BLOOD BANK LOGIC
+  const priorityValue: Record<string, number> = { critical: 3, urgent: 2, normal: 1 };
+  
+  const filteredLocalBloodRequests = localBloodRequests.filter(req => {
+    const matchesSearch = req.patientName?.toLowerCase().includes(bloodSearchTerm.toLowerCase()) || 
+                          req.hospitalName?.toLowerCase().includes(bloodSearchTerm.toLowerCase()) || 
+                          req.bloodGroup?.toLowerCase().includes(bloodSearchTerm.toLowerCase());
+    const matchesStatus = bloodStatusFilter === "all" || req.status === bloodStatusFilter;
+    const matchesPriority = bloodPriorityFilter === "all" || req.urgency === bloodPriorityFilter;
+    const matchesGroup = bloodGroupFilter === "all" || req.bloodGroup === bloodGroupFilter;
+    
+    return matchesSearch && matchesStatus && matchesPriority && matchesGroup;
+  }).sort((a, b) => {
+    const pA = priorityValue[a.urgency] || 0;
+    const pB = priorityValue[b.urgency] || 0;
+    if (pA !== pB) return pB - pA;
+    return new Date(b.requestDate || 0).getTime() - new Date(a.requestDate || 0).getTime();
+  });
+
+  const bloodTotalPages = Math.ceil(filteredLocalBloodRequests.length / BLOOD_ITEMS_PER_PAGE) || 1;
+  const paginatedBloodRequests = filteredLocalBloodRequests.slice((bloodCurrentPage - 1) * BLOOD_ITEMS_PER_PAGE, bloodCurrentPage * BLOOD_ITEMS_PER_PAGE);
+
+  // Blood Analytics
+  const bloodStats = {
+    totalReqs: localBloodRequests.length,
+    criticalReqs: localBloodRequests.filter(r => r.urgency === 'critical').length,
+    urgentReqs: localBloodRequests.filter(r => r.urgency === 'urgent').length,
+    normalReqs: localBloodRequests.filter(r => r.urgency === 'normal').length,
+    fulfilledReqs: localBloodRequests.filter(r => r.status === 'fulfilled').length,
+    availableDonors: localBloodDonors.filter(d => d.status === 'eligible').length,
   };
 
   const handleActionSubmit = async (e: React.FormEvent) => {
@@ -586,7 +626,87 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
             </span>
             Blood Requests
           </h2>
-          {localBloodRequests.length === 0 ? (
+
+          {/* Analytics Cards */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div className="bg-dark-100 p-4 rounded-2xl border border-dark-300 flex flex-col gap-1">
+              <span className="text-[10px] uppercase font-bold text-dark-500 tracking-wider">Total Requests</span>
+              <span className="text-2xl font-black text-white">{bloodStats.totalReqs}</span>
+            </div>
+            <div className="bg-dark-100 p-4 rounded-2xl border border-brand-red/20 flex flex-col gap-1">
+              <span className="text-[10px] uppercase font-bold text-brand-red tracking-wider">Critical</span>
+              <span className="text-2xl font-black text-brand-red">{bloodStats.criticalReqs}</span>
+            </div>
+            <div className="bg-dark-100 p-4 rounded-2xl border border-brand-orange/20 flex flex-col gap-1">
+              <span className="text-[10px] uppercase font-bold text-brand-orange tracking-wider">Urgent</span>
+              <span className="text-2xl font-black text-brand-orange">{bloodStats.urgentReqs}</span>
+            </div>
+            <div className="bg-dark-100 p-4 rounded-2xl border border-brand-green/20 flex flex-col gap-1">
+              <span className="text-[10px] uppercase font-bold text-brand-green tracking-wider">Fulfilled</span>
+              <span className="text-2xl font-black text-brand-green">{bloodStats.fulfilledReqs}</span>
+            </div>
+          </div>
+
+          {/* Filters & Search */}
+          <div className="flex flex-col md:flex-row gap-4 mb-6">
+            <input
+              type="text"
+              placeholder="Search Patient, Hospital, Blood Group..."
+              value={bloodSearchTerm}
+              onChange={(e) => {
+                setBloodSearchTerm(e.target.value);
+                setBloodCurrentPage(1);
+              }}
+              className="flex-1 bg-dark-100 border border-dark-300 rounded-xl py-3 px-4 text-xs font-bold text-white focus:border-brand-green focus:outline-none transition-all"
+            />
+            <select
+              value={bloodStatusFilter}
+              onChange={(e) => {
+                setBloodStatusFilter(e.target.value);
+                setBloodCurrentPage(1);
+              }}
+              className="bg-dark-100 border border-dark-300 rounded-xl py-3 px-4 text-xs font-bold text-white focus:border-brand-green focus:outline-none transition-all"
+            >
+              <option value="all">All Statuses</option>
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="fulfilled">Fulfilled</option>
+              <option value="rejected">Rejected</option>
+            </select>
+            <select
+              value={bloodPriorityFilter}
+              onChange={(e) => {
+                setBloodPriorityFilter(e.target.value);
+                setBloodCurrentPage(1);
+              }}
+              className="bg-dark-100 border border-dark-300 rounded-xl py-3 px-4 text-xs font-bold text-white focus:border-brand-green focus:outline-none transition-all"
+            >
+              <option value="all">All Priorities</option>
+              <option value="critical">Critical</option>
+              <option value="urgent">Urgent</option>
+              <option value="normal">Normal</option>
+            </select>
+            <select
+              value={bloodGroupFilter}
+              onChange={(e) => {
+                setBloodGroupFilter(e.target.value);
+                setBloodCurrentPage(1);
+              }}
+              className="bg-dark-100 border border-dark-300 rounded-xl py-3 px-4 text-xs font-bold text-white focus:border-brand-green focus:outline-none transition-all"
+            >
+              <option value="all">All Blood Groups</option>
+              <option value="A+">A+</option>
+              <option value="A-">A-</option>
+              <option value="B+">B+</option>
+              <option value="B-">B-</option>
+              <option value="AB+">AB+</option>
+              <option value="AB-">AB-</option>
+              <option value="O+">O+</option>
+              <option value="O-">O-</option>
+            </select>
+          </div>
+
+          {filteredLocalBloodRequests.length === 0 ? (
             <div className="p-8 border border-dark-300 border-dashed rounded-2xl flex flex-col items-center justify-center text-center bg-dark-100/50">
               <span className="text-sm font-bold text-dark-500">No active blood requests found</span>
             </div>
@@ -604,7 +724,7 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-dark-300">
-                  {localBloodRequests.map((req, i) => (
+                  {paginatedBloodRequests.map((req, i) => (
                     <tr key={i} className="hover:bg-dark-200/50 transition-colors">
                       <td className="py-3 px-5 text-sm font-bold text-white">{req.patientName}</td>
                       <td className="py-3 px-5 text-sm font-bold text-brand-red">{req.bloodGroup}</td>
@@ -624,6 +744,28 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
                   ))}
                 </tbody>
               </table>
+            </div>
+          )}
+
+          {bloodTotalPages > 1 && (
+            <div className="flex items-center justify-between mt-6 bg-dark-100 p-4 rounded-2xl border border-dark-300">
+              <button
+                onClick={() => setBloodCurrentPage((prev) => Math.max(1, prev - 1))}
+                disabled={bloodCurrentPage === 1}
+                className="px-4 py-2 bg-dark-200 hover:bg-dark-300 border border-dark-400 text-xs font-bold text-white rounded-xl transition-all disabled:opacity-50 cursor-pointer"
+              >
+                Previous
+              </button>
+              <span className="text-[10px] text-dark-500 font-bold uppercase tracking-widest">
+                Page {bloodCurrentPage} of {bloodTotalPages}
+              </span>
+              <button
+                onClick={() => setBloodCurrentPage((prev) => Math.min(bloodTotalPages, prev + 1))}
+                disabled={bloodCurrentPage === bloodTotalPages}
+                className="px-4 py-2 bg-dark-200 hover:bg-dark-300 border border-dark-400 text-xs font-bold text-white rounded-xl transition-all disabled:opacity-50 cursor-pointer"
+              >
+                Next
+              </button>
             </div>
           )}
         </section>

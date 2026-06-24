@@ -60,10 +60,21 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const [doctorCurrentPage, setDoctorCurrentPage] = useState(1);
   const [bloodRequests, setBloodRequests] = useState<any[]>([]);
   const [bloodDonors, setBloodDonors] = useState<any[]>([]);
+  
+  // Blood Bank Filters & Pagination
+  const [bloodSearchTerm, setBloodSearchTerm] = useState("");
+  const [bloodStatusFilter, setBloodStatusFilter] = useState("all");
+  const [bloodPriorityFilter, setBloodPriorityFilter] = useState("all");
+  const [bloodGroupFilter, setBloodGroupFilter] = useState("all");
+  const [bloodCurrentPage, setBloodCurrentPage] = useState(1);
+  const BLOOD_ITEMS_PER_PAGE = 10;
 
   const [isAddingDoctor, setIsAddingDoctor] = useState(false);
   const [editingDoctorId, setEditingDoctorId] = useState<string | null>(null);
   const [isSubmittingDoctor, setIsSubmittingDoctor] = useState(false);
+  const [deletingDoctor, setDeletingDoctor] = useState<IDoctor | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  
   const [newDoctor, setNewDoctor] = useState({
     name: "",
     email: "",
@@ -331,6 +342,23 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     }
   };
 
+  const handleDeleteDoctor = async () => {
+    if (!deletingDoctor) return;
+    try {
+      setIsDeleting(true);
+      const res = await api.doctors.remove(deletingDoctor._id);
+      if (res.success) {
+        setDoctorsList(prev => prev.filter(d => d._id !== deletingDoctor._id));
+        setDeletingDoctor(null);
+        alert("Doctor deleted successfully");
+      }
+    } catch (err: any) {
+      alert(err.message || "Failed to delete doctor.");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   // DOCTORS PAGINATION LOGIC
   const filteredDoctors = doctorsList.filter(d =>
     d.name.toLowerCase().includes(doctorSearchTerm.toLowerCase()) ||
@@ -338,10 +366,42 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     d.email.toLowerCase().includes(doctorSearchTerm.toLowerCase())
   );
 
-  const totalDoctorsFiltered = filteredDoctors.length;
-  const docTotalPages = Math.ceil(totalDoctorsFiltered / ITEMS_PER_PAGE) || 1;
-  const docStartIndex = (doctorCurrentPage - 1) * ITEMS_PER_PAGE;
-  const paginatedDoctors = filteredDoctors.slice(docStartIndex, docStartIndex + ITEMS_PER_PAGE);
+  const docTotalPages = Math.ceil(filteredDoctors.length / 10);
+  const paginatedDoctors = filteredDoctors.slice((doctorCurrentPage - 1) * 10, doctorCurrentPage * 10);
+
+  // BLOOD BANK LOGIC
+  const priorityValue: Record<string, number> = { critical: 3, urgent: 2, normal: 1 };
+  
+  const filteredBloodRequests = bloodRequests.filter(req => {
+    const matchesSearch = req.patientName?.toLowerCase().includes(bloodSearchTerm.toLowerCase()) || 
+                          req.hospitalName?.toLowerCase().includes(bloodSearchTerm.toLowerCase()) || 
+                          req.bloodGroup?.toLowerCase().includes(bloodSearchTerm.toLowerCase());
+    const matchesStatus = bloodStatusFilter === "all" || req.status === bloodStatusFilter;
+    const matchesPriority = bloodPriorityFilter === "all" || req.urgency === bloodPriorityFilter;
+    const matchesGroup = bloodGroupFilter === "all" || req.bloodGroup === bloodGroupFilter;
+    
+    return matchesSearch && matchesStatus && matchesPriority && matchesGroup;
+  }).sort((a, b) => {
+    const pA = priorityValue[a.urgency] || 0;
+    const pB = priorityValue[b.urgency] || 0;
+    if (pA !== pB) return pB - pA;
+    return new Date(b.requestDate || 0).getTime() - new Date(a.requestDate || 0).getTime();
+  });
+
+  const bloodTotalPages = Math.ceil(filteredBloodRequests.length / BLOOD_ITEMS_PER_PAGE) || 1;
+  const paginatedBloodRequests = filteredBloodRequests.slice((bloodCurrentPage - 1) * BLOOD_ITEMS_PER_PAGE, bloodCurrentPage * BLOOD_ITEMS_PER_PAGE);
+
+  // Blood Analytics
+  const bloodStats = {
+    totalReqs: bloodRequests.length,
+    criticalReqs: bloodRequests.filter(r => r.urgency === 'critical').length,
+    urgentReqs: bloodRequests.filter(r => r.urgency === 'urgent').length,
+    normalReqs: bloodRequests.filter(r => r.urgency === 'normal').length,
+    fulfilledReqs: bloodRequests.filter(r => r.status === 'fulfilled').length,
+    availableDonors: bloodDonors.filter(d => d.status === 'eligible').length,
+    activeDonors: bloodDonors.filter(d => d.status === 'active' || d.status === 'eligible').length,
+    inactiveDonors: bloodDonors.filter(d => d.status === 'inactive' || d.status === 'ineligible').length,
+  };
 
   // If viewing a specific doctor, completely overtake the screen
   if (selectedDoctorView) {
@@ -856,6 +916,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                                   Edit
                                 </button>
                                 <button
+                                  onClick={() => setDeletingDoctor(doc)}
+                                  className="px-3 py-1.5 bg-brand-red/10 border border-brand-red/20 text-brand-red hover:bg-brand-red/15 text-[10px] uppercase font-black tracking-wider rounded-lg cursor-pointer transition-all"
+                                >
+                                  Delete
+                                </button>
+                                <button
                                   onClick={() => setSelectedDoctorView(doc)}
                                   className="px-3 py-1.5 bg-brand-blue/10 border border-brand-blue/20 text-brand-blue hover:bg-brand-blue/15 text-[10px] uppercase font-black tracking-wider rounded-lg cursor-pointer transition-all"
                                 >
@@ -892,8 +958,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 </div>
               )}
             </section>
-          </>
-        )}
         {/* ======================= BLOOD BANK TAB ======================= */}
         {activeTab === "blood" && (
           <div className="space-y-8 animate-in fade-in duration-300">
@@ -906,7 +970,91 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   Blood Requests
                 </h2>
               </div>
-              {bloodRequests.length === 0 ? (
+
+              {/* Analytics Cards */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <div className="bg-dark-100 p-4 rounded-2xl border border-dark-300 flex flex-col gap-1">
+                  <span className="text-[10px] uppercase font-bold text-dark-500 tracking-wider">Total Requests</span>
+                  <span className="text-2xl font-black text-white">{bloodStats.totalReqs}</span>
+                </div>
+                <div className="bg-dark-100 p-4 rounded-2xl border border-brand-red/20 flex flex-col gap-1">
+                  <span className="text-[10px] uppercase font-bold text-brand-red tracking-wider">Critical</span>
+                  <span className="text-2xl font-black text-brand-red">{bloodStats.criticalReqs}</span>
+                </div>
+                <div className="bg-dark-100 p-4 rounded-2xl border border-brand-orange/20 flex flex-col gap-1">
+                  <span className="text-[10px] uppercase font-bold text-brand-orange tracking-wider">Urgent</span>
+                  <span className="text-2xl font-black text-brand-orange">{bloodStats.urgentReqs}</span>
+                </div>
+                <div className="bg-dark-100 p-4 rounded-2xl border border-brand-green/20 flex flex-col gap-1">
+                  <span className="text-[10px] uppercase font-bold text-brand-green tracking-wider">Fulfilled</span>
+                  <span className="text-2xl font-black text-brand-green">{bloodStats.fulfilledReqs}</span>
+                </div>
+                <div className="bg-dark-100 p-4 rounded-2xl border border-dark-300 flex flex-col gap-1">
+                  <span className="text-[10px] uppercase font-bold text-dark-500 tracking-wider">Available Donors</span>
+                  <span className="text-2xl font-black text-white">{bloodStats.availableDonors}</span>
+                </div>
+              </div>
+
+              {/* Filters & Search */}
+              <div className="flex flex-col md:flex-row gap-4 mb-6">
+                <input
+                  type="text"
+                  placeholder="Search Patient, Hospital, Blood Group..."
+                  value={bloodSearchTerm}
+                  onChange={(e) => {
+                    setBloodSearchTerm(e.target.value);
+                    setBloodCurrentPage(1);
+                  }}
+                  className="flex-1 bg-dark-100 border border-dark-300 rounded-xl py-3 px-4 text-xs font-bold text-white focus:border-brand-green focus:outline-none transition-all"
+                />
+                <select
+                  value={bloodStatusFilter}
+                  onChange={(e) => {
+                    setBloodStatusFilter(e.target.value);
+                    setBloodCurrentPage(1);
+                  }}
+                  className="bg-dark-100 border border-dark-300 rounded-xl py-3 px-4 text-xs font-bold text-white focus:border-brand-green focus:outline-none transition-all"
+                >
+                  <option value="all">All Statuses</option>
+                  <option value="pending">Pending</option>
+                  <option value="approved">Approved</option>
+                  <option value="fulfilled">Fulfilled</option>
+                  <option value="rejected">Rejected</option>
+                </select>
+                <select
+                  value={bloodPriorityFilter}
+                  onChange={(e) => {
+                    setBloodPriorityFilter(e.target.value);
+                    setBloodCurrentPage(1);
+                  }}
+                  className="bg-dark-100 border border-dark-300 rounded-xl py-3 px-4 text-xs font-bold text-white focus:border-brand-green focus:outline-none transition-all"
+                >
+                  <option value="all">All Priorities</option>
+                  <option value="critical">Critical</option>
+                  <option value="urgent">Urgent</option>
+                  <option value="normal">Normal</option>
+                </select>
+                <select
+                  value={bloodGroupFilter}
+                  onChange={(e) => {
+                    setBloodGroupFilter(e.target.value);
+                    setBloodCurrentPage(1);
+                  }}
+                  className="bg-dark-100 border border-dark-300 rounded-xl py-3 px-4 text-xs font-bold text-white focus:border-brand-green focus:outline-none transition-all"
+                >
+                  <option value="all">All Blood Groups</option>
+                  <option value="A+">A+</option>
+                  <option value="A-">A-</option>
+                  <option value="B+">B+</option>
+                  <option value="B-">B-</option>
+                  <option value="AB+">AB+</option>
+                  <option value="AB-">AB-</option>
+                  <option value="O+">O+</option>
+                  <option value="O-">O-</option>
+                </select>
+              </div>
+
+              {filteredBloodRequests.length === 0 ? (
                 <div className="p-8 border border-dark-300 border-dashed rounded-2xl flex flex-col items-center justify-center text-center bg-dark-100/50">
                   <span className="text-sm font-bold text-dark-500">No active blood requests</span>
                 </div>
@@ -926,7 +1074,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-dark-300">
-                      {bloodRequests.map((req, i) => (
+                      {paginatedBloodRequests.map((req, i) => (
                         <tr key={i} className="hover:bg-dark-200/50 transition-colors">
                           <td className="py-3 px-5 text-sm text-gray-400">{new Date(req.requestDate || new Date()).toLocaleDateString()}</td>
                           <td className="py-3 px-5 text-sm font-bold text-white">{req.patientName}</td>
@@ -958,6 +1106,28 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                       ))}
                     </tbody>
                   </table>
+                </div>
+              )}
+
+              {bloodTotalPages > 1 && (
+                <div className="flex items-center justify-between mt-6 bg-dark-100 p-4 rounded-2xl border border-dark-300">
+                  <button
+                    onClick={() => setBloodCurrentPage((prev) => Math.max(1, prev - 1))}
+                    disabled={bloodCurrentPage === 1}
+                    className="px-4 py-2 bg-dark-200 hover:bg-dark-300 border border-dark-400 text-xs font-bold text-white rounded-xl transition-all disabled:opacity-50 cursor-pointer"
+                  >
+                    Previous
+                  </button>
+                  <span className="text-[10px] text-dark-500 font-bold uppercase tracking-widest">
+                    Page {bloodCurrentPage} of {bloodTotalPages}
+                  </span>
+                  <button
+                    onClick={() => setBloodCurrentPage((prev) => Math.min(bloodTotalPages, prev + 1))}
+                    disabled={bloodCurrentPage === bloodTotalPages}
+                    className="px-4 py-2 bg-dark-200 hover:bg-dark-300 border border-dark-400 text-xs font-bold text-white rounded-xl transition-all disabled:opacity-50 cursor-pointer"
+                  >
+                    Next
+                  </button>
                 </div>
               )}
             </section>
@@ -1169,6 +1339,17 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   type="date"
                   value={selectedDate}
                   onChange={(e) => setSelectedDate(e.target.value)}
+                  min={(() => {
+                    const now = new Date();
+                    const offset = now.getTimezoneOffset();
+                    return new Date(now.getTime() - offset * 60000).toISOString().split('T')[0];
+                  })()}
+                  max={(() => {
+                    const d = new Date();
+                    d.setMonth(d.getMonth() + 6);
+                    const offset = d.getTimezoneOffset();
+                    return new Date(d.getTime() - offset * 60000).toISOString().split('T')[0];
+                  })()}
                   className="w-full bg-dark-100 border border-dark-300 rounded-xl py-3 px-4 text-xs text-white mb-3"
                   required
                 />
@@ -1247,6 +1428,45 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               </button>
             </div>
           </form>
+        </div>
+      )}
+
+      {/* Delete Doctor Modal */}
+      {deletingDoctor && (
+        <div className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-6">
+          <div className="bg-dark-200 border border-brand-red/30 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl space-y-5 animate-in fade-in zoom-in duration-150 relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-red to-orange-500"></div>
+            
+            <div className="text-center">
+              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-brand-red/20 mb-4">
+                <svg className="h-6 w-6 text-brand-red" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-black text-white">Delete Doctor</h3>
+              <p className="text-sm text-dark-500 mt-2">
+                Are you sure you want to delete <span className="font-bold text-white">{deletingDoctor.name}</span>? 
+                This action is permanent and cannot be undone. Associated appointments will lose their primary physician reference.
+              </p>
+            </div>
+            
+            <div className="flex gap-3 pt-4">
+              <button
+                onClick={() => setDeletingDoctor(null)}
+                disabled={isDeleting}
+                className="flex-1 py-3 px-4 bg-dark-100 hover:bg-dark-300 text-white text-sm font-bold rounded-xl transition-all border border-dark-400 disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteDoctor}
+                disabled={isDeleting}
+                className="flex-1 py-3 px-4 bg-brand-red hover:bg-brand-red/90 text-white text-sm font-bold rounded-xl transition-all shadow-lg shadow-brand-red/20 disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {isDeleting ? "Deleting..." : "Delete Permanently"}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
