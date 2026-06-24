@@ -9,6 +9,8 @@ import { ForgotPasswordView } from "./components/ForgotPasswordView";
 import { ResetPasswordView } from "./components/ResetPasswordView";
 import { DoctorDashboardView } from "./components/DoctorDashboardView";
 import { BloodServicesView } from "./components/BloodServicesView";
+import { ThemeToggle } from "./components/ThemeToggle";
+import { ToastContainer } from "./components/Toast";
 import { api, IUser, IPatient } from "./services/api";
 
 type ViewState = "landing" | "login" | "register" | "book" | "profile" | "admin" | "doctor" | "forgot-password" | "reset-password" | "blood";
@@ -129,15 +131,17 @@ export default function App() {
 
   if (isInitializing) {
     return (
-      <div className="min-h-screen bg-[#0d0f10] flex flex-col items-center justify-center p-6 text-white space-y-4">
-        <div className="w-8 h-8 border-3 border-[#24ae7c] border-t-transparent rounded-full animate-spin mx-auto" />
+      <div className="min-h-screen bg-dark-100 flex flex-col items-center justify-center p-6 text-white space-y-4">
+        <div className="w-8 h-8 border-3 border-brand-green border-t-transparent rounded-full animate-spin mx-auto" />
         <span className="font-mono text-xs uppercase tracking-widest text-gray-500">Initializing MediConnect Core...</span>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0d0f10] select-none text-white">
+    <div className="min-h-screen bg-dark-100 select-none text-white transition-colors duration-300 relative">
+      <ToastContainer />
+      <ThemeToggle />
       {currentView === "landing" && (
         <LandingView
           onNavigate={handleNavigate}

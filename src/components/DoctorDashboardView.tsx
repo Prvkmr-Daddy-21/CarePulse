@@ -15,6 +15,7 @@ import {
   HelpCircle,
   FileMinus
 } from "lucide-react";
+import { toast } from "./Toast";
 import { api, IAppointment, IDoctor } from "../services/api";
 import { DoctorInfoPanel } from "./DoctorInfoPanel";
 
@@ -159,15 +160,15 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
 
   // BLOOD BANK LOGIC
   const priorityValue: Record<string, number> = { critical: 3, urgent: 2, normal: 1 };
-  
+
   const filteredLocalBloodRequests = localBloodRequests.filter(req => {
-    const matchesSearch = req.patientName?.toLowerCase().includes(bloodSearchTerm.toLowerCase()) || 
-                          req.hospitalName?.toLowerCase().includes(bloodSearchTerm.toLowerCase()) || 
-                          req.bloodGroup?.toLowerCase().includes(bloodSearchTerm.toLowerCase());
+    const matchesSearch = req.patientName?.toLowerCase().includes(bloodSearchTerm.toLowerCase()) ||
+      req.hospitalName?.toLowerCase().includes(bloodSearchTerm.toLowerCase()) ||
+      req.bloodGroup?.toLowerCase().includes(bloodSearchTerm.toLowerCase());
     const matchesStatus = bloodStatusFilter === "all" || req.status === bloodStatusFilter;
     const matchesPriority = bloodPriorityFilter === "all" || req.urgency === bloodPriorityFilter;
     const matchesGroup = bloodGroupFilter === "all" || req.bloodGroup === bloodGroupFilter;
-    
+
     return matchesSearch && matchesStatus && matchesPriority && matchesGroup;
   }).sort((a, b) => {
     const pA = priorityValue[a.urgency] || 0;
@@ -236,7 +237,7 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
         }
       }
     } catch (err: any) {
-      alert(err?.message || "Action state transmission failed.");
+      toast.error("Action failed or encountered an error.");
     } finally {
       setIsActionSubmitting(false);
     }
@@ -834,6 +835,17 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
                   type="date"
                   value={selectedDate}
                   onChange={(e) => setSelectedDate(e.target.value)}
+                  min={(() => {
+                    const now = new Date();
+                    const offset = now.getTimezoneOffset();
+                    return new Date(now.getTime() - offset * 60000).toISOString().split('T')[0];
+                  })()}
+                  max={(() => {
+                    const d = new Date();
+                    d.setMonth(d.getMonth() + 6);
+                    const offset = d.getTimezoneOffset();
+                    return new Date(d.getTime() - offset * 60000).toISOString().split('T')[0];
+                  })()}
                   className="w-full bg-dark-100 border border-dark-300 rounded-xl py-3 px-4 text-xs text-white mb-3"
                   required
                 />

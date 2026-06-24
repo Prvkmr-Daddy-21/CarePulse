@@ -93,6 +93,14 @@ export const localDb = {
       db.users[index] = { ...db.users[index], ...update };
       writeDb(db);
       return db.users[index];
+    },
+    findByIdAndDelete: async (id: string) => {
+      const db = readDb();
+      const index = db.users.findIndex(u => u._id === id);
+      if (index === -1) return null;
+      const deleted = db.users.splice(index, 1)[0];
+      writeDb(db);
+      return deleted;
     }
   },
 
@@ -128,6 +136,14 @@ export const localDb = {
       db.doctors[index] = { ...db.doctors[index], ...update };
       writeDb(db);
       return db.doctors[index];
+    },
+    findByIdAndDelete: async (id: string) => {
+      const db = readDb();
+      const index = db.doctors.findIndex(d => d._id === id);
+      if (index === -1) return null;
+      const deleted = db.doctors.splice(index, 1)[0];
+      writeDb(db);
+      return deleted;
     }
   },
 

@@ -25,15 +25,45 @@
   --animate-bounce: bounce 1s infinite;
 }
 
-body {
+html, body {
   background-color: var(--color-dark-100);
   font-family: var(--font-sans);
-  color: #ffffff;
+  color: var(--text-base, #ffffff);
   margin: 0;
   padding: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  width: 100%;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
+
+:root.light {
+  --color-dark-100: #f4f6f8;
+  --color-dark-150: #ebf0f4;
+  --color-dark-200: #ffffff;
+  --color-dark-300: #e2e8f0;
+  --color-dark-350: #cbd5e1;
+  --color-dark-400: #94a3b8;
+  --color-dark-450: #64748b;
+  --color-dark-500: #475569;
+  --color-slate-text: #1e293b;
+  --color-text-muted: #64748b;
+  --text-base: #0f172a;
+}
+
+:root.light .text-white {
+  color: #0f172a !important;
+}
+
+:root.light .bg-dark-100 { background-color: var(--color-dark-100); }
+:root.light .bg-dark-200 { background-color: var(--color-dark-200); }
+:root.light .border-dark-300 { border-color: var(--color-dark-300); }
+:root.light .border-dark-400 { border-color: var(--color-dark-400); }
+:root.light .text-dark-500 { color: var(--color-dark-500); }
+:root.light .text-gray-300 { color: #334155; }
+:root.light .text-gray-400 { color: #475569; }
+:root.light .text-slate-100 { color: #1e293b; }
 
 /* Custom gorgeous scrollbar */
 ::-webkit-scrollbar {
