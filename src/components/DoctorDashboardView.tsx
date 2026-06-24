@@ -24,6 +24,9 @@ interface DoctorDashboardViewProps {
   onLogout: () => void;
   onBack?: () => void;
   doctorProfile?: IDoctor;
+
+  bloodRequests?: any[];
+  bloodDonors?: any[];
 }
 
 export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
@@ -31,8 +34,12 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
   currentUser,
   onLogout,
   onBack,
-  doctorProfile
+  doctorProfile,
+  bloodRequests = [],
+  bloodDonors = []
 }) => {
+  console.log("Doctor Dashboard Requests:", bloodRequests);
+  console.log("Doctor Dashboard Donors:", bloodDonors);
   const [appointments, setAppointments] = useState<IAppointment[]>([]);
   const [stats, setStats] = useState({ total: 0, pending: 0, scheduled: 0, completed: 0, cancelled: 0 });
   const [totalPages, setTotalPages] = useState(1);

@@ -58,6 +58,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const [doctorsError, setDoctorsError] = useState<string | null>(null);
   const [doctorSearchTerm, setDoctorSearchTerm] = useState("");
   const [doctorCurrentPage, setDoctorCurrentPage] = useState(1);
+  const [bloodRequests, setBloodRequests] = useState<any[]>([]);
+  const [bloodDonors, setBloodDonors] = useState<any[]>([]);
 
   const [isAddingDoctor, setIsAddingDoctor] = useState(false);
   const [editingDoctorId, setEditingDoctorId] = useState<string | null>(null);
@@ -125,11 +127,34 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       setDoctorsLoading(false);
     }
   }
+  async function loadBloodData() {
+    try {
+      const requestsRes = await api.blood.listRequests();
+      const donorsRes = await api.blood.listDonors();
+
+      if (requestsRes.success) {
+        setBloodRequests(requestsRes.requests);
+      }
+
+      if (donorsRes.success) {
+        setBloodDonors(donorsRes.donors);
+      }
+    } catch (err) {
+      console.error("Blood data load failed:", err);
+    }
+  }
 
   // Load both initially to ensure global stats are available
   useEffect(() => {
     loadDoctors();
+    loadBloodData();
   }, []);
+
+  useEffect(() => {
+    console.log("Blood Requests:", bloodRequests);
+    console.log("Blood Donors:", bloodDonors);
+  }, [bloodRequests, bloodDonors]);
+
 
   useEffect(() => {
     loadData();
@@ -305,6 +330,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         onLogout={onLogout}
         onBack={() => setSelectedDoctorView(null)}
         doctorProfile={selectedDoctorView}
+        bloodRequests={bloodRequests}
+        bloodDonors={bloodDonors}
       />
     );
   }
