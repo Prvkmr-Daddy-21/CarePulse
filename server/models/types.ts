@@ -16,6 +16,7 @@ export interface IDoctor {
   phone: string;
   qualification?: string;
   experience?: string | number;
+  consultationFee?: number;
   avatarUrl?: string;
   status: "active" | "inactive";
   stats?: {
@@ -35,6 +36,7 @@ export interface IPatient {
   phone: string;
   birthDate: Date;
   gender: "male" | "female" | "other";
+  bloodType?: "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-";
   address: string;
   occupation: string;
   emergencyContactName: string;
@@ -59,5 +61,30 @@ export interface IAppointment {
   status: "pending" | "scheduled" | "cancelled" | "completed";
   note?: string;
   cancellationReason?: string;
+  createdAt?: Date;
+}
+
+export interface IBloodDonor {
+  _id?: string;
+  patientId: string;
+  patientName: string;
+  bloodGroup: string;
+  lastDonationDate?: Date;
+  status: "eligible" | "ineligible";
+  medicalConditions?: string;
+  createdAt?: Date;
+}
+
+export interface IBloodRequest {
+  _id?: string;
+  patientId: string;
+  patientName: string;
+  bloodGroup: string;
+  unitsRequired: number;
+  urgency: "normal" | "urgent" | "critical";
+  status: "pending" | "fulfilled" | "cancelled";
+  hospitalName?: string;
+  contactPhone?: string;
+  requestDate: Date;
   createdAt?: Date;
 }

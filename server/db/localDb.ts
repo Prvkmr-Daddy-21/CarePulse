@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { IUser, IDoctor, IPatient, IAppointment } from "../models/types";
+import { IUser, IDoctor, IPatient, IAppointment, IBloodDonor, IBloodRequest } from "../models/types";
 
 const UPLOADS_DIR = path.join(process.cwd(), "server", "uploads");
 const DB_FILE = path.join(UPLOADS_DIR, "db.json");
@@ -10,6 +10,8 @@ interface ILocalSchema {
   doctors: IDoctor[];
   patients: IPatient[];
   appointments: IAppointment[];
+  bloodDonors: IBloodDonor[];
+  bloodRequests: IBloodRequest[];
 }
 
 const DEFAULT_DOCTORS: IDoctor[] = [];
@@ -27,7 +29,9 @@ function readDb(): ILocalSchema {
       users: [],
       doctors: DEFAULT_DOCTORS,
       patients: [],
-      appointments: []
+      appointments: [],
+      bloodDonors: [],
+      bloodRequests: []
     };
     fs.writeFileSync(DB_FILE, JSON.stringify(fresh, null, 2));
     return fresh;
@@ -41,7 +45,9 @@ function readDb(): ILocalSchema {
       users: [],
       doctors: DEFAULT_DOCTORS,
       patients: [],
-      appointments: []
+      appointments: [],
+      bloodDonors: [],
+      bloodRequests: []
     };
     fs.writeFileSync(DB_FILE, JSON.stringify(fresh, null, 2));
     return fresh;
@@ -209,6 +215,78 @@ export const localDb = {
       db.appointments[index] = { ...db.appointments[index], ...update };
       writeDb(db);
       return db.appointments[index];
+    }
+  },
+
+  // Blood Donors Queries
+  bloodDonors: {
+    find: async (query?: Partial<IBloodDonor>) => {
+      const db = readDb();
+      if (!query) return db.bloodDonors;
+      return db.bloodDonors.filter(a => Object.entries(query).every(([k, v]) => (a as any)[k] === v));
+    },
+    findOne: async (query: Partial<IBloodDonor>) => {
+      const db = readDb();
+      return db.bloodDonors.find(a => Object.entries(query).every(([k, v]) => (a as any)[k] === v)) || null;
+    },
+    findById: async (id: string) => {
+      const db = readDb();
+      return db.bloodDonors.find(a => a._id === id) || null;
+    },
+    create: async (data: Omit<IBloodDonor, "_id" | "createdAt">) => {
+      const db = readDb();
+      const newDonor: IBloodDonor = {
+        ...data,
+        _id: `bd_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+        createdAt: new Date()
+      };
+      db.bloodDonors.push(newDonor);
+      writeDb(db);
+      return newDonor;
+    },
+    findByIdAndUpdate: async (id: string, update: Partial<IBloodDonor>) => {
+      const db = readDb();
+      const index = db.bloodDonors.findIndex(a => a._id === id);
+      if (index === -1) return null;
+      db.bloodDonors[index] = { ...db.bloodDonors[index], ...update };
+      writeDb(db);
+      return db.bloodDonors[index];
+    }
+  },
+
+  // Blood Requests Queries
+  bloodRequests: {
+    find: async (query?: Partial<IBloodRequest>) => {
+      const db = readDb();
+      if (!query) return db.bloodRequests;
+      return db.bloodRequests.filter(a => Object.entries(query).every(([k, v]) => (a as any)[k] === v));
+    },
+    findOne: async (query: Partial<IBloodRequest>) => {
+      const db = readDb();
+      return db.bloodRequests.find(a => Object.entries(query).every(([k, v]) => (a as any)[k] === v)) || null;
+    },
+    findById: async (id: string) => {
+      const db = readDb();
+      return db.bloodRequests.find(a => a._id === id) || null;
+    },
+    create: async (data: Omit<IBloodRequest, "_id" | "createdAt">) => {
+      const db = readDb();
+      const newReq: IBloodRequest = {
+        ...data,
+        _id: `br_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+        createdAt: new Date()
+      };
+      db.bloodRequests.push(newReq);
+      writeDb(db);
+      return newReq;
+    },
+    findByIdAndUpdate: async (id: string, update: Partial<IBloodRequest>) => {
+      const db = readDb();
+      const index = db.bloodRequests.findIndex(a => a._id === id);
+      if (index === -1) return null;
+      db.bloodRequests[index] = { ...db.bloodRequests[index], ...update };
+      writeDb(db);
+      return db.bloodRequests[index];
     }
   }
 };

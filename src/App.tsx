@@ -8,9 +8,10 @@ import { PatientProfileView } from "./components/PatientProfileView";
 import { ForgotPasswordView } from "./components/ForgotPasswordView";
 import { ResetPasswordView } from "./components/ResetPasswordView";
 import { DoctorDashboardView } from "./components/DoctorDashboardView";
+import { BloodServicesView } from "./components/BloodServicesView";
 import { api, IUser, IPatient } from "./services/api";
 
-type ViewState = "landing" | "login" | "register" | "book" | "profile" | "admin" | "doctor" | "forgot-password" | "reset-password";
+type ViewState = "landing" | "login" | "register" | "book" | "profile" | "admin" | "doctor" | "forgot-password" | "reset-password" | "blood";
 
 export default function App() {
   const [currentView, setCurrentView] = useState<ViewState>("landing");
@@ -201,6 +202,13 @@ export default function App() {
         <ResetPasswordView
           token={resetToken || ""}
           onNavigate={handleNavigate}
+        />
+      )}
+
+      {currentView === "blood" && (
+        <BloodServicesView
+          onNavigate={handleNavigate}
+          currentPatient={currentPatient}
         />
       )}
     </div>

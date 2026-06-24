@@ -22,6 +22,7 @@ const DoctorSchema = new Schema<IDoctor>({
   phone: { type: String, required: true },
   qualification: { type: String },
   experience: { type: Schema.Types.Mixed }, // String or Number
+  consultationFee: { type: Number },
   avatarUrl: { type: String },
   status: { type: String, enum: ["active", "inactive"], default: "active", index: true },
 });
@@ -72,3 +73,28 @@ AppointmentSchema.index({ patientId: 1, status: 1 });
 AppointmentSchema.index({ schedule: 1, status: 1 });
 
 export const AppointmentModel = mongoose.models.Appointment || mongoose.model<IAppointment>("Appointment", AppointmentSchema);
+
+const BloodDonorSchema = new Schema({
+  patientId: { type: String, required: true },
+  patientName: { type: String, required: true },
+  bloodGroup: { type: String, required: true },
+  lastDonationDate: { type: Date },
+  status: { type: String, enum: ["eligible", "ineligible"], default: "eligible" },
+  medicalConditions: { type: String },
+}, { timestamps: true });
+
+export const BloodDonorModel = mongoose.models.BloodDonor || mongoose.model("BloodDonor", BloodDonorSchema);
+
+const BloodRequestSchema = new Schema({
+  patientId: { type: String, required: true },
+  patientName: { type: String, required: true },
+  bloodGroup: { type: String, required: true },
+  unitsRequired: { type: Number, required: true },
+  urgency: { type: String, enum: ["normal", "urgent", "critical"], default: "normal" },
+  status: { type: String, enum: ["pending", "fulfilled", "cancelled"], default: "pending" },
+  hospitalName: { type: String },
+  contactPhone: { type: String },
+  requestDate: { type: Date, default: Date.now },
+}, { timestamps: true });
+
+export const BloodRequestModel = mongoose.models.BloodRequest || mongoose.model("BloodRequest", BloodRequestSchema);

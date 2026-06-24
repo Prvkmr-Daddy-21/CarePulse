@@ -48,7 +48,7 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
 
   // Scheduling Modal State
   const [actionTarget, setActionTarget] = useState<IAppointment | null>(null);
-  const [actionType, setActionType] = useState<"schedule" | "cancel" | "complete" | null>(null);
+  const [actionType, setActionType] = useState<"schedule" | "reschedule" | "cancel" | "complete" | null>(null);
   const [note, setNote] = useState("");
   const [cancellationReason, setCancellationReason] = useState("");
   const [isActionSubmitting, setIsActionSubmitting] = useState(false);
@@ -99,7 +99,7 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
 
   useEffect(() => {
     async function fetchSlots() {
-      if (!actionTarget || actionType !== "schedule" || !selectedDate) {
+      if (!actionTarget || actionType !== "reschedule" || !selectedDate) {
         setAvailableSlots([]);
         return;
       }
@@ -126,7 +126,7 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
     loadData();
   };
 
-  const handleActionClick = (apt: IAppointment, action: "schedule" | "cancel" | "complete") => {
+  const handleActionClick = (apt: IAppointment, action: "schedule" | "reschedule" | "cancel" | "complete") => {
     setActionTarget(apt);
     setActionType(action);
     setNote(apt.note || "");
@@ -140,7 +140,7 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
     try {
       setIsActionSubmitting(true);
 
-      if (actionType === "schedule" && selectedDate && selectedSlot) {
+      if (actionType === "reschedule" && selectedDate && selectedSlot) {
         const res = await api.appointments.reschedule(
           actionTarget._id,
           {
@@ -158,7 +158,7 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
         }
       } else {
         const payload = {
-          note: actionType === "schedule" ? note : "",
+          note: (actionType === "schedule" || actionType === "reschedule") ? note : "",
           cancellationReason:
             actionType === "cancel"
               ? cancellationReason
@@ -167,7 +167,7 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
 
         const res = await api.appointments.updateStatus(
           actionTarget._id,
-          actionType,
+          actionType === "reschedule" ? "schedule" : actionType,
           payload
         );
 
@@ -497,18 +497,18 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
                         <td className="py-3.5 px-5 text-right">
                           {apt.status === "pending" || apt.status === "scheduled" ? (
                             <div className="flex items-center justify-end gap-1.5">
-                              {apt.status === "scheduled" && (
+                              {apt.status === "pending" && (
                                 <button
-                                  onClick={() => handleActionClick(apt, "complete")}
+                                  onClick={() => handleActionClick(apt, "schedule")}
                                   className="px-2.5 py-1.5 bg-brand-green/10 border border-brand-green/20 text-brand-green hover:bg-brand-green/15 text-[10px] uppercase font-black tracking-wider rounded-lg cursor-pointer transition-all"
                                 >
-                                  Complete
+                                  Schedule
                                 </button>
                               )}
 
                               <button
                                 onClick={() => {
-                                  handleActionClick(apt, "schedule");
+                                  handleActionClick(apt, "reschedule");
 
                                   setSelectedDate(
                                     new Date(apt.schedule)
@@ -572,66 +572,62 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
           >
             <div className="border-b border-dark-300 pb-4">
               <h3 className="text-lg font-black text-neutral-100 flex items-center gap-2">
-                {actionType === "schedule" || actionType === "complete" ? <CheckCircle className="text-brand-green w-5 h-5" /> : <XOctagon className="text-brand-red w-5 h-5" />}
-                <span>
-                  {actionType === "schedule"
-                    ? "Reschedule Appointment"
-                    : actionType === "complete" ? "Complete Appointment" : "Submit Cancellation Notice"}
-                </span>
+                {actionType === "schedule" || actionType === "reschedule" || actionType === "complete" ? <CheckCircle className="text-brand-green w-5 h-5" /> : <XOctagon className="text-brand-red w-5 h-5" />}
+                <span>{actionType === "reschedule" ? "Reschedule Appointment" : actionType === "schedule" ? "Confirm Appointment" : actionType === "complete" ? "Complete Appointment" : "Cancel Appointment"}</span>
               </h3>
-              <p className="text-xs text-slate-100 mt-1">
-                Updating schedule state for patient profile <strong>{actionTarget.patientName}</strong>.
-              </p>
+              <p className="text-xs text-slate-100 mt-1">Updating state for <strong>{actionTarget.patientName}</strong>.</p>
             </div>
 
-            {actionType === "schedule" ? (
+            {actionType === "reschedule" ? (
               <div className="space-y-2">
-                <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Specialist Consultation Notes</label>
-                <div className="space-y-2">
-                  <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">
-                    New Appointment Date & Time
-                  </label>
-
-                  <input
-                    type="date"
-                    value={selectedDate}
-                    onChange={(e) => setSelectedDate(e.target.value)}
-                    className="w-full bg-dark-100 border border-dark-300 rounded-xl py-3 px-4 text-xs text-white mb-3"
-                    required
-                  />
-
-                  {selectedDate && (
-                    <div className="space-y-2 mt-2">
-                      <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Available Time Slots</label>
-                      {isLoadingSlots ? (
-                        <div className="h-10 w-full bg-dark-100 animate-pulse rounded-xl" />
-                      ) : availableSlots.length === 0 ? (
-                        <p className="text-brand-red text-xs font-semibold">No available slots for this date.</p>
-                      ) : (
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-3">
-                          {availableSlots.map(slot => (
-                            <button
-                              type="button"
-                              key={slot}
-                              onClick={() => setSelectedSlot(slot)}
-                              className={`py-2 rounded-lg text-xs font-bold transition-all ${selectedSlot === slot ? 'bg-brand-green text-dark-100 shadow-md shadow-brand-green/20' : 'bg-dark-100 border border-dark-300 text-gray-150 hover:border-brand-green/50'}`}
-                            >
-                              {slot}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
+                <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">New Appointment Date</label>
+                <input
+                  type="date"
+                  value={selectedDate}
+                  onChange={(e) => setSelectedDate(e.target.value)}
+                  className="w-full bg-dark-100 border border-dark-300 rounded-xl py-3 px-4 text-xs text-white mb-3"
+                  required
+                />
+                {selectedDate && (
+                  <div className="space-y-2 mt-2">
+                    <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Available Slots</label>
+                    {isLoadingSlots ? (
+                      <div className="h-10 w-full bg-dark-100 animate-pulse rounded-xl" />
+                    ) : availableSlots.length === 0 ? (
+                      <p className="text-brand-red text-xs font-semibold">No slots available.</p>
+                    ) : (
+                      <div className="grid grid-cols-4 gap-2 mb-3">
+                        {availableSlots.map(slot => (
+                          <button
+                            type="button"
+                            key={slot}
+                            onClick={() => setSelectedSlot(slot)}
+                            className={`py-2 rounded-lg text-xs font-bold transition-all ${selectedSlot === slot ? 'bg-brand-green text-dark-100 shadow-md' : 'bg-dark-100 border border-dark-300 text-gray-150 hover:border-brand-green/50'}`}
+                          >
+                            {slot}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+                <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Notes</label>
                 <textarea
                   required
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
-                  placeholder="e.g. Schedule diagnostic chest X-ray on arrival; request fasting for 4 hours."
-                  rows={4}
-                  className="w-full bg-dark-100 border border-dark-300 rounded-xl py-3 px-4 text-xs text-white focus:outline-none focus:border-brand-green transition-all resize-none"
-                  id="modal-note-textarea"
+                  rows={3}
+                  className="w-full bg-dark-100 border border-dark-300 rounded-xl py-3 px-4 text-xs text-white focus:border-brand-green transition-all resize-none"
+                />
+              </div>
+            ) : actionType === "schedule" ? (
+              <div className="space-y-2">
+                <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Confirmation Notes</label>
+                <textarea
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  rows={3}
+                  className="w-full bg-dark-100 border border-dark-300 rounded-xl py-3 px-4 text-xs text-white focus:border-brand-green transition-all resize-none"
                 />
               </div>
             ) : actionType === "complete" ? (
@@ -644,7 +640,6 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
                   placeholder="e.g. Patient successfully examined. Prescribed XYZ for 5 days."
                   rows={4}
                   className="w-full bg-dark-100 border border-dark-300 rounded-xl py-3 px-4 text-xs text-white focus:outline-none focus:border-brand-green transition-all resize-none"
-                  id="modal-complete-note-textarea"
                 />
               </div>
             ) : (
@@ -657,7 +652,6 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
                   placeholder="e.g. Practitioner unavailable due to unscheduled surgical deployment."
                   rows={4}
                   className="w-full bg-dark-100 border border-dark-300 rounded-xl py-3 px-4 text-xs text-white focus:outline-none focus:border-brand-green transition-all resize-none"
-                  id="modal-reason-textarea"
                 />
               </div>
             )}
@@ -670,8 +664,6 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
                   setActionType(null);
                   setSelectedDate("");
                   setSelectedSlot("");
-
-
                 }}
                 className="px-4 py-2 bg-dark-300 hover:bg-dark-400 border border-dark-400 text-xs font-bold rounded-xl transition-all cursor-pointer"
               >
@@ -681,10 +673,7 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
               <button
                 type="submit"
                 disabled={isActionSubmitting}
-                className={`px-5 py-2.5 text-dark-100 text-xs font-black uppercase tracking-wider rounded-xl flex items-center gap-1 shadow-lg cursor-pointer disabled:cursor-not-allowed transition-all ${actionType === "schedule"
-                  ? "bg-brand-green hover:bg-brand-green/90 shadow-brand-green/10"
-                  : "bg-brand-red hover:bg-brand-red/90 shadow-brand-red/10"
-                  }`}
+                className={`px-5 py-2 text-dark-100 text-xs font-black uppercase rounded-xl flex items-center gap-1 cursor-pointer transition-all ${actionType === "schedule" || actionType === "reschedule" || actionType === "complete" ? "bg-brand-green" : "bg-brand-red"}`}
                 id="modal-submit-btn"
               >
                 {isActionSubmitting ? (
@@ -694,8 +683,8 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
                   </>
                 ) : (
                   <>
-                    {actionType === "schedule" || actionType === "complete" ? <FileCheck className="w-4 h-4" /> : <FileText className="w-4 h-4" />}
-                    <span>{actionType === "schedule" ? "Confirm & Schedule" : actionType === "complete" ? "Complete Appointment" : "Submit Cancellation"}</span>
+                    {actionType === "schedule" || actionType === "reschedule" || actionType === "complete" ? <FileCheck className="w-4 h-4" /> : <FileText className="w-4 h-4" />}
+                    <span>{actionType === "reschedule" ? "Reschedule" : actionType === "schedule" ? "Confirm Appointment" : actionType === "complete" ? "Complete Appointment" : "Submit Cancellation"}</span>
                   </>
                 )}
               </button>

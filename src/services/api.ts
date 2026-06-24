@@ -13,6 +13,7 @@ export interface IDoctor {
   phone: string;
   qualification?: string;
   experience?: string | number;
+  consultationFee?: number;
   avatarUrl?: string;
   status: "active" | "inactive";
   stats?: {
@@ -174,6 +175,13 @@ export const api = {
         headers: getHeaders(),
         body: JSON.stringify({ status }),
       });
+    },
+    update: async (id: string, payload: any) => {
+      return request<{ success: boolean; doctor: IDoctor }>(`${API_BASE}/doctors/${id}`, {
+        method: "PUT",
+        headers: getHeaders(),
+        body: JSON.stringify(payload),
+      });
     }
   },
 
@@ -250,6 +258,50 @@ export const api = {
         method: "PATCH",
         headers: getHeaders(),
         body: JSON.stringify(payload),
+      });
+    }
+  },
+
+  // Blood Services API
+  blood: {
+    listDonors: async () => {
+      return request<{ success: boolean; donors: any[] }>(`${API_BASE}/blood/donors`, {
+        method: "GET",
+        headers: getHeaders(),
+      });
+    },
+    addDonor: async (data: any) => {
+      return request<{ success: boolean; donor: any }>(`${API_BASE}/blood/donors`, {
+        method: "POST",
+        headers: getHeaders(),
+        body: JSON.stringify(data),
+      });
+    },
+    updateDonorStatus: async (id: string, status: string) => {
+      return request<{ success: boolean; donor: any }>(`${API_BASE}/blood/donors/${id}/status`, {
+        method: "PATCH",
+        headers: getHeaders(),
+        body: JSON.stringify({ status }),
+      });
+    },
+    listRequests: async () => {
+      return request<{ success: boolean; requests: any[] }>(`${API_BASE}/blood/requests`, {
+        method: "GET",
+        headers: getHeaders(),
+      });
+    },
+    addRequest: async (data: any) => {
+      return request<{ success: boolean; request: any }>(`${API_BASE}/blood/requests`, {
+        method: "POST",
+        headers: getHeaders(),
+        body: JSON.stringify(data),
+      });
+    },
+    updateRequestStatus: async (id: string, status: string) => {
+      return request<{ success: boolean; request: any }>(`${API_BASE}/blood/requests/${id}/status`, {
+        method: "PATCH",
+        headers: getHeaders(),
+        body: JSON.stringify({ status }),
       });
     }
   }

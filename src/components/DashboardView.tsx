@@ -60,6 +60,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const [doctorCurrentPage, setDoctorCurrentPage] = useState(1);
 
   const [isAddingDoctor, setIsAddingDoctor] = useState(false);
+  const [editingDoctorId, setEditingDoctorId] = useState<string | null>(null);
   const [isSubmittingDoctor, setIsSubmittingDoctor] = useState(false);
   const [newDoctor, setNewDoctor] = useState({
     name: "",
@@ -68,14 +69,15 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     specialty: "General Medicine",
     phone: "",
     qualification: "",
-    experience: ""
+    experience: "",
+    consultationFee: 0
   });
 
   const [doctorToDeactivate, setDoctorToDeactivate] = useState<IDoctor | null>(null);
 
   // Scheduling Modal State
   const [actionTarget, setActionTarget] = useState<IAppointment | null>(null);
-  const [actionType, setActionType] = useState<"schedule" | "cancel" | "complete" | null>(null);
+  const [actionType, setActionType] = useState<"schedule" | "reschedule" | "cancel" | "complete" | null>(null);
   const [note, setNote] = useState("");
   const [cancellationReason, setCancellationReason] = useState("");
   const [isActionSubmitting, setIsActionSubmitting] = useState(false);
@@ -135,7 +137,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
   useEffect(() => {
     async function fetchSlots() {
-      if (!actionTarget || actionType !== "schedule" || !selectedDate) {
+      if (!actionTarget || actionType !== "reschedule" || !selectedDate) {
         setAvailableSlots([]);
         return;
       }
@@ -166,7 +168,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     setDoctorCurrentPage(1);
   };
 
-  const handleActionClick = (apt: IAppointment, action: "schedule" | "cancel" | "complete") => {
+  const handleActionClick = (apt: IAppointment, action: "schedule" | "reschedule" | "cancel" | "complete") => {
     setActionTarget(apt);
     setActionType(action);
     setNote(apt.note || "");
@@ -180,7 +182,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     try {
       setIsActionSubmitting(true);
 
-      if (actionType === "schedule" && selectedDate && selectedSlot) {
+      if (actionType === "reschedule" && selectedDate && selectedSlot) {
         const res = await api.appointments.reschedule(
           actionTarget._id,
           {
@@ -198,11 +200,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         }
       } else {
         const payload = {
-          note: actionType === "schedule" ? note : "",
+          note: (actionType === "schedule" || actionType === "reschedule") ? note : "",
           cancellationReason: actionType === "cancel" ? cancellationReason : "",
         };
 
-        const res = await api.appointments.updateStatus(actionTarget._id, actionType, payload);
+        const res = await api.appointments.updateStatus(actionTarget._id, actionType === "reschedule" ? "schedule" : actionType, payload);
 
         if (res.success) {
           await loadData();
@@ -223,22 +225,29 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     e.preventDefault();
     try {
       setIsSubmittingDoctor(true);
-      const res = await api.doctors.create(newDoctor);
-      if (res.success) {
-        await loadDoctors();
-        setIsAddingDoctor(false);
-        setNewDoctor({
-          name: "",
-          email: "",
-          password: "",
-          specialty: "General Medicine",
-          phone: "",
-          qualification: "",
-          experience: ""
-        });
+      if (editingDoctorId) {
+        const res = await api.doctors.update(editingDoctorId, newDoctor);
+        if (res.success) {
+          await loadDoctors();
+          setIsAddingDoctor(false);
+          setEditingDoctorId(null);
+          setNewDoctor({
+            name: "", email: "", password: "", specialty: "General Medicine", phone: "", qualification: "", experience: "", consultationFee: 0
+          });
+        }
+      } else {
+        const res = await api.doctors.create(newDoctor);
+        if (res.success) {
+          await loadDoctors();
+          setIsAddingDoctor(false);
+          setEditingDoctorId(null);
+          setNewDoctor({
+            name: "", email: "", password: "", specialty: "General Medicine", phone: "", qualification: "", experience: "", consultationFee: 0
+          });
+        }
       }
     } catch (err: any) {
-      alert(err?.message || "Failed to create doctor.");
+      alert(err?.message || "Failed to submit doctor profile.");
     } finally {
       setIsSubmittingDoctor(false);
     }
@@ -578,17 +587,17 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                             <td className="py-3.5 px-5 text-right">
                               {apt.status === "pending" || apt.status === "scheduled" ? (
                                 <div className="flex items-center justify-end gap-1.5">
-                                  {apt.status === "scheduled" && (
+                                  {apt.status === "pending" && (
                                     <button
-                                      onClick={() => handleActionClick(apt, "complete")}
+                                      onClick={() => handleActionClick(apt, "schedule")}
                                       className="px-2.5 py-1.5 bg-brand-green/10 border border-brand-green/20 text-brand-green hover:bg-brand-green/15 text-[10px] uppercase font-black tracking-wider rounded-lg cursor-pointer transition-all"
                                     >
-                                      Complete
+                                      Schedule
                                     </button>
                                   )}
                                   <button
                                     onClick={() => {
-                                      handleActionClick(apt, "schedule");
+                                      handleActionClick(apt, "reschedule");
                                       setSelectedDate(new Date(apt.schedule).toISOString().split('T')[0]);
                                     }}
                                     className="px-2.5 py-1.5 bg-brand-blue/10 border border-brand-blue/20 text-brand-blue hover:bg-brand-blue/15 text-[10px] uppercase font-black tracking-wider rounded-lg cursor-pointer transition-all"
@@ -685,7 +694,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   <Activity className="w-4 h-4" />
                 </button>
                 <button
-                  onClick={() => setIsAddingDoctor(true)}
+                  onClick={() => {
+                    setEditingDoctorId(null);
+                    setNewDoctor({ name: "", email: "", password: "", specialty: "General Medicine", phone: "", qualification: "", experience: "", consultationFee: 0 });
+                    setIsAddingDoctor(true);
+                  }}
                   className="px-4 py-3 bg-brand-green hover:bg-brand-green/90 text-dark-100 font-bold text-xs rounded-xl flex items-center gap-2 shadow-md shadow-brand-green/10 transition-all cursor-pointer"
                 >
                   <UserPlus className="w-4 h-4" />
@@ -766,12 +779,33 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                               </button>
                             </td>
                             <td className="py-4 px-5 text-right">
-                              <button
-                                onClick={() => setSelectedDoctorView(doc)}
-                                className="px-3 py-1.5 bg-brand-blue/10 border border-brand-blue/20 text-brand-blue hover:bg-brand-blue/15 text-[10px] uppercase font-black tracking-wider rounded-lg cursor-pointer transition-all"
-                              >
-                                View Dashboard
-                              </button>
+                              <div className="flex items-center justify-end gap-2">
+                                <button
+                                  onClick={() => {
+                                    setEditingDoctorId(doc._id);
+                                    setNewDoctor({
+                                      name: doc.name,
+                                      email: doc.email,
+                                      password: "",
+                                      specialty: doc.specialty,
+                                      phone: doc.phone,
+                                      qualification: doc.qualification || "",
+                                      experience: doc.experience?.toString() || "",
+                                      consultationFee: doc.consultationFee || 0
+                                    });
+                                    setIsAddingDoctor(true);
+                                  }}
+                                  className="px-3 py-1.5 bg-brand-green/10 border border-brand-green/20 text-brand-green hover:bg-brand-green/15 text-[10px] uppercase font-black tracking-wider rounded-lg cursor-pointer transition-all"
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  onClick={() => setSelectedDoctorView(doc)}
+                                  className="px-3 py-1.5 bg-brand-blue/10 border border-brand-blue/20 text-brand-blue hover:bg-brand-blue/15 text-[10px] uppercase font-black tracking-wider rounded-lg cursor-pointer transition-all"
+                                >
+                                  View Dashboard
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         ))}
@@ -839,10 +873,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <div className="border-b border-dark-300 pb-4">
               <h3 className="text-lg font-black text-neutral-100 flex items-center gap-2">
                 <UserPlus className="text-brand-green w-5 h-5" />
-                <span>Onboard New Specialist</span>
+                <span>{editingDoctorId ? "Edit Specialist" : "Onboard New Specialist"}</span>
               </h3>
               <p className="text-xs text-slate-100 mt-1">
-                Enter details to create a new doctor profile and system account.
+                {editingDoctorId ? "Update existing details for this doctor profile." : "Enter details to create a new doctor profile and system account."}
               </p>
             </div>
 
@@ -869,7 +903,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               </div>
               <div className="space-y-1">
                 <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">System Password</label>
-                <input required type="password" value={newDoctor.password} onChange={e => setNewDoctor({ ...newDoctor, password: e.target.value })} placeholder="********" className="w-full bg-dark-100 border border-dark-300 rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:border-brand-green transition-all" />
+                <input required={!editingDoctorId} type="password" value={newDoctor.password} onChange={e => setNewDoctor({ ...newDoctor, password: e.target.value })} placeholder={editingDoctorId ? "Leave blank to keep current" : "********"} className="w-full bg-dark-100 border border-dark-300 rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:border-brand-green transition-all" />
               </div>
               <div className="space-y-1">
                 <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Phone Number</label>
@@ -883,6 +917,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Qualifications</label>
                 <input type="text" value={newDoctor.qualification} onChange={e => setNewDoctor({ ...newDoctor, qualification: e.target.value })} placeholder="MBBS, MD - Cardiology" className="w-full bg-dark-100 border border-dark-300 rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:border-brand-green transition-all" />
               </div>
+              <div className="space-y-1 sm:col-span-2">
+                <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Consultation Fee</label>
+                <input type="number" value={newDoctor.consultationFee} onChange={e => setNewDoctor({ ...newDoctor, consultationFee: parseFloat(e.target.value) || 0 })} placeholder="e.g. 500" className="w-full bg-dark-100 border border-dark-300 rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:border-brand-green transition-all" />
+              </div>
             </div>
 
             <div className="flex items-center justify-between border-t border-dark-300 pt-5">
@@ -890,7 +928,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 Cancel
               </button>
               <button type="submit" disabled={isSubmittingDoctor} className="px-5 py-2.5 text-dark-100 text-xs font-black uppercase tracking-wider rounded-xl flex items-center gap-1 shadow-lg bg-brand-green hover:bg-brand-green/90 shadow-brand-green/10 cursor-pointer disabled:opacity-50 transition-all">
-                {isSubmittingDoctor ? "Creating Profile..." : "Create Doctor Profile"}
+                {isSubmittingDoctor ? "Processing..." : (editingDoctorId ? "Save Profile" : "Create Doctor Profile")}
               </button>
             </div>
           </form>
@@ -939,13 +977,13 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           >
             <div className="border-b border-dark-300 pb-4">
               <h3 className="text-lg font-black text-neutral-100 flex items-center gap-2">
-                {actionType === "schedule" || actionType === "complete" ? <CheckCircle className="text-brand-green w-5 h-5" /> : <XOctagon className="text-brand-red w-5 h-5" />}
-                <span>{actionType === "schedule" ? "Reschedule Appointment" : actionType === "complete" ? "Complete Appointment" : "Cancel Appointment"}</span>
+                {actionType === "schedule" || actionType === "reschedule" || actionType === "complete" ? <CheckCircle className="text-brand-green w-5 h-5" /> : <XOctagon className="text-brand-red w-5 h-5" />}
+                <span>{actionType === "reschedule" ? "Reschedule Appointment" : actionType === "schedule" ? "Confirm Appointment" : actionType === "complete" ? "Complete Appointment" : "Cancel Appointment"}</span>
               </h3>
               <p className="text-xs text-slate-100 mt-1">Updating state for <strong>{actionTarget.patientName}</strong>.</p>
             </div>
 
-            {actionType === "schedule" ? (
+            {actionType === "reschedule" ? (
               <div className="space-y-2">
                 <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">New Appointment Date</label>
                 <input
@@ -987,6 +1025,16 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   className="w-full bg-dark-100 border border-dark-300 rounded-xl py-3 px-4 text-xs text-white focus:border-brand-green transition-all resize-none"
                 />
               </div>
+            ) : actionType === "schedule" ? (
+              <div className="space-y-2">
+                <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Confirmation Notes</label>
+                <textarea
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  rows={3}
+                  className="w-full bg-dark-100 border border-dark-300 rounded-xl py-3 px-4 text-xs text-white focus:border-brand-green transition-all resize-none"
+                />
+              </div>
             ) : actionType === "complete" ? (
               <div className="space-y-2">
                 <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Completion Notes</label>
@@ -1015,8 +1063,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <button type="button" onClick={() => { setActionTarget(null); setActionType(null); }} className="px-4 py-2 bg-dark-300 hover:bg-dark-400 border border-dark-400 text-xs font-bold rounded-xl transition-all cursor-pointer">
                 Close
               </button>
-              <button type="submit" disabled={isActionSubmitting} className={`px-5 py-2 text-dark-100 text-xs font-black uppercase rounded-xl flex items-center gap-1 cursor-pointer transition-all ${actionType === "schedule" || actionType === "complete" ? "bg-brand-green" : "bg-brand-red"}`}>
-                {isActionSubmitting ? "Processing..." : (actionType === "schedule" ? "Confirm" : actionType === "complete" ? "Complete" : "Submit")}
+              <button type="submit" disabled={isActionSubmitting} className={`px-5 py-2 text-dark-100 text-xs font-black uppercase rounded-xl flex items-center gap-1 cursor-pointer transition-all ${actionType === "schedule" || actionType === "reschedule" || actionType === "complete" ? "bg-brand-green" : "bg-brand-red"}`}>
+                {isActionSubmitting ? "Processing..." : (actionType === "reschedule" ? "Reschedule" : actionType === "schedule" ? "Confirm" : actionType === "complete" ? "Complete" : "Submit")}
               </button>
             </div>
           </form>

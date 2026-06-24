@@ -13,12 +13,13 @@ import {
   PlusCircle,
   Clock,
   AlertTriangle,
-  FolderOpen
+  FolderOpen,
+  Droplet
 } from "lucide-react";
 import { api, IPatient, IAppointment } from "../services/api";
 
 interface PatientProfileViewProps {
-  onNavigate: (view: "landing" | "login" | "register" | "book" | "profile" | "admin") => void;
+  onNavigate: (view: "landing" | "login" | "register" | "book" | "profile" | "admin" | "blood") => void;
   currentUser: any;
   onLogout: () => void;
 }
@@ -304,14 +305,23 @@ export const PatientProfileView: React.FC<PatientProfileViewProps> = ({
               </p>
             </div>
 
-            <button
-              onClick={() => onNavigate("book")}
-              className="px-5 py-3.5 bg-brand-green hover:bg-brand-green/90 text-dark-100 text-xs font-black uppercase tracking-wider rounded-xl shadow-lg shadow-brand-green/10 flex items-center gap-1.5 transition-all cursor-pointer shrink-0 z-10"
-              id="cta-book-appointment-btn"
-            >
-              <PlusCircle className="w-4.5 h-4.5" />
-              <span>Book Appointment Slot</span>
-            </button>
+            <div className="flex flex-col sm:flex-row gap-3 z-10 shrink-0">
+              <button
+                onClick={() => onNavigate("blood")}
+                className="px-5 py-3.5 bg-brand-red/10 hover:bg-brand-red/20 border border-brand-red/30 text-brand-red text-xs font-black uppercase tracking-wider rounded-xl shadow-lg flex items-center gap-1.5 transition-all cursor-pointer"
+              >
+                <Droplet className="w-4.5 h-4.5" />
+                <span>Blood Services</span>
+              </button>
+              <button
+                onClick={() => onNavigate("book")}
+                className="px-5 py-3.5 bg-brand-green hover:bg-brand-green/90 text-dark-100 text-xs font-black uppercase tracking-wider rounded-xl shadow-lg shadow-brand-green/10 flex items-center gap-1.5 transition-all cursor-pointer"
+                id="cta-book-appointment-btn"
+              >
+                <PlusCircle className="w-4.5 h-4.5" />
+                <span>Book Appointment Slot</span>
+              </button>
+            </div>
           </div>
 
           {/* Statistics Dashboard */}

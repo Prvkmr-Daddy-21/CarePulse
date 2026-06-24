@@ -16,4 +16,12 @@ router.patch(
     authorizeRoles(["admin"]),
     DoctorController.updateStatus
 );
+
+// Update doctor profile
+router.put(
+    "/:id",
+    authMiddleware,
+    authorizeRoles(["admin"]),
+    DoctorController.updateDoctor
+);
 export default router;

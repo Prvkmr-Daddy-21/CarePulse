@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import { localDb } from "./localDb";
-import { UserModel, DoctorModel, PatientModel, AppointmentModel } from "../models/mongoose.models";
-import { IUser, IDoctor, IPatient, IAppointment } from "../models/types";
+import { UserModel, DoctorModel, PatientModel, AppointmentModel, BloodDonorModel, BloodRequestModel } from "../models/mongoose.models";
+import { IUser, IDoctor, IPatient, IAppointment, IBloodDonor, IBloodRequest } from "../models/types";
 
 let isMongoConnected = false;
 
@@ -316,6 +316,116 @@ export const db = {
       }
       assertMongoDBConnection();
       return localDb.appointments.findByIdAndUpdate(id, update);
+    }
+  },
+
+  bloodDonors: {
+    find: async (query?: Partial<IBloodDonor>): Promise<IBloodDonor[]> => {
+      if (isMongoConnected) {
+        const donors = await BloodDonorModel.find((query || {}) as any);
+        return donors.map(d => toJSON<IBloodDonor>(d));
+      }
+      assertMongoDBConnection();
+      return localDb.bloodDonors.find(query);
+    },
+    findOne: async (query: Partial<IBloodDonor>): Promise<IBloodDonor | null> => {
+      if (isMongoConnected) {
+        const doc = await BloodDonorModel.findOne(query as any);
+        return doc ? toJSON<IBloodDonor>(doc) : null;
+      }
+      assertMongoDBConnection();
+      return localDb.bloodDonors.findOne(query);
+    },
+    findById: async (id: string): Promise<IBloodDonor | null> => {
+      if (isMongoConnected) {
+        try {
+          const doc = await BloodDonorModel.findOne({ _id: id } as any);
+          return doc ? toJSON<IBloodDonor>(doc) : null;
+        } catch {
+          return null;
+        }
+      }
+      assertMongoDBConnection();
+      return localDb.bloodDonors.findById(id);
+    },
+    create: async (data: Omit<IBloodDonor, "_id" | "createdAt">): Promise<IBloodDonor> => {
+      if (isMongoConnected) {
+        const doc = await BloodDonorModel.create(data as any);
+        return toJSON<IBloodDonor>(doc);
+      }
+      assertMongoDBConnection();
+      return localDb.bloodDonors.create(data);
+    },
+    findByIdAndUpdate: async (id: string, update: Partial<IBloodDonor>): Promise<IBloodDonor | null> => {
+      if (isMongoConnected) {
+        try {
+          const doc = await BloodDonorModel.findByIdAndUpdate(
+            id as any,
+            { $set: update } as any,
+            { returnDocument: "after" } as any
+          );
+          return doc ? toJSON<IBloodDonor>(doc) : null;
+        } catch {
+          return null;
+        }
+      }
+      assertMongoDBConnection();
+      return localDb.bloodDonors.findByIdAndUpdate(id, update);
+    }
+  },
+
+  bloodRequests: {
+    find: async (query?: Partial<IBloodRequest>): Promise<IBloodRequest[]> => {
+      if (isMongoConnected) {
+        const reqs = await BloodRequestModel.find((query || {}) as any);
+        return reqs.map(r => toJSON<IBloodRequest>(r));
+      }
+      assertMongoDBConnection();
+      return localDb.bloodRequests.find(query);
+    },
+    findOne: async (query: Partial<IBloodRequest>): Promise<IBloodRequest | null> => {
+      if (isMongoConnected) {
+        const doc = await BloodRequestModel.findOne(query as any);
+        return doc ? toJSON<IBloodRequest>(doc) : null;
+      }
+      assertMongoDBConnection();
+      return localDb.bloodRequests.findOne(query);
+    },
+    findById: async (id: string): Promise<IBloodRequest | null> => {
+      if (isMongoConnected) {
+        try {
+          const doc = await BloodRequestModel.findOne({ _id: id } as any);
+          return doc ? toJSON<IBloodRequest>(doc) : null;
+        } catch {
+          return null;
+        }
+      }
+      assertMongoDBConnection();
+      return localDb.bloodRequests.findById(id);
+    },
+    create: async (data: Omit<IBloodRequest, "_id" | "createdAt">): Promise<IBloodRequest> => {
+      if (isMongoConnected) {
+        const doc = await BloodRequestModel.create(data as any);
+        return toJSON<IBloodRequest>(doc);
+      }
+      assertMongoDBConnection();
+      return localDb.bloodRequests.create(data);
+    },
+    findByIdAndUpdate: async (id: string, update: Partial<IBloodRequest>): Promise<IBloodRequest | null> => {
+      if (isMongoConnected) {
+        try {
+          const doc = await BloodRequestModel.findByIdAndUpdate(
+            id as any,
+            { $set: update } as any,
+            { returnDocument: "after" } as any
+          );
+          return doc ? toJSON<IBloodRequest>(doc) : null;
+        } catch {
+          return null;
+        }
+      }
+      assertMongoDBConnection();
+      return localDb.bloodRequests.findByIdAndUpdate(id, update);
     }
   }
 };

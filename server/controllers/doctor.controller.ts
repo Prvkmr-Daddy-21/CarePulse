@@ -34,7 +34,7 @@ export class DoctorController {
 
   static async addDoctor(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { name, email, password, specialty, phone, qualification, experience } = req.body;
+      const { name, email, password, specialty, phone, qualification, experience, consultationFee } = req.body;
 
       const existingUser = await db.users.findOne({ email });
       if (existingUser) {
@@ -58,6 +58,7 @@ export class DoctorController {
         phone,
         qualification,
         experience,
+        consultationFee,
         status: "active"
       });
 
@@ -99,6 +100,39 @@ export class DoctorController {
       }
 
       const updated = await db.doctors.findByIdAndUpdate(id, { status });
+      res.status(200).json({ success: true, doctor: updated });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async updateDoctor(req: any, res: Response, next: NextFunction): Promise<void> {
+    try {
+      if (req.user?.role !== "admin") {
+        res.status(403).json({ error: "Forbidden: Only administrators can modify doctor profiles." });
+        return;
+      }
+
+      const { id } = req.params;
+      const { name, specialty, phone, qualification, experience, consultationFee, status } = req.body;
+
+      const doctor = await db.doctors.findById(id);
+      if (!doctor) {
+        res.status(404).json({ error: "Doctor not found." });
+        return;
+      }
+
+      if (status === "inactive" && doctor.status === "active") {
+        const activeDoctors = await db.doctors.find({ status: "active" });
+        if (activeDoctors.length <= 1) {
+          res.status(400).json({ error: "At least one active doctor must remain in the system." });
+          return;
+        }
+      }
+
+      const updated = await db.doctors.findByIdAndUpdate(id, {
+        name, specialty, phone, qualification, experience, consultationFee, status
+      });
       res.status(200).json({ success: true, doctor: updated });
     } catch (err) {
       next(err);
