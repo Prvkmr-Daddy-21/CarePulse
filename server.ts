@@ -57,7 +57,7 @@ async function startServer() {
   }
 
   app.listen(PORT, "0.0.0.0", () => {
-    console.log(`🚀 CarePulse E-Health System running on port ${PORT}`);
+    console.log(`🚀 MediConnect E-Health System running on port ${PORT}`);
     console.log(`📁 Uploads endpoint available at /uploads`);
   });
 }

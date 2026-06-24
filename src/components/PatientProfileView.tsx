@@ -157,7 +157,7 @@ export const PatientProfileView: React.FC<PatientProfileViewProps> = ({
             </div>
             <div>
               <span className="text-lg font-black tracking-tight text-white">
-                Care<span className="text-brand-green">Pulse</span>
+                Medi<span className="text-brand-green">Connect</span>
               </span>
               <span className="block text-[8px] font-mono tracking-widest text-brand-green uppercase">Authorized Patient Node</span>
             </div>
@@ -317,7 +317,7 @@ export const PatientProfileView: React.FC<PatientProfileViewProps> = ({
           {/* Statistics Dashboard */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
 
-            <div 
+            <div
               className={`bg-dark-200 border rounded-2xl p-5 cursor-pointer transition-all ${statusFilter === "all" ? "border-white shadow-lg" : "border-dark-300 hover:border-dark-400"}`}
               onClick={() => handleFilterClick("all")}
             >
@@ -329,7 +329,7 @@ export const PatientProfileView: React.FC<PatientProfileViewProps> = ({
               </h2>
             </div>
 
-            <div 
+            <div
               className={`bg-dark-200 border rounded-2xl p-5 cursor-pointer transition-all ${statusFilter === "scheduled" ? "border-brand-green shadow-lg" : "border-brand-green/20 hover:border-brand-green/50"}`}
               onClick={() => handleFilterClick("scheduled")}
             >
@@ -341,7 +341,7 @@ export const PatientProfileView: React.FC<PatientProfileViewProps> = ({
               </h2>
             </div>
 
-            <div 
+            <div
               className={`bg-dark-200 border rounded-2xl p-5 cursor-pointer transition-all ${statusFilter === "pending" ? "border-brand-orange shadow-lg" : "border-brand-orange/20 hover:border-brand-orange/50"}`}
               onClick={() => handleFilterClick("pending")}
             >
@@ -353,7 +353,7 @@ export const PatientProfileView: React.FC<PatientProfileViewProps> = ({
               </h2>
             </div>
 
-            <div 
+            <div
               className={`bg-dark-200 border rounded-2xl p-5 cursor-pointer transition-all ${statusFilter === "cancelled" ? "border-brand-red shadow-lg" : "border-brand-red/20 hover:border-brand-red/50"}`}
               onClick={() => handleFilterClick("cancelled")}
             >
@@ -365,7 +365,7 @@ export const PatientProfileView: React.FC<PatientProfileViewProps> = ({
               </h2>
             </div>
 
-            <div 
+            <div
               className={`bg-dark-200 border rounded-2xl p-5 cursor-pointer transition-all ${statusFilter === "completed" ? "border-cyan-500 shadow-lg" : "border-cyan-500/20 hover:border-cyan-500/50"}`}
               onClick={() => handleFilterClick("completed")}
             >
@@ -419,59 +419,59 @@ export const PatientProfileView: React.FC<PatientProfileViewProps> = ({
                   {paginatedAppointments.map((apt) => (
                     <div key={apt._id} className="py-4 first:pt-0 last:pb-0 flex flex-col md:flex-row md:items-center justify-between gap-4">
 
-                    {/* Diagnostic Reason details */}
-                    <div className="space-y-1.5">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="px-2.5 py-0.5 bg-dark-300 border border-dark-400 text-slate-100 text-[10px] font-extrabold rounded-lg">
-                          {apt.primaryPhysician}
-                        </span>
-                        <span className="text-xs font-mono font-bold text-dark-500">
-                          {new Date(apt.schedule).toLocaleString("en-IN", {
-                            day: "2-digit",
-                            month: "short",
-                            year: "numeric",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                            hour12: true,
-                          })}
+                      {/* Diagnostic Reason details */}
+                      <div className="space-y-1.5">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="px-2.5 py-0.5 bg-dark-300 border border-dark-400 text-slate-100 text-[10px] font-extrabold rounded-lg">
+                            {apt.primaryPhysician}
+                          </span>
+                          <span className="text-xs font-mono font-bold text-dark-500">
+                            {new Date(apt.schedule).toLocaleString("en-IN", {
+                              day: "2-digit",
+                              month: "short",
+                              year: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                              hour12: true,
+                            })}
+                          </span>
+                        </div>
+
+                        <p className="text-xs text-neutral-100 font-medium">Reason: "{apt.reason}"</p>
+
+                        {/* Note and feedback responses */}
+                        {apt.note && (
+                          <p className="text-[11px] text-brand-green bg-brand-green/5 border border-brand-green/10 rounded-lg p-2 max-w-lg">
+                            📝 <strong>Practitioner Feedback:</strong> "{apt.note}"
+                          </p>
+                        )}
+
+                        {apt.cancellationReason && (
+                          <p className="text-[11px] text-brand-red bg-brand-red/5 border border-brand-red/10 rounded-lg p-2 max-w-lg flex items-start gap-1 justify-start">
+                            <AlertTriangle className="w-3.5 h-3.5 text-brand-red mt-0.5 shrink-0" />
+                            <span><strong>Cancellation Notice:</strong> "{apt.cancellationReason}"</span>
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Status Badge right aligned */}
+                      <div className="shrink-0 flex items-center md:justify-end">
+                        <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wider ${apt.status === "scheduled"
+                          ? "bg-brand-green/10 text-brand-green border border-brand-green/20"
+                          : apt.status === "pending"
+                            ? "bg-brand-orange/10 text-brand-orange border border-brand-orange/20"
+                            : apt.status === "completed"
+                              ? "bg-cyan-500/10 text-cyan-400 border border-cyan-500/20"
+                              : "bg-brand-red/10 text-brand-red border border-brand-red/20"
+                          }`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${apt.status === "scheduled" ? "bg-brand-green" : apt.status === "pending" ? "bg-brand-orange" : apt.status === "completed" ? "bg-cyan-400" : "bg-brand-red"
+                            }`} />
+                          <span>{apt.status}</span>
                         </span>
                       </div>
 
-                      <p className="text-xs text-neutral-100 font-medium">Reason: "{apt.reason}"</p>
-
-                      {/* Note and feedback responses */}
-                      {apt.note && (
-                        <p className="text-[11px] text-brand-green bg-brand-green/5 border border-brand-green/10 rounded-lg p-2 max-w-lg">
-                          📝 <strong>Practitioner Feedback:</strong> "{apt.note}"
-                        </p>
-                      )}
-
-                      {apt.cancellationReason && (
-                        <p className="text-[11px] text-brand-red bg-brand-red/5 border border-brand-red/10 rounded-lg p-2 max-w-lg flex items-start gap-1 justify-start">
-                          <AlertTriangle className="w-3.5 h-3.5 text-brand-red mt-0.5 shrink-0" />
-                          <span><strong>Cancellation Notice:</strong> "{apt.cancellationReason}"</span>
-                        </p>
-                      )}
                     </div>
-
-                    {/* Status Badge right aligned */}
-                    <div className="shrink-0 flex items-center md:justify-end">
-                      <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wider ${apt.status === "scheduled"
-                        ? "bg-brand-green/10 text-brand-green border border-brand-green/20"
-                        : apt.status === "pending"
-                          ? "bg-brand-orange/10 text-brand-orange border border-brand-orange/20"
-                          : apt.status === "completed"
-                          ? "bg-cyan-500/10 text-cyan-400 border border-cyan-500/20"
-                          : "bg-brand-red/10 text-brand-red border border-brand-red/20"
-                        }`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${apt.status === "scheduled" ? "bg-brand-green" : apt.status === "pending" ? "bg-brand-orange" : apt.status === "completed" ? "bg-cyan-400" : "bg-brand-red"
-                          }`} />
-                        <span>{apt.status}</span>
-                      </span>
-                    </div>
-
-                  </div>
-                ))}
+                  ))}
                 </div>
                 {totalPages > 1 && (
                   <div className="flex items-center justify-between pt-4 border-t border-dark-300 mt-4">
@@ -590,7 +590,7 @@ export const PatientProfileView: React.FC<PatientProfileViewProps> = ({
         </div>
       )}
       <footer className="border-t border-dark-300 py-6 text-center text-xs text-dark-500 font-mono relative z-20">
-        CarePulse patient timeline node • All sessions encrypted under TLS coordinates.
+        MediConnect patient timeline node • All sessions encrypted under TLS coordinates.
       </footer>
     </div>
   );

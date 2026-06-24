@@ -1,6 +1,6 @@
-# 🏥 CarePulse - Healthcare Management System
+# 🏥 MediConnect - Healthcare Management System
 
-CarePulse is a full-stack healthcare management platform designed to streamline patient registration, appointment scheduling, doctor management, and hospital administration through a modern web interface.
+MediConnect is a full-stack healthcare management platform designed to streamline patient registration, appointment scheduling, doctor management, and hospital administration through a modern web interface.
 
 ## 🚀 Features
 
@@ -57,7 +57,7 @@ CarePulse is a full-stack healthcare management platform designed to streamline 
 ## 📂 Project Structure
 
 ```bash
-CarePulse/
+MediConnect/
 ├── src/
 │   ├── components/
 │   ├── services/
@@ -76,8 +76,8 @@ CarePulse/
 ### Clone Repository
 
 ```bash
-git clone https://github.com/yourusername/carepulse.git
-cd carepulse
+git clone https://github.com/yourusername/MediConnect.git
+cd MediConnect
 ```
 
 ### Install Dependencies

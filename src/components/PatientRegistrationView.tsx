@@ -297,7 +297,7 @@ export const PatientRegistrationView: React.FC<PatientRegistrationViewProps> = (
             </div>
             <div>
               <span className="text-lg font-black tracking-tight text-white">
-                Care<span className="text-brand-green">Pulse</span>
+                Medi<span className="text-brand-green">Connect</span>
               </span>
               <span className="block text-[8px] font-mono tracking-widest text-brand-green uppercase">Ecosystem Registry</span>
             </div>
@@ -307,7 +307,7 @@ export const PatientRegistrationView: React.FC<PatientRegistrationViewProps> = (
         {/* Section Title */}
         <div className="space-y-2">
           <h1 className="text-3xl font-extrabold tracking-tight text-neutral-100 sm:text-4xl">
-            Welcome to <span className="text-brand-green">CarePulse</span> 👋
+            Welcome to <span className="text-brand-green">MediConnect</span> 👋
           </h1>
           <p className="text-sm text-gray-300 max-w-lg leading-relaxed">
             Let's get you set up in our secure hospital network. Complete the four steps below to create a fully tracked patient profile and safe document history storage.
@@ -790,7 +790,7 @@ export const PatientRegistrationView: React.FC<PatientRegistrationViewProps> = (
                         id="checkbox-consent"
                       />
                       <span className="text-[11px] text-gray-300 leading-tight">
-                        I hereby consent to treatment instructions, diagnostic tracking, and coordinate storage parameters aligned to HIPAA privacy standards configured by CarePulse platform admins.
+                        I hereby consent to treatment instructions, diagnostic tracking, and coordinate storage parameters aligned to HIPAA privacy standards configured by MediConnect platform admins.
                       </span>
                     </label>
                     {validationErrors.privacyConsent && <p className="text-brand-red text-xs mt-1 font-semibold">{validationErrors.privacyConsent}</p>}
@@ -853,7 +853,7 @@ export const PatientRegistrationView: React.FC<PatientRegistrationViewProps> = (
         {/* Security parameters trust disclaimer footer */}
         <div className="flex items-center justify-center gap-2 text-xs text-dark-500 font-mono">
           <ShieldCheck className="w-3.5 h-3.5 text-brand-green" />
-          <span>CarePulse uses end-to-end sandbox storage. Your data is under strict authorization logs.</span>
+          <span>MediConnect uses end-to-end sandbox storage. Your data is under strict authorization logs.</span>
         </div>
       </div>
     </div>

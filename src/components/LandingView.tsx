@@ -109,7 +109,7 @@ export const LandingView: React.FC<LandingViewProps> = ({
 
           <div className="flex flex-col">
             <h1 className="text-xl sm:text-2xl font-black leading-none">
-              Care<span className="text-brand-green">Pulse</span>
+              Medi<span className="text-brand-green">Connect</span>
             </h1>
 
             <span className="text-[10px] sm:text-xs text-gray-400 font-semibold tracking-wide">
@@ -154,7 +154,7 @@ export const LandingView: React.FC<LandingViewProps> = ({
           </h1>
 
           <p className="text-sm sm:text-base text-gray-100 max-w-xl leading-relaxed mx-auto lg:mx-0">
-            CarePulse helps patients schedule appointments, manage healthcare records,
+            MediConnect helps patients schedule appointments, manage healthcare records,
             connect with doctors, and receive timely medical care through a secure
             digital healthcare platform.
           </p>
@@ -183,7 +183,7 @@ export const LandingView: React.FC<LandingViewProps> = ({
           </div>
 
           {/* Trust indicators */}
-          {/* CarePulse Highlights */}
+          {/* MediConnect Highlights */}
           <div className="grid grid-cols-3 gap-3 sm:gap-6 border-t border-dark-300 pt-8 max-w-lg mx-auto lg:mx-0">
 
             <div className="space-y-1">
@@ -294,7 +294,7 @@ export const LandingView: React.FC<LandingViewProps> = ({
 
             <div className="text-center pt-2 flex flex-col gap-2">
               <span className="text-xs text-gray-100">
-                New to CarePulse?{" "}
+                New to MediConnect?{" "}
                 <button
                   onClick={() => onNavigate("register")}
                   className="font-extrabold text-brand-green underline hover:text-brand-green/80 cursor-pointer"
@@ -316,7 +316,7 @@ export const LandingView: React.FC<LandingViewProps> = ({
       {/* Standard Legal Footer */}
       <footer className="border-t border-dark-300 bg-dark-150 relative z-20">
         <div className="max-w-7xl mx-auto w-full px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-dark-500 font-mono">
-          <span>© 2026 CarePulse. Advancing SDG 3 – Good Health & Well-being through accessible digital healthcare.</span>
+          <span>© 2026 MediConnect. Advancing SDG 3 – Good Health & Well-being through accessible digital healthcare.</span>
           <div className="flex items-center gap-4">
             <span className="hover:text-white cursor-pointer transition-colors">Privacy Ordinance</span>
             <span className="hover:text-white cursor-pointer transition-colors font-semibold flex items-center gap-1">

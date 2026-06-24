@@ -32,8 +32,8 @@ export default function App() {
           return;
         }
 
-        const storedToken = localStorage.getItem("carepulse_token");
-        const storedUserJson = localStorage.getItem("carepulse_user");
+        const storedToken = localStorage.getItem("MediConnect_token");
+        const storedUserJson = localStorage.getItem("MediConnect_user");
 
         if (storedToken && storedUserJson) {
           const userObj = JSON.parse(storedUserJson) as IUser;
@@ -73,9 +73,9 @@ export default function App() {
       handleNavigate("landing");
     };
 
-    window.addEventListener("carepulse_logout", handleLogoutTrigger);
+    window.addEventListener("MediConnect_logout", handleLogoutTrigger);
     return () => {
-      window.removeEventListener("carepulse_logout", handleLogoutTrigger);
+      window.removeEventListener("MediConnect_logout", handleLogoutTrigger);
     };
   }, []);
 
@@ -130,7 +130,7 @@ export default function App() {
     return (
       <div className="min-h-screen bg-[#0d0f10] flex flex-col items-center justify-center p-6 text-white space-y-4">
         <div className="w-8 h-8 border-3 border-[#24ae7c] border-t-transparent rounded-full animate-spin mx-auto" />
-        <span className="font-mono text-xs uppercase tracking-widest text-gray-500">Initializing CarePulse Core...</span>
+        <span className="font-mono text-xs uppercase tracking-widest text-gray-500">Initializing MediConnect Core...</span>
       </div>
     );
   }

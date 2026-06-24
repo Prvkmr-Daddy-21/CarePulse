@@ -315,7 +315,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               </div>
               <div>
                 <span className="text-lg font-black tracking-tight text-white">
-                  Care<span className="text-brand-green">Pulse</span>
+                  Medi<span className="text-brand-green">Connect</span>
                 </span>
                 <span className="block text-[8px] font-mono tracking-widest text-brand-green uppercase">Admin Terminal</span>
               </div>
@@ -810,8 +810,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         <button
           onClick={() => setActiveTab("appointments")}
           className={`flex-1 flex flex-col items-center justify-center gap-1 py-3 text-[10px] font-black uppercase tracking-wider transition-all ${activeTab === "appointments"
-              ? "text-brand-green border-t-2 border-brand-green -mt-px"
-              : "text-dark-500 hover:text-white"
+            ? "text-brand-green border-t-2 border-brand-green -mt-px"
+            : "text-dark-500 hover:text-white"
             }`}
         >
           <Calendar className="w-5 h-5" />
@@ -820,8 +820,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         <button
           onClick={() => setActiveTab("doctors")}
           className={`flex-1 flex flex-col items-center justify-center gap-1 py-3 text-[10px] font-black uppercase tracking-wider transition-all ${activeTab === "doctors"
-              ? "text-brand-green border-t-2 border-brand-green -mt-px"
-              : "text-dark-500 hover:text-white"
+            ? "text-brand-green border-t-2 border-brand-green -mt-px"
+            : "text-dark-500 hover:text-white"
             }`}
         >
           <Users className="w-5 h-5" />
@@ -865,7 +865,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               </div>
               <div className="space-y-1">
                 <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">Email Address</label>
-                <input required type="email" value={newDoctor.email} onChange={e => setNewDoctor({ ...newDoctor, email: e.target.value })} placeholder="doctor@carepulse.com" className="w-full bg-dark-100 border border-dark-300 rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:border-brand-green transition-all" />
+                <input required type="email" value={newDoctor.email} onChange={e => setNewDoctor({ ...newDoctor, email: e.target.value })} placeholder="doctor@MediConnect.com" className="w-full bg-dark-100 border border-dark-300 rounded-xl py-2.5 px-3 text-xs text-white focus:outline-none focus:border-brand-green transition-all" />
               </div>
               <div className="space-y-1">
                 <label className="block text-[10px] font-bold text-gray-300 uppercase tracking-widest">System Password</label>

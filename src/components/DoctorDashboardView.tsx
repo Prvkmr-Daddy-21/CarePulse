@@ -206,7 +206,7 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
             </div>
             <div>
               <span className="text-lg font-black tracking-tight text-white">
-                Care<span className="text-brand-green">Pulse</span>
+                Medi<span className="text-brand-green">Connect</span>
               </span>
               <span className="block text-[8px] font-mono tracking-widest text-brand-green uppercase">Clinical Dashboard Terminal</span>
             </div>
@@ -239,7 +239,7 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
 
       {/* Content wrapper */}
       <main className="max-w-7xl mx-auto w-full px-6 py-8 space-y-6 relative z-20 flex-grow flex flex-col">
-        
+
         {doctorProfile?.status === "inactive" && (
           <div className="bg-brand-red/10 border border-brand-red border-dashed rounded-xl p-4 flex items-center justify-center gap-2 flex-shrink-0">
             <XOctagon className="w-5 h-5 text-brand-red" />
@@ -250,7 +250,7 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
         {/* Statistics highlights bar */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 flex-shrink-0" id="stats-banner-cards">
           {/* Total */}
-          <div 
+          <div
             className={`bg-dark-200 border rounded-2xl p-5 flex items-center gap-4 transition-all cursor-pointer ${statusFilter === "all" ? "border-purple-500 shadow-xl shadow-purple-500/10" : "border-dark-300 hover:border-purple-500/50"}`}
             onClick={() => handleFilterClick("all")}
           >
@@ -264,7 +264,7 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
           </div>
 
           {/* Pending */}
-          <div 
+          <div
             className={`bg-dark-200 border rounded-2xl p-5 flex items-center gap-4 transition-all cursor-pointer ${statusFilter === "pending" ? "border-brand-orange shadow-xl shadow-brand-orange/10" : "border-dark-300 hover:border-brand-orange/50"}`}
             onClick={() => handleFilterClick("pending")}
           >
@@ -278,7 +278,7 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
           </div>
 
           {/* Scheduled */}
-          <div 
+          <div
             className={`bg-dark-200 border rounded-2xl p-5 flex items-center gap-4 transition-all cursor-pointer ${statusFilter === "scheduled" ? "border-brand-green shadow-xl shadow-brand-green/10" : "border-dark-300 hover:border-brand-green/50"}`}
             onClick={() => handleFilterClick("scheduled")}
           >
@@ -292,7 +292,7 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
           </div>
 
           {/* Completed */}
-          <div 
+          <div
             className={`bg-dark-200 border rounded-2xl p-5 flex items-center gap-4 transition-all cursor-pointer ${statusFilter === "completed" ? "border-cyan-500 shadow-xl shadow-cyan-500/10" : "border-dark-300 hover:border-cyan-500/50"}`}
             onClick={() => handleFilterClick("completed")}
           >
@@ -306,7 +306,7 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
           </div>
 
           {/* Cancelled */}
-          <div 
+          <div
             className={`bg-dark-200 border rounded-2xl p-5 flex items-center gap-4 transition-all cursor-pointer ${statusFilter === "cancelled" ? "border-brand-red shadow-xl shadow-brand-red/10" : "border-dark-300 hover:border-brand-red/50"}`}
             onClick={() => handleFilterClick("cancelled")}
           >
@@ -415,127 +415,127 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
               )}
               <div className="overflow-x-auto flex-grow">
                 <table className="w-full border-collapse text-left relative" id="schedules-data-table">
-                <thead className="sticky top-0 z-10">
-                  <tr className="bg-dark-200 border-b border-dark-300 text-[10px] uppercase font-mono tracking-widest text-dark-500 font-black">
-                    <th className="py-4 px-5">Patient Name</th>
-                    <th className="py-4 px-5">Scheduled Date</th>
-                    <th className="py-4 px-5">Specialist</th>
-                    <th className="py-4 px-5">Diagnosis Requirements</th>
-                    <th className="py-4 px-5">Validation Status</th>
-                    <th className="py-4 px-5 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-dark-300 text-xs text-gray-150">
-                  {appointments.map((apt) => (
-                    <tr key={apt._id} className="hover:bg-dark-100/25 transition-colors">
-                      {/* Name */}
-                      <td className="py-3.5 px-5">
-                        <div className="flex flex-col">
-                          <span className="font-black text-white text-sm">{apt.patientName}</span>
-                          <span className="text-[10px] text-dark-500 font-mono">{apt.patientPhone}</span>
-                        </div>
-                      </td>
-
-                      {/* Schedule */}
-                      <td className="py-3.5 px-5 font-bold">
-                        <div className="flex items-center gap-1.5">
-                          <Clock className="w-3.5 h-3.5 text-brand-green" />
-                          <span>
-                            {new Date(apt.schedule).toLocaleString("en-IN", {
-                              day: "2-digit",
-                              month: "short",
-                              year: "numeric",
-                              hour: "2-digit",
-                              minute: "2-digit",
-                              hour12: true,
-                            })}
-                          </span>
-                        </div>
-                      </td>
-
-                      {/* Specialist */}
-                      <td className="py-3.5 px-5 font-semibold text-neutral-100">
-                        {apt.primaryPhysician}
-                      </td>
-
-                      {/* Reason */}
-                      <td className="py-3.5 px-5 max-w-xs xl:max-w-sm truncate" title={apt.reason}>
-                        <div className="flex flex-col gap-0.5">
-                          <span>{apt.reason}</span>
-                          {apt.note && (
-                            <span className="text-[10px] text-brand-green font-semibold leading-none flex items-center gap-0.5">
-                              <CornerDownRight className="w-3 h-3" />
-                              Note: "{apt.note}"
-                            </span>
-                          )}
-                          {apt.cancellationReason && (
-                            <span className="text-[10px] text-brand-red font-semibold leading-none flex items-center gap-0.5">
-                              <CornerDownRight className="w-3 h-3" />
-                              Cancelled: "{apt.cancellationReason}"
-                            </span>
-                          )}
-                        </div>
-                      </td>
-
-                      {/* Status */}
-                      <td className="py-3.5 px-5">
-                        <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wider ${apt.status === "scheduled"
-                          ? "bg-brand-green/10 text-brand-green border border-brand-green/20"
-                          : apt.status === "pending"
-                            ? "bg-brand-orange/10 text-brand-orange border border-brand-orange/20"
-                            : apt.status === "completed"
-                            ? "bg-cyan-500/10 text-cyan-400 border border-cyan-500/20"
-                            : "bg-brand-red/10 text-brand-red border border-brand-red/20"
-                          }`}>
-                          <span className={`w-1.5 h-1.5 rounded-full ${apt.status === "scheduled" ? "bg-brand-green" : apt.status === "pending" ? "bg-brand-orange" : apt.status === "completed" ? "bg-cyan-400" : "bg-brand-red"
-                            }`} />
-                          <span>{apt.status === "scheduled" ? "scheduled" : apt.status === "pending" ? "pending" : apt.status === "completed" ? "completed" : "cancelled"}</span>
-                        </span>
-                      </td>
-
-                      {/* Actions */}
-                      <td className="py-3.5 px-5 text-right">
-                        {apt.status === "pending" || apt.status === "scheduled" ? (
-                          <div className="flex items-center justify-end gap-1.5">
-                            {apt.status === "scheduled" && (
-                              <button
-                                onClick={() => handleActionClick(apt, "complete")}
-                                className="px-2.5 py-1.5 bg-brand-green/10 border border-brand-green/20 text-brand-green hover:bg-brand-green/15 text-[10px] uppercase font-black tracking-wider rounded-lg cursor-pointer transition-all"
-                              >
-                                Complete
-                              </button>
-                            )}
-
-                            <button
-                              onClick={() => {
-                                handleActionClick(apt, "schedule");
-
-                                setSelectedDate(
-                                  new Date(apt.schedule)
-                                    .toISOString()
-                                    .split('T')[0]
-                                );
-                              }}
-                              className="px-2.5 py-1.5 bg-brand-blue/10 border border-brand-blue/20 text-brand-blue hover:bg-brand-blue/15 text-[10px] uppercase font-black tracking-wider rounded-lg cursor-pointer transition-all"
-                            >
-                              Reschedule
-                            </button>
-
-                            <button
-                              onClick={() => handleActionClick(apt, "cancel")}
-                              className="px-2.5 py-1.5 bg-brand-red/10 border border-brand-red/20 text-brand-red hover:bg-brand-red/15 text-[10px] uppercase font-black tracking-wider rounded-lg cursor-pointer transition-all"
-                            >
-                              Cancel
-                            </button>
-                          </div>
-                        ) : (
-                          <span className="text-[10px] text-dark-500 font-mono">Processed</span>
-                        )}
-                      </td>
+                  <thead className="sticky top-0 z-10">
+                    <tr className="bg-dark-200 border-b border-dark-300 text-[10px] uppercase font-mono tracking-widest text-dark-500 font-black">
+                      <th className="py-4 px-5">Patient Name</th>
+                      <th className="py-4 px-5">Scheduled Date</th>
+                      <th className="py-4 px-5">Specialist</th>
+                      <th className="py-4 px-5">Diagnosis Requirements</th>
+                      <th className="py-4 px-5">Validation Status</th>
+                      <th className="py-4 px-5 text-right">Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-dark-300 text-xs text-gray-150">
+                    {appointments.map((apt) => (
+                      <tr key={apt._id} className="hover:bg-dark-100/25 transition-colors">
+                        {/* Name */}
+                        <td className="py-3.5 px-5">
+                          <div className="flex flex-col">
+                            <span className="font-black text-white text-sm">{apt.patientName}</span>
+                            <span className="text-[10px] text-dark-500 font-mono">{apt.patientPhone}</span>
+                          </div>
+                        </td>
+
+                        {/* Schedule */}
+                        <td className="py-3.5 px-5 font-bold">
+                          <div className="flex items-center gap-1.5">
+                            <Clock className="w-3.5 h-3.5 text-brand-green" />
+                            <span>
+                              {new Date(apt.schedule).toLocaleString("en-IN", {
+                                day: "2-digit",
+                                month: "short",
+                                year: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                hour12: true,
+                              })}
+                            </span>
+                          </div>
+                        </td>
+
+                        {/* Specialist */}
+                        <td className="py-3.5 px-5 font-semibold text-neutral-100">
+                          {apt.primaryPhysician}
+                        </td>
+
+                        {/* Reason */}
+                        <td className="py-3.5 px-5 max-w-xs xl:max-w-sm truncate" title={apt.reason}>
+                          <div className="flex flex-col gap-0.5">
+                            <span>{apt.reason}</span>
+                            {apt.note && (
+                              <span className="text-[10px] text-brand-green font-semibold leading-none flex items-center gap-0.5">
+                                <CornerDownRight className="w-3 h-3" />
+                                Note: "{apt.note}"
+                              </span>
+                            )}
+                            {apt.cancellationReason && (
+                              <span className="text-[10px] text-brand-red font-semibold leading-none flex items-center gap-0.5">
+                                <CornerDownRight className="w-3 h-3" />
+                                Cancelled: "{apt.cancellationReason}"
+                              </span>
+                            )}
+                          </div>
+                        </td>
+
+                        {/* Status */}
+                        <td className="py-3.5 px-5">
+                          <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-black uppercase tracking-wider ${apt.status === "scheduled"
+                            ? "bg-brand-green/10 text-brand-green border border-brand-green/20"
+                            : apt.status === "pending"
+                              ? "bg-brand-orange/10 text-brand-orange border border-brand-orange/20"
+                              : apt.status === "completed"
+                                ? "bg-cyan-500/10 text-cyan-400 border border-cyan-500/20"
+                                : "bg-brand-red/10 text-brand-red border border-brand-red/20"
+                            }`}>
+                            <span className={`w-1.5 h-1.5 rounded-full ${apt.status === "scheduled" ? "bg-brand-green" : apt.status === "pending" ? "bg-brand-orange" : apt.status === "completed" ? "bg-cyan-400" : "bg-brand-red"
+                              }`} />
+                            <span>{apt.status === "scheduled" ? "scheduled" : apt.status === "pending" ? "pending" : apt.status === "completed" ? "completed" : "cancelled"}</span>
+                          </span>
+                        </td>
+
+                        {/* Actions */}
+                        <td className="py-3.5 px-5 text-right">
+                          {apt.status === "pending" || apt.status === "scheduled" ? (
+                            <div className="flex items-center justify-end gap-1.5">
+                              {apt.status === "scheduled" && (
+                                <button
+                                  onClick={() => handleActionClick(apt, "complete")}
+                                  className="px-2.5 py-1.5 bg-brand-green/10 border border-brand-green/20 text-brand-green hover:bg-brand-green/15 text-[10px] uppercase font-black tracking-wider rounded-lg cursor-pointer transition-all"
+                                >
+                                  Complete
+                                </button>
+                              )}
+
+                              <button
+                                onClick={() => {
+                                  handleActionClick(apt, "schedule");
+
+                                  setSelectedDate(
+                                    new Date(apt.schedule)
+                                      .toISOString()
+                                      .split('T')[0]
+                                  );
+                                }}
+                                className="px-2.5 py-1.5 bg-brand-blue/10 border border-brand-blue/20 text-brand-blue hover:bg-brand-blue/15 text-[10px] uppercase font-black tracking-wider rounded-lg cursor-pointer transition-all"
+                              >
+                                Reschedule
+                              </button>
+
+                              <button
+                                onClick={() => handleActionClick(apt, "cancel")}
+                                className="px-2.5 py-1.5 bg-brand-red/10 border border-brand-red/20 text-brand-red hover:bg-brand-red/15 text-[10px] uppercase font-black tracking-wider rounded-lg cursor-pointer transition-all"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          ) : (
+                            <span className="text-[10px] text-dark-500 font-mono">Processed</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
               {totalPages > 1 && (
                 <div className="flex items-center justify-between p-5 border-t border-dark-300 bg-dark-100/30">

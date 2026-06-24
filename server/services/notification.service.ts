@@ -143,7 +143,7 @@ export class NotificationService {
               <h2 style="color: #10b981; border-bottom: 2px solid #ecfdf5; padding-bottom: 10px;">✅ Appointment Completed</h2>
               <p>Dear <strong>${params.patientName}</strong>,</p>
               <p>Your appointment with <strong>${params.doctorName}</strong> on <strong>${formattedDate}</strong> has been marked as successfully completed.</p>
-              <p>Thank you for choosing CarePulse for your healthcare needs.</p>
+              <p>Thank you for choosing MediConnect for your healthcare needs.</p>
               ${params.note ? `
               <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; padding: 12px; border-radius: 6px; margin: 15px 0;">
                 <strong style="color: #166534;">Specialist Notes:</strong><br/>
@@ -162,7 +162,7 @@ export class NotificationService {
         console.log("BEFORE SENDMAIL");
 
         await transporter.sendMail({
-          from: `"CarePulse Healthcare" <${process.env.SMTP_USER}>`,
+          from: `"MediConnect Healthcare" <${process.env.SMTP_USER}>`,
           to: params.email,
           subject,
           text: bodyText,
@@ -179,7 +179,7 @@ export class NotificationService {
         console.log("SUBJECT:", subject);
       }
     } else {
-      console.log("------------------ CarePulse Notification Log ------------------");
+      console.log("------------------ MediConnect Notification Log ------------------");
       console.log(`To: ${params.email}`);
       console.log(`Subject: ${subject}`);
       console.log(`Content:\n${bodyText}`);
@@ -188,13 +188,13 @@ export class NotificationService {
   }
 
   static async sendPasswordResetEmail(email: string, resetUrl: string): Promise<void> {
-    const subject = `🔑 Password Reset Request | CarePulse`;
-    const bodyText = `Hello,\n\nYou requested a password reset for your CarePulse account. Please click the following link to reset your password:\n\n${resetUrl}\n\nThis link is valid for 15 minutes.\n\nWarm regards,\nCarePulse Team`;
+    const subject = `🔑 Password Reset Request | MediConnect`;
+    const bodyText = `Hello,\n\nYou requested a password reset for your MediConnect account. Please click the following link to reset your password:\n\n${resetUrl}\n\nThis link is valid for 15 minutes.\n\nWarm regards,\nMediConnect Team`;
     const htmlContent = `
         <div style="font-family: sans-serif; padding: 20px; color: #333;">
           <h2 style="color: #2563eb; border-bottom: 2px solid #eff6ff; padding-bottom: 10px;">🔑 Password Reset Request</h2>
           <p>Hello,</p>
-          <p>You requested a password reset for your CarePulse account. Please click the button below to reset your password:</p>
+          <p>You requested a password reset for your MediConnect account. Please click the button below to reset your password:</p>
           <div style="margin: 20px 0;">
             <a href="${resetUrl}" style="background-color: #2563eb; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">Reset Password</a>
           </div>
@@ -210,7 +210,7 @@ export class NotificationService {
     if (transporter) {
       try {
         await transporter.sendMail({
-          from: `"CarePulse Healthcare" <${process.env.SMTP_USER}>`,
+          from: `"MediConnect Healthcare" <${process.env.SMTP_USER}>`,
           to: email,
           subject,
           text: bodyText,
@@ -221,7 +221,7 @@ export class NotificationService {
         console.error("❌ NodeMailer failed to transmit reset email:", mailingError);
       }
     } else {
-      console.log("------------------ CarePulse Reset Password Notification Log ------------------");
+      console.log("------------------ MediConnect Reset Password Notification Log ------------------");
       console.log(`To: ${email}`);
       console.log(`Subject: ${subject}`);
       console.log(`Link: ${resetUrl}`);

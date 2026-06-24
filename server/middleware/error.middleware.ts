@@ -35,6 +35,6 @@ export function errorMiddleware(
   // 3. Fallback standard error
   const statusCode = err.status || 500;
   res.status(statusCode).json({
-    error: err.message || "An unexpected system discrepancy has occurred. Please contact CarePulse administration."
+    error: err.message || "An unexpected system discrepancy has occurred. Please contact MediConnect administration."
   });
 }

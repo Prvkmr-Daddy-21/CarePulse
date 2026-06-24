@@ -205,7 +205,7 @@ export const AppointmentBookingView: React.FC<AppointmentBookingViewProps> = ({
             </div>
             <div>
               <span className="text-lg font-black tracking-tight text-white">
-                Care<span className="text-brand-green">Pulse</span>
+                Medi<span className="text-brand-green">Connect</span>
               </span>
             </div>
           </div>

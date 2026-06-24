@@ -67,7 +67,7 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
           </div>
           <div>
             <span className="text-lg font-black tracking-tight text-white">
-              Care<span className="text-brand-green">Pulse</span>
+              Medi<span className="text-brand-green">Connect</span>
             </span>
           </div>
         </div>
@@ -100,7 +100,7 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="specialist@carepulse.com"
+                  placeholder="specialist@MediConnect.com"
                   className="w-full bg-dark-100 border border-dark-300 rounded-xl py-3 pl-10 pr-4 text-xs text-white placeholder-dark-500 focus:outline-none focus:border-brand-green transition-all"
                   id="admin-email-input"
                 />
@@ -152,7 +152,7 @@ export const AdminLoginView: React.FC<AdminLoginViewProps> = ({
 
       {/* Sandbox credits disclaimer */}
       <span className="text-center text-[10px] text-dark-500 font-mono relative z-10 pr-2">
-        CarePulse specialist portal • Admin clearance logs required.
+        MediConnect specialist portal • Admin clearance logs required.
       </span>
     </div>
   );

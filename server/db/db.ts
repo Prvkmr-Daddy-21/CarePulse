@@ -38,11 +38,11 @@ export async function connectDatabase() {
     }
 
     // Seed default admin specifically by email to prevent silent exclusions if other users already exist
-    const existingAdmin = await UserModel.findOne({ email: "specialist@carepulse.com" } as any);
+    const existingAdmin = await UserModel.findOne({ email: "specialist@MediConnect.com" } as any);
     if (!existingAdmin) {
       const hashedPassword = await bcrypt.hash("admin123", 10);
       await UserModel.create({
-        email: "specialist@carepulse.com",
+        email: "specialist@MediConnect.com",
         password: hashedPassword,
         role: "admin"
       });
@@ -63,11 +63,11 @@ export async function connectDatabase() {
 
 async function seedLocalDbDefaultCredentials() {
   try {
-    const adminUser = await localDb.users.findOne({ email: "specialist@carepulse.com" });
+    const adminUser = await localDb.users.findOne({ email: "specialist@MediConnect.com" });
     if (!adminUser) {
       const hashedPassword = await bcrypt.hash("admin123", 10);
       await localDb.users.create({
-        email: "specialist@carepulse.com",
+        email: "specialist@MediConnect.com",
         password: hashedPassword,
         role: "admin"
       });

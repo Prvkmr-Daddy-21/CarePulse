@@ -63,17 +63,17 @@ const API_BASE = "/api";
 
 // Auto-retrieve header authorization
 function getHeaders(isMultipart = false): HeadersInit {
-  const token = localStorage.getItem("carepulse_token");
+  const token = localStorage.getItem("MediConnect_token");
   const headers: Record<string, string> = {};
-  
+
   if (!isMultipart) {
     headers["Content-Type"] = "application/json";
   }
-  
+
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
   }
-  
+
   return headers;
 }
 
@@ -81,17 +81,17 @@ function getHeaders(isMultipart = false): HeadersInit {
 async function request<T>(url: string, options: RequestInit = {}): Promise<T> {
   const res = await fetch(url, options);
   const data = await res.json().catch(() => ({}));
-  
+
   if (!res.ok) {
     // Check for tokens getting stale or expired to log out gracefully
     if (res.status === 401 && data.error === "TokenExpired") {
-      localStorage.removeItem("carepulse_token");
-      localStorage.removeItem("carepulse_user");
-      window.dispatchEvent(new Event("carepulse_logout"));
+      localStorage.removeItem("MediConnect_token");
+      localStorage.removeItem("MediConnect_user");
+      window.dispatchEvent(new Event("MediConnect_logout"));
     }
     throw new Error(data.error || data.message || `API error (${res.status})`);
   }
-  
+
   return data as T;
 }
 
@@ -111,8 +111,8 @@ export const api = {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      localStorage.setItem("carepulse_token", data.token);
-      localStorage.setItem("carepulse_user", JSON.stringify(data.user));
+      localStorage.setItem("MediConnect_token", data.token);
+      localStorage.setItem("MediConnect_user", JSON.stringify(data.user));
       return data;
     },
     login: async (payload: any) => {
@@ -121,8 +121,8 @@ export const api = {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      localStorage.setItem("carepulse_token", data.token);
-      localStorage.setItem("carepulse_user", JSON.stringify(data.user));
+      localStorage.setItem("MediConnect_token", data.token);
+      localStorage.setItem("MediConnect_user", JSON.stringify(data.user));
       return data;
     },
     getMe: async () => {
@@ -145,9 +145,9 @@ export const api = {
       });
     },
     logout: () => {
-      localStorage.removeItem("carepulse_token");
-      localStorage.removeItem("carepulse_user");
-      window.dispatchEvent(new Event("carepulse_logout"));
+      localStorage.removeItem("MediConnect_token");
+      localStorage.removeItem("MediConnect_user");
+      window.dispatchEvent(new Event("MediConnect_logout"));
     }
   },
 
@@ -221,7 +221,7 @@ export const api = {
       if (filters.doctor && filters.doctor !== "all") params.append("doctor", filters.doctor);
       if (filters.page) params.append("page", filters.page.toString());
       if (filters.limit) params.append("limit", filters.limit.toString());
-      
+
       const query = params.toString() ? `?${params.toString()}` : "";
       return request<{ success: boolean; appointments: IAppointment[]; total: number; page: number; totalPages: number; stats: { total: number, pending: number, scheduled: number, completed: number, cancelled: number } }>(`${API_BASE}/appointments${query}`, {
         headers: getHeaders(),
