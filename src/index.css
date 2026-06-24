@@ -20,12 +20,13 @@
   --color-brand-red: #ff453a;
   --color-slate-text: #ABB8C4;
   --color-text-muted: #ABB8C4;
-  
+
   --animate-pulse: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   --animate-bounce: bounce 1s infinite;
 }
 
-html, body {
+html,
+body {
   background-color: var(--color-dark-100);
   font-family: var(--font-sans);
   color: var(--text-base, #ffffff);
@@ -36,6 +37,10 @@ html, body {
   overflow-x: hidden;
   width: 100%;
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+:root.light body {
+  color: #0f172a;
 }
 
 :root.light {
@@ -56,27 +61,82 @@ html, body {
   color: #0f172a !important;
 }
 
-:root.light .bg-dark-100 { background-color: var(--color-dark-100); }
-:root.light .bg-dark-200 { background-color: var(--color-dark-200); }
-:root.light .border-dark-300 { border-color: var(--color-dark-300); }
-:root.light .border-dark-400 { border-color: var(--color-dark-400); }
-:root.light .text-dark-500 { color: var(--color-dark-500); }
-:root.light .text-gray-300 { color: #334155; }
-:root.light .text-gray-400 { color: #475569; }
-:root.light .text-slate-100 { color: #1e293b; }
+
+:root.light .text-neutral-100 {
+  color: #0f172a !important;
+}
+
+:root.light .text-neutral-200 {
+  color: #1e293b !important;
+}
+
+:root.light .text-gray-100 {
+  color: #334155 !important;
+}
+
+:root.light .text-gray-150 {
+  color: #475569 !important;
+}
+
+:root.light .text-slate-200 {
+  color: #334155 !important;
+}
+
+:root.light .text-slate-300 {
+  color: #475569 !important;
+}
+
+:root.light .text-dark-400 {
+  color: #64748b !important;
+}
+
+:root.light .bg-dark-100 {
+  background-color: var(--color-dark-100);
+}
+
+:root.light .bg-dark-200 {
+  background-color: var(--color-dark-200);
+}
+
+:root.light .border-dark-300 {
+  border-color: var(--color-dark-300);
+}
+
+:root.light .border-dark-400 {
+  border-color: var(--color-dark-400);
+}
+
+:root.light .text-dark-500 {
+  color: var(--color-dark-500);
+}
+
+:root.light .text-gray-300 {
+  color: #334155;
+}
+
+:root.light .text-gray-400 {
+  color: #475569;
+}
+
+:root.light .text-slate-100 {
+  color: #1e293b;
+}
 
 /* Custom gorgeous scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
+
 ::-webkit-scrollbar-track {
   background: var(--color-dark-100);
 }
+
 ::-webkit-scrollbar-thumb {
   background: var(--color-dark-300);
   border-radius: 4px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-dark-400);
 }

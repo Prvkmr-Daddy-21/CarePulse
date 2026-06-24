@@ -30,21 +30,23 @@ interface DoctorDashboardViewProps {
   bloodDonors?: any[];
 }
 
+const EMPTY_ARRAY: any[] = [];
+
 export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
   onNavigate,
   currentUser,
   onLogout,
   onBack,
   doctorProfile,
-  bloodRequests = [],
-  bloodDonors = []
+  bloodRequests,
+  bloodDonors
 }) => {
-  const [localBloodRequests, setLocalBloodRequests] = useState<any[]>(bloodRequests);
-  const [localBloodDonors, setLocalBloodDonors] = useState<any[]>(bloodDonors);
+  const [localBloodRequests, setLocalBloodRequests] = useState<any[]>(bloodRequests || EMPTY_ARRAY);
+  const [localBloodDonors, setLocalBloodDonors] = useState<any[]>(bloodDonors || EMPTY_ARRAY);
 
   useEffect(() => {
-    setLocalBloodRequests(bloodRequests);
-    setLocalBloodDonors(bloodDonors);
+    if (bloodRequests) setLocalBloodRequests(bloodRequests);
+    if (bloodDonors) setLocalBloodDonors(bloodDonors);
   }, [bloodRequests, bloodDonors]);
 
   // Blood Filters State

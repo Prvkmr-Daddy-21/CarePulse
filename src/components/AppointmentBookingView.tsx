@@ -349,11 +349,11 @@ export const AppointmentBookingView: React.FC<AppointmentBookingViewProps> = ({
           </div>
 
           {/* Form Actions */}
-          <div className="flex items-center justify-between border-t border-dark-300 pt-5 mt-4">
+          <div className="flex flex-col-reverse sm:flex-row items-center sm:justify-between border-t border-dark-300 pt-5 mt-4 gap-3">
             <button
               type="button"
               onClick={() => onNavigate("profile")}
-              className="px-5 py-2.5 bg-dark-300 hover:bg-dark-400 text-xs font-bold text-white rounded-xl border border-dark-400 transition-all cursor-pointer"
+              className="w-full sm:w-auto justify-center px-4 py-2.5 bg-dark-300 hover:bg-dark-400 text-xs font-bold text-white rounded-xl border border-dark-400 transition-all cursor-pointer"
             >
               Cancel
             </button>
@@ -361,7 +361,7 @@ export const AppointmentBookingView: React.FC<AppointmentBookingViewProps> = ({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-6 py-2.5 bg-brand-green hover:bg-brand-green/90 disabled:bg-dark-450 text-dark-100 text-xs font-black uppercase tracking-wider rounded-xl flex items-center gap-1.5 shadow-lg shadow-brand-green/10 cursor-pointer disabled:cursor-not-allowed transition-all"
+              className="w-full sm:w-auto justify-center px-4 py-2.5 bg-brand-green hover:bg-brand-green/90 disabled:bg-dark-450 text-dark-100 text-xs font-black uppercase tracking-wider rounded-xl flex items-center gap-1.5 shadow-lg shadow-brand-green/10 cursor-pointer disabled:cursor-not-allowed transition-all"
               id="book-submit-btn"
             >
               {isSubmitting ? (

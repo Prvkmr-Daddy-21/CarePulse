@@ -101,21 +101,23 @@ export const LandingView: React.FC<LandingViewProps> = ({
       <div className="absolute bottom-[-10%] left-[-10%] w-[60%] h-[50%] rounded-full bg-brand-blue/5 blur-[120px] pointer-events-none" />
 
       {/* Navigation Header */}
-      <header className="max-w-7xl mx-auto w-full px-6 py-6 flex items-center justify-between border-b border-dark-300 relative z-20">
-        <div className="flex items-center gap-3 cursor-pointer">
-          <div className="bg-brand-green/15 p-2.5 rounded-xl border border-brand-green/20">
-            <Activity className="h-6 w-6 text-brand-green" />
-          </div>
+      <header className="max-w-7xl mx-auto w-full px-4 sm:px-6 py-4 sm:py-6 flex flex-col sm:flex-row items-center justify-between border-b border-dark-300 relative z-20 gap-4 sm:gap-0">
+        <div className="flex items-center w-full sm:w-auto justify-between sm:justify-start gap-3 cursor-pointer">
+          <div className="flex items-center gap-3">
+            <div className="bg-brand-green/15 p-2.5 rounded-xl border border-brand-green/20 flex-shrink-0">
+              <Activity className="h-5 w-5 sm:h-6 sm:w-6 text-brand-green" />
+            </div>
 
-          <div className="flex flex-col">
-            <h1 className="text-xl sm:text-2xl font-black leading-none">
-              Medi<span className="text-brand-green">Connect</span>
-            </h1>
-
-            <span className="text-[10px] sm:text-xs text-gray-400 font-semibold tracking-wide">
-              From Booking to Better Health
-            </span>
+            <div className="flex flex-col">
+              <h1 className="text-lg sm:text-2xl font-black leading-none">
+                Medi<span className="text-brand-green">Connect</span>
+              </h1>
+              <span className="text-[9px] sm:text-[10px] text-gray-400 font-semibold tracking-wide hidden xs:block">
+                From Booking to Better Health
+              </span>
+            </div>
           </div>
+          
           <div className="hidden sm:flex items-center ml-2">
             <span className="bg-green-500 text-black font-black text-[10px] sm:text-xs px-2 py-1 rounded-md">
               SDG 3
@@ -123,12 +125,12 @@ export const LandingView: React.FC<LandingViewProps> = ({
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center w-full sm:w-auto justify-end">
           <button
             onClick={() => onNavigate("login")}
-            className="text-xs text-gray-100 hover:text-white flex items-center gap-1.5 bg-dark-200 border border-dark-300 px-3.5 py-2 rounded-xl hover:bg-dark-300 transition-all cursor-pointer"
+            className="w-full sm:w-auto justify-center text-xs text-gray-100 hover:text-white flex items-center gap-1.5 bg-dark-200 border border-dark-300 px-4 py-2.5 sm:px-3.5 sm:py-2 rounded-xl hover:bg-dark-300 transition-all cursor-pointer shadow-sm"
           >
-            <LogIn className="w-3.5 h-3.5 text-brand-green" />
+            <LogIn className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-brand-green" />
             Specialist Login
           </button>
         </div>

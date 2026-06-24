@@ -149,6 +149,18 @@ export const db = {
       }
       assertMongoDBConnection();
       return localDb.users.findByIdAndUpdate(id, update);
+    },
+    findByIdAndDelete: async (id: string): Promise<IUser | null> => {
+      if (isMongoConnected) {
+        try {
+          const user = await UserModel.findOneAndDelete({ _id: id } as any);
+          return user ? toJSON<IUser>(user) : null;
+        } catch {
+          return null;
+        }
+      }
+      assertMongoDBConnection();
+      return localDb.users.findByIdAndDelete(id);
     }
   },
 
@@ -203,7 +215,19 @@ export const db = {
         }
       }
       assertMongoDBConnection();
-      return localDb.doctors.findByIdAndUpdate(id, update as any); // localDb.doctors might not have it either? Let's check localDb
+      return localDb.doctors.findByIdAndUpdate(id, update as any);
+    },
+    findByIdAndDelete: async (id: string): Promise<IDoctor | null> => {
+      if (isMongoConnected) {
+        try {
+          const doc = await DoctorModel.findOneAndDelete({ _id: id } as any);
+          return doc ? toJSON<IDoctor>(doc) : null;
+        } catch {
+          return null;
+        }
+      }
+      assertMongoDBConnection();
+      return localDb.doctors.findByIdAndDelete(id);
     }
   },
 

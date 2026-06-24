@@ -1,6 +1,6 @@
+import { Activity } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import {
-  Activity,
   CalendarCheck,
   Clock,
   XOctagon,
@@ -368,8 +368,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     d.email.toLowerCase().includes(doctorSearchTerm.toLowerCase())
   );
 
-  const docTotalPages = Math.ceil(filteredDoctors.length / 10);
-  const paginatedDoctors = filteredDoctors.slice((doctorCurrentPage - 1) * 10, doctorCurrentPage * 10);
+  const totalDoctorsFiltered = filteredDoctors.length;
+  const docTotalPages = Math.ceil(totalDoctorsFiltered / ITEMS_PER_PAGE);
+  const docStartIndex = (doctorCurrentPage - 1) * ITEMS_PER_PAGE;
+  const paginatedDoctors = filteredDoctors.slice(docStartIndex, docStartIndex + ITEMS_PER_PAGE);
 
   // BLOOD BANK LOGIC
   const priorityValue: Record<string, number> = { critical: 3, urgent: 2, normal: 1 };
@@ -1213,6 +1215,16 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         >
           <Users className="w-5 h-5" />
           Doctors
+        </button>
+        <button
+          onClick={() => setActiveTab("blood")}
+          className={`flex-1 flex flex-col items-center justify-center gap-1 py-3 text-[10px] font-black uppercase tracking-wider transition-all ${activeTab === "blood"
+            ? "text-brand-red border-t-2 border-brand-red -mt-px"
+            : "text-dark-500 hover:text-brand-red"
+            }`}
+        >
+          <Activity className="w-5 h-5" />
+          Blood Bank
         </button>
       </nav>
 
