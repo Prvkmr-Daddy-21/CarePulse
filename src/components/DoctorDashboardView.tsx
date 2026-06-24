@@ -38,8 +38,13 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
   bloodRequests = [],
   bloodDonors = []
 }) => {
-  console.log("Doctor Dashboard Requests:", bloodRequests);
-  console.log("Doctor Dashboard Donors:", bloodDonors);
+  const [localBloodRequests, setLocalBloodRequests] = useState<any[]>(bloodRequests);
+  const [localBloodDonors, setLocalBloodDonors] = useState<any[]>(bloodDonors);
+
+  useEffect(() => {
+    setLocalBloodRequests(bloodRequests);
+    setLocalBloodDonors(bloodDonors);
+  }, [bloodRequests, bloodDonors]);
   const [appointments, setAppointments] = useState<IAppointment[]>([]);
   const [stats, setStats] = useState({ total: 0, pending: 0, scheduled: 0, completed: 0, cancelled: 0 });
   const [totalPages, setTotalPages] = useState(1);
@@ -74,6 +79,10 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
           if (doc) setActiveDoctorProfile(doc);
         }
       }).catch(console.error);
+
+      // Fetch blood data directly when mounted by App.tsx
+      api.blood.listRequests().then(r => r.success && setLocalBloodRequests(r.requests)).catch(console.error);
+      api.blood.listDonors().then(r => r.success && setLocalBloodDonors(r.donors)).catch(console.error);
     }
   }, [doctorProfile, currentUser]);
 
@@ -565,6 +574,97 @@ export const DoctorDashboardView: React.FC<DoctorDashboardViewProps> = ({
                   </button>
                 </div>
               )}
+            </div>
+          )}
+        </section>
+
+        {/* Blood Module Sections */}
+        <section className="bg-dark-200 border border-dark-300 rounded-3xl p-6 md:p-8 shadow-2xl mt-8">
+          <h2 className="text-xl font-black mb-6 flex items-center gap-2">
+            <span className="bg-brand-red/20 text-brand-red p-2 rounded-xl">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" /></svg>
+            </span>
+            Blood Requests
+          </h2>
+          {localBloodRequests.length === 0 ? (
+            <div className="p-8 border border-dark-300 border-dashed rounded-2xl flex flex-col items-center justify-center text-center bg-dark-100/50">
+              <span className="text-sm font-bold text-dark-500">No active blood requests found</span>
+            </div>
+          ) : (
+            <div className="overflow-x-auto rounded-2xl border border-dark-300 bg-dark-100">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-dark-200 border-b border-dark-300">
+                    <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500">Patient</th>
+                    <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500">Blood Group</th>
+                    <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500">Units</th>
+                    <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500">Urgency</th>
+                    <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500">Hospital</th>
+                    <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-dark-300">
+                  {localBloodRequests.map((req, i) => (
+                    <tr key={i} className="hover:bg-dark-200/50 transition-colors">
+                      <td className="py-3 px-5 text-sm font-bold text-white">{req.patientName}</td>
+                      <td className="py-3 px-5 text-sm font-bold text-brand-red">{req.bloodGroup}</td>
+                      <td className="py-3 px-5 text-sm text-gray-300">{req.unitsRequired}</td>
+                      <td className="py-3 px-5">
+                        <span className={`text-[10px] uppercase font-bold tracking-wider px-2 py-1 rounded-md ${req.urgency === 'critical' ? 'bg-red-500/10 text-red-500' : req.urgency === 'urgent' ? 'bg-orange-500/10 text-orange-500' : 'bg-brand-blue/10 text-brand-blue'}`}>
+                          {req.urgency}
+                        </span>
+                      </td>
+                      <td className="py-3 px-5 text-sm text-gray-300">{req.hospitalName}</td>
+                      <td className="py-3 px-5 text-sm">
+                        <span className={`text-[10px] uppercase font-bold tracking-wider px-2 py-1 rounded-md ${req.status === 'pending' ? 'bg-brand-orange/10 text-brand-orange' : req.status === 'fulfilled' ? 'bg-brand-green/10 text-brand-green' : 'bg-dark-300 text-gray-300'}`}>
+                          {req.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
+
+        <section className="bg-dark-200 border border-dark-300 rounded-3xl p-6 md:p-8 shadow-2xl mt-8">
+          <h2 className="text-xl font-black mb-6 flex items-center gap-2">
+            <span className="bg-brand-red/20 text-brand-red p-2 rounded-xl">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg>
+            </span>
+            Blood Donors
+          </h2>
+          {localBloodDonors.length === 0 ? (
+            <div className="p-8 border border-dark-300 border-dashed rounded-2xl flex flex-col items-center justify-center text-center bg-dark-100/50">
+              <span className="text-sm font-bold text-dark-500">No active blood donors found</span>
+            </div>
+          ) : (
+            <div className="overflow-x-auto rounded-2xl border border-dark-300 bg-dark-100">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-dark-200 border-b border-dark-300">
+                    <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500">Donor Name</th>
+                    <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500">Blood Group</th>
+                    <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500">Status</th>
+                    <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500">Medical Notes</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-dark-300">
+                  {localBloodDonors.map((donor, i) => (
+                    <tr key={i} className="hover:bg-dark-200/50 transition-colors">
+                      <td className="py-3 px-5 text-sm font-bold text-white">{donor.patientName}</td>
+                      <td className="py-3 px-5 text-sm font-bold text-brand-red">{donor.bloodGroup}</td>
+                      <td className="py-3 px-5 text-sm">
+                        <span className={`text-[10px] uppercase font-bold tracking-wider px-2 py-1 rounded-md ${donor.status === 'eligible' ? 'bg-brand-green/10 text-brand-green' : 'bg-brand-orange/10 text-brand-orange'}`}>
+                          {donor.status}
+                        </span>
+                      </td>
+                      <td className="py-3 px-5 text-xs text-gray-400 max-w-[200px] truncate">{donor.medicalConditions || 'None'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
         </section>

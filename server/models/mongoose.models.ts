@@ -79,7 +79,7 @@ const BloodDonorSchema = new Schema({
   patientName: { type: String, required: true },
   bloodGroup: { type: String, required: true },
   lastDonationDate: { type: Date },
-  status: { type: String, enum: ["eligible", "ineligible"], default: "eligible" },
+  status: { type: String, enum: ["eligible", "ineligible", "active", "inactive"], default: "eligible" },
   medicalConditions: { type: String },
 }, { timestamps: true });
 
@@ -91,7 +91,7 @@ const BloodRequestSchema = new Schema({
   bloodGroup: { type: String, required: true },
   unitsRequired: { type: Number, required: true },
   urgency: { type: String, enum: ["normal", "urgent", "critical"], default: "normal" },
-  status: { type: String, enum: ["pending", "fulfilled", "cancelled"], default: "pending" },
+  status: { type: String, enum: ["pending", "approved", "rejected", "fulfilled", "cancelled"], default: "pending" },
   hospitalName: { type: String },
   contactPhone: { type: String },
   requestDate: { type: Date, default: Date.now },

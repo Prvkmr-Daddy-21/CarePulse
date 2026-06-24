@@ -37,7 +37,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   onLogout
 }) => {
   const [selectedDoctorView, setSelectedDoctorView] = useState<IDoctor | null>(null);
-  const [activeTab, setActiveTab] = useState<"appointments" | "doctors">("appointments");
+  const [activeTab, setActiveTab] = useState<"appointments" | "doctors" | "blood">("appointments");
 
   // ==== APPOINTMENTS STATE ====
   const [appointments, setAppointments] = useState<IAppointment[]>([]);
@@ -144,17 +144,39 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     }
   }
 
+  const handleBloodRequestAction = async (id: string, status: string, actionName: string) => {
+    if (!window.confirm(`Are you sure you want to ${actionName} this request?`)) return;
+    try {
+      const res = await api.blood.updateRequestStatus(id, status);
+      if (res.success) {
+        loadBloodData();
+      } else {
+        alert("Failed to update status");
+      }
+    } catch (err: any) {
+      alert(err.message || "An error occurred");
+    }
+  };
+
+  const handleBloodDonorAction = async (id: string, status: string, actionName: string) => {
+    if (!window.confirm(`Are you sure you want to ${actionName} this donor?`)) return;
+    try {
+      const res = await api.blood.updateDonorStatus(id, status);
+      if (res.success) {
+        loadBloodData();
+      } else {
+        alert("Failed to update status");
+      }
+    } catch (err: any) {
+      alert(err.message || "An error occurred");
+    }
+  };
+
   // Load both initially to ensure global stats are available
   useEffect(() => {
     loadDoctors();
     loadBloodData();
   }, []);
-
-  useEffect(() => {
-    console.log("Blood Requests:", bloodRequests);
-    console.log("Blood Donors:", bloodDonors);
-  }, [bloodRequests, bloodDonors]);
-
 
   useEffect(() => {
     loadData();
@@ -370,7 +392,14 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${activeTab === "doctors" ? "bg-dark-300 text-white shadow-md" : "text-gray-150 hover:text-white"}`}
               >
                 <Users className="w-3.5 h-3.5" />
-                Doctors Management
+                Doctors
+              </button>
+              <button
+                onClick={() => setActiveTab("blood")}
+                className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2 ${activeTab === "blood" ? "bg-brand-red/20 text-brand-red shadow-md border border-brand-red/30" : "text-gray-150 hover:text-brand-red"}`}
+              >
+                <Activity className="w-3.5 h-3.5" />
+                Blood Bank
               </button>
             </div>
           </div>
@@ -864,6 +893,129 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               )}
             </section>
           </>
+        )}
+        {/* ======================= BLOOD BANK TAB ======================= */}
+        {activeTab === "blood" && (
+          <div className="space-y-8 animate-in fade-in duration-300">
+            <section className="bg-dark-200 border border-dark-300 rounded-3xl p-6 md:p-8 shadow-2xl">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-black flex items-center gap-2">
+                  <span className="bg-brand-red/20 text-brand-red p-2 rounded-xl">
+                    <Activity className="w-5 h-5" />
+                  </span>
+                  Blood Requests
+                </h2>
+              </div>
+              {bloodRequests.length === 0 ? (
+                <div className="p-8 border border-dark-300 border-dashed rounded-2xl flex flex-col items-center justify-center text-center bg-dark-100/50">
+                  <span className="text-sm font-bold text-dark-500">No active blood requests</span>
+                </div>
+              ) : (
+                <div className="overflow-x-auto rounded-2xl border border-dark-300 bg-dark-100">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-dark-200 border-b border-dark-300">
+                        <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500">Date</th>
+                        <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500">Patient</th>
+                        <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500">Blood Group</th>
+                        <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500">Units</th>
+                        <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500">Urgency</th>
+                        <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500">Hospital</th>
+                        <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500">Status</th>
+                        <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-dark-300">
+                      {bloodRequests.map((req, i) => (
+                        <tr key={i} className="hover:bg-dark-200/50 transition-colors">
+                          <td className="py-3 px-5 text-sm text-gray-400">{new Date(req.requestDate || new Date()).toLocaleDateString()}</td>
+                          <td className="py-3 px-5 text-sm font-bold text-white">{req.patientName}</td>
+                          <td className="py-3 px-5 text-sm font-bold text-brand-red">{req.bloodGroup}</td>
+                          <td className="py-3 px-5 text-sm text-gray-300">{req.unitsRequired}</td>
+                          <td className="py-3 px-5">
+                            <span className={`text-[10px] uppercase font-bold tracking-wider px-2 py-1 rounded-md ${req.urgency === 'critical' ? 'bg-red-500/10 text-red-500' : req.urgency === 'urgent' ? 'bg-orange-500/10 text-orange-500' : 'bg-brand-blue/10 text-brand-blue'}`}>
+                              {req.urgency}
+                            </span>
+                          </td>
+                          <td className="py-3 px-5 text-sm text-gray-300">{req.hospitalName}</td>
+                          <td className="py-3 px-5 text-sm">
+                            <span className={`text-[10px] uppercase font-bold tracking-wider px-2 py-1 rounded-md ${req.status === 'pending' ? 'bg-brand-orange/10 text-brand-orange' : req.status === 'fulfilled' ? 'bg-brand-green/10 text-brand-green' : req.status === 'approved' ? 'bg-cyan-500/10 text-cyan-400' : 'bg-dark-300 text-gray-300'}`}>
+                              {req.status}
+                            </span>
+                          </td>
+                          <td className="py-3 px-5 text-right">
+                            {req.status === 'pending' && (
+                              <div className="flex justify-end gap-2">
+                                <button onClick={() => handleBloodRequestAction(req._id, 'approved', 'Approve')} className="text-[10px] bg-brand-green/20 text-brand-green px-2 py-1 rounded hover:bg-brand-green/30">Approve</button>
+                                <button onClick={() => handleBloodRequestAction(req._id, 'rejected', 'Reject')} className="text-[10px] bg-brand-red/20 text-brand-red px-2 py-1 rounded hover:bg-brand-red/30">Reject</button>
+                              </div>
+                            )}
+                            {req.status === 'approved' && (
+                              <button onClick={() => handleBloodRequestAction(req._id, 'fulfilled', 'Mark Fulfilled')} className="text-[10px] bg-brand-blue/20 text-brand-blue px-2 py-1 rounded hover:bg-brand-blue/30">Mark Fulfilled</button>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </section>
+
+            <section className="bg-dark-200 border border-dark-300 rounded-3xl p-6 md:p-8 shadow-2xl">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-black flex items-center gap-2">
+                  <span className="bg-brand-red/20 text-brand-red p-2 rounded-xl">
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg>
+                  </span>
+                  Blood Donors
+                </h2>
+              </div>
+              {bloodDonors.length === 0 ? (
+                <div className="p-8 border border-dark-300 border-dashed rounded-2xl flex flex-col items-center justify-center text-center bg-dark-100/50">
+                  <span className="text-sm font-bold text-dark-500">No active blood donors</span>
+                </div>
+              ) : (
+                <div className="overflow-x-auto rounded-2xl border border-dark-300 bg-dark-100">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-dark-200 border-b border-dark-300">
+                        <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500">Donor Name</th>
+                        <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500">Blood Group</th>
+                        <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500">Status</th>
+                        <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500">Medical Notes</th>
+                        <th className="py-4 px-5 text-[10px] uppercase font-black tracking-widest text-dark-500 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-dark-300">
+                      {bloodDonors.map((donor, i) => (
+                        <tr key={i} className="hover:bg-dark-200/50 transition-colors">
+                          <td className="py-3 px-5 text-sm font-bold text-white">{donor.patientName}</td>
+                          <td className="py-3 px-5 text-sm font-bold text-brand-red">{donor.bloodGroup}</td>
+                          <td className="py-3 px-5 text-sm">
+                            <span className={`text-[10px] uppercase font-bold tracking-wider px-2 py-1 rounded-md ${donor.status === 'eligible' || donor.status === 'active' ? 'bg-brand-green/10 text-brand-green' : 'bg-brand-orange/10 text-brand-orange'}`}>
+                              {donor.status}
+                            </span>
+                          </td>
+                          <td className="py-3 px-5 text-xs text-gray-400 max-w-[300px] truncate">{donor.medicalConditions || 'None'}</td>
+                          <td className="py-3 px-5 text-right flex justify-end gap-2">
+                            {donor.status === 'eligible' || donor.status === 'ineligible' ? (
+                              <>
+                                <button onClick={() => handleBloodDonorAction(donor._id, 'active', 'Activate')} className="text-[10px] bg-brand-green/20 text-brand-green px-2 py-1 rounded hover:bg-brand-green/30">Activate</button>
+                                <button onClick={() => handleBloodDonorAction(donor._id, 'inactive', 'Deactivate')} className="text-[10px] bg-brand-red/20 text-brand-red px-2 py-1 rounded hover:bg-brand-red/30">Deactivate</button>
+                              </>
+                            ) : (
+                              <button onClick={() => handleBloodDonorAction(donor._id, donor.status === 'active' ? 'inactive' : 'active', 'Toggle Availability')} className="text-[10px] bg-brand-blue/20 text-brand-blue px-2 py-1 rounded hover:bg-brand-blue/30">Toggle Availability</button>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </section>
+          </div>
         )}
       </main>
       {/* Mobile Bottom Navigation */}
